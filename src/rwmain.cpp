@@ -1,52 +1,59 @@
 #include "Image.h"
 #include "Ray.h"
 #include "geometry.h"
+#include "Scene.h"
+#import "Camera.h"
 
-typedef struct State {
+// viewport - A projection plane in 3D space. In world space, not view space:
+//            because objects are not projected, not transformed to view space.
+//            Instead, the camera is moved and it generates rays from it's own transform.
+// screen - an image on monitor (screen space)
+
+
+class State {
+public:
     Image* image;
-} State;
+    Scene* scene;
+    Camera* camera;
+    
+    double screen_aspect;
+    int screen_W;
+    int screen_H;
+    
+    ~State() {
+        delete image;
+        delete scene;
+        delete camera;
+    }
+    
+};
 
 State state = State();
 Image* getImage() { return state.image; }
 
 
+void init_image() {
+    state.screen_aspect = 16.0 / 9.0;
+    state.screen_W = 600;
+    state.screen_H = (int) (state.screen_W / state.screen_aspect);
+    state.image = new Image(state.screen_W, state.screen_H);
+    state.scene = new Scene();
+}
+
+void init_camera() {
+    state.camera = new Camera(state.screen_W, state.screen_H);
+}
+
 void rwmain()
 {
-    // screen pixels
-    double screen_aspect = 16.0 / 9.0;
-    int screen_W = 600;
-    int screen_H = (int) (screen_W / screen_aspect);
-    Image image = Image(screen_W, screen_H);
-    state.image = &image;
+    init_image();
+    init_camera();
     
-    // camera - virtual viewport
-    double real_aspect = screen_W / (double) screen_H;
-    double focal_len = 1.0;
-    double viewport_W = 2.0;
-    double viewport_H = viewport_W / real_aspect;
-    double point_delta_x = viewport_W / (double) screen_W;
-    double point_delta_y = viewport_H / (double) screen_H;
-    
-    Vec3 camera_pos = { 0, 0, 0 };
-    Vec3 camera_fwd   = { 0, 0, 1 };
-    Vec3 camera_right = { 1, 0, 0 };
-    Vec3 camera_up    = { 0, 1, 0 };
-    
-    // scan from top to bottom, left to right
-    Vec3 viewport_top_left =
-        camera_pos
-        + camera_fwd * focal_len
-        - camera_right * (viewport_W/2.0)
-        + camera_up * (viewport_H/2.0);
-    
-    // top left
-    Vec3 p0 = viewport_top_left
-            + camera_right * (point_delta_x / 2.0)
-            - camera_up * (point_delta_y / 2.0);
+    Image& image = *state.image;
+    Camera& camera = *state.camera;
     
     // world
-    Vec3 sphere_c = {0, 0, 4};
-    double sphere_r = 1;
+    Sphere sphere({0,0,4}, 1);
     
     // render
     
@@ -56,20 +63,19 @@ void rwmain()
     {
         for (int c = 0; c < image.W(); c++)
         {
-            Vec3 p = p0 + (camera_right * (c * point_delta_x))
-                        - (camera_up * (r * point_delta_y));
-            Ray ray = Ray(camera_pos, norm(p - camera_pos));
+            Vec3 viewport_point;
+            Ray ray = camera.make_ray(c, r, viewport_point);
             
             int i = r * image.W() + c;
             Vec3& pixel = image[i];
-            double d = ray_to_sphere_distance(ray, sphere_c, sphere_r);
-            if (d > 0) {
-                Vec3 hit_point = ray.at(d);
-                Vec3 normal = norm(hit_point - sphere_c);
-                pixel = 0.5* Vec3AddScalar(normal, 1.0);
+            
+            Hit hit;
+            if (sphere.ray_hit(ray, 0.2, 100, hit))
+            {
+                pixel = 0.5 * Vec3AddScalar(hit.n, 1.0);
             }
             else {
-                double f = (p.Y() + 1.0) * 0.5;
+                double f = (ray.Dir().Y() + 1.0) * 0.5;
                 pixel = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
             }
         }
