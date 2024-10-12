@@ -5,9 +5,9 @@
 #include "Vec3.h"
 
 void write_color(std::ostream& out, const Vec3& color) {
-    auto r = color.x();
-    auto g = color.y();
-    auto b = color.z();
+    auto r = color.X();
+    auto g = color.Y();
+    auto b = color.Z();
 
     // Translate the [0,1] component values to the byte range [0,255].
     int rbyte = int(255.999 * r);

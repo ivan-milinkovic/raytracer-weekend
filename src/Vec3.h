@@ -11,16 +11,16 @@ public:
     Vec3(): v{0,0,0} {}
     Vec3(double x, double y, double z): v{x,y,z} {}
     
-    double x() const { return v[0]; }
-    double y() const { return v[1]; }
-    double z() const { return v[2]; }
+    double X() const { return v[0]; }
+    double Y() const { return v[1]; }
+    double Z() const { return v[2]; }
     
     Vec3 operator -() const {
         return Vec3(-v[0], -v[1], -v[2]);
     }
     
-    double operator[](int i) const { return v[i]; }
-    double& operator[](int i) { return v[i]; }
+    double operator[] (int i) const { return v[i]; }
+    double& operator[] (int i) { return v[i]; }
     
     Vec3& operator+=(Vec3 v2) {
         v[0] += v2[0];

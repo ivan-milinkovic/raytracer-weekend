@@ -74,12 +74,12 @@
 		2CBD71B42CBA7B9200C14983 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				2CBD71B22CBA7B9200C14983 /* rwmain.cpp */,
 				2CBD71AD2CBA7B9200C14983 /* color.h */,
 				2CBD71AE2CBA7B9200C14983 /* Image.h */,
 				2CBD71AF2CBA7B9200C14983 /* ppm.h */,
 				2CBD71B02CBA7B9200C14983 /* Ray.h */,
 				2CBD71B12CBA7B9200C14983 /* rwmain.h */,
-				2CBD71B22CBA7B9200C14983 /* rwmain.cpp */,
 				2CBD71B32CBA7B9200C14983 /* Vec3.h */,
 			);
 			name = src;
