@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Vec3.h"
 
-void write_color(std::ostream& out, const Vec3& color) {
+void write_color(std::ostream& stream, const Vec3& color) {
     auto r = color.X();
     auto g = color.Y();
     auto b = color.Z();
@@ -15,7 +15,7 @@ void write_color(std::ostream& out, const Vec3& color) {
     int bbyte = int(255.999 * b);
 
     // Write out the pixel color components.
-    out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
+    stream << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
 
 

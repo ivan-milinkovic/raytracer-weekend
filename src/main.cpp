@@ -1,8 +1,12 @@
 #include <iostream>
 #include "rwmain.h"
-#include "stdout_redir.h"
+#include "ppm.h"
+#include "Image.h"
 
 int main(int argc, const char * argv[]) {
-    redirect_stdout();
     rwmain();
+    
+    // output
+    Image* img = getImage();
+    write_ppm_file(img->Pixels(), img->W(), img->H());
 }

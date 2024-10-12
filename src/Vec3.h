@@ -47,6 +47,12 @@ public:
     }
 };
 
+inline Vec3 Vec3AddScalar(const Vec3& v, double s) {
+    return Vec3(v[0] + s,
+                v[1] + s,
+                v[2] + s);
+}
+
 inline Vec3 operator+(const Vec3& v1, const Vec3& v2) {
     return Vec3(v1[0] + v2[0],
                 v1[1] + v2[1],
