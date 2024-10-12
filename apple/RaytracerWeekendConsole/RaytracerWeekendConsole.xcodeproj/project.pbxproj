@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2CBD71B62CBA7BA300C14983 /* rwmain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CBD71B22CBA7B9200C14983 /* rwmain.cpp */; };
+		2CBD71BC2CBAA57700C14983 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CBD71BB2CBAA57700C14983 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +25,6 @@
 
 /* Begin PBXFileReference section */
 		2CBD718F2CBA787600C14983 /* RaytracerWeekendConsole */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RaytracerWeekendConsole; sourceTree = BUILT_PRODUCTS_DIR; };
-		2CBD71A72CBA79DC00C14983 /* out.ppm */ = {isa = PBXFileReference; lastKnownFileType = text; path = out.ppm; sourceTree = "<group>"; };
 		2CBD71AD2CBA7B9200C14983 /* color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = color.h; sourceTree = "<group>"; };
 		2CBD71AE2CBA7B9200C14983 /* Image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
 		2CBD71AF2CBA7B9200C14983 /* ppm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ppm.h; sourceTree = "<group>"; };
@@ -33,6 +33,9 @@
 		2CBD71B22CBA7B9200C14983 /* rwmain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rwmain.cpp; sourceTree = "<group>"; };
 		2CBD71B32CBA7B9200C14983 /* Vec3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vec3.h; sourceTree = "<group>"; };
 		2CBD71B72CBA91FA00C14983 /* geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = geometry.h; sourceTree = "<group>"; };
+		2CBD71B92CBAA37900C14983 /* stdout_redir.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stdout_redir.h; sourceTree = "<group>"; };
+		2CBD71BB2CBAA57700C14983 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		2CBD71BD2CBAA5C300C14983 /* out.ppm */ = {isa = PBXFileReference; lastKnownFileType = text; name = out.ppm; path = ../../out.ppm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -57,7 +60,7 @@
 		2CBD71862CBA787600C14983 = {
 			isa = PBXGroup;
 			children = (
-				2CBD71A72CBA79DC00C14983 /* out.ppm */,
+				2CBD71BD2CBAA5C300C14983 /* out.ppm */,
 				2CBD71B42CBA7B9200C14983 /* src */,
 				2CBD71912CBA787600C14983 /* RaytracerWeekendConsole */,
 				2CBD71902CBA787600C14983 /* Products */,
@@ -75,6 +78,7 @@
 		2CBD71B42CBA7B9200C14983 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				2CBD71BB2CBAA57700C14983 /* main.cpp */,
 				2CBD71B22CBA7B9200C14983 /* rwmain.cpp */,
 				2CBD71AD2CBA7B9200C14983 /* color.h */,
 				2CBD71AE2CBA7B9200C14983 /* Image.h */,
@@ -83,6 +87,7 @@
 				2CBD71B12CBA7B9200C14983 /* rwmain.h */,
 				2CBD71B32CBA7B9200C14983 /* Vec3.h */,
 				2CBD71B72CBA91FA00C14983 /* geometry.h */,
+				2CBD71B92CBAA37900C14983 /* stdout_redir.h */,
 			);
 			name = src;
 			path = ../../src;
@@ -152,6 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CBD71B62CBA7BA300C14983 /* rwmain.cpp in Sources */,
+				2CBD71BC2CBAA57700C14983 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

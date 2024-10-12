@@ -6,18 +6,15 @@
             "command": "/usr/bin/clang++",
             "args": [
                 "-std=c++23",
-                "-Iraylib/",
-                "-L${workspaceFolder}/raylib/",
-                "-lraylib.4.5.0",
                 "-fcolor-diagnostics",
                 "-fansi-escape-codes",
                 "-g",
-                "${workspaceFolder}/*.cpp",
+                "${workspaceFolder}/src/*.cpp",
                 "-o",
-                "${workspaceFolder}/build/raytracerweekend"
+                "${workspaceFolder}/build/raytracer-weekend"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"
@@ -26,6 +23,25 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "shell",
+            "label": "run",
+            "command": "${workspaceFolder}/build/raytracer-weekend",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
         }
     ],
     "version": "2.0.0"
