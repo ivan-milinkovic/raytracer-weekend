@@ -1,6 +1,7 @@
 #include "ppm.h"
 #include "Image.h"
 #include "Ray.h"
+#include "geometry.h"
 
 void rwmain()
 {
@@ -8,7 +9,7 @@ void rwmain()
     double screen_aspect = 16.0 / 9.0;
     int screen_W = 200;
     int screen_H = (int) (screen_W / screen_aspect);
-    Image image = Image(100, 80);
+    Image image = Image(screen_W, screen_H);
     
     // camera - virtual viewport
     double real_aspect = screen_W / (double) screen_H;
@@ -35,6 +36,10 @@ void rwmain()
             + camera_right * (point_delta_x / 2.0)
             - camera_up * (point_delta_y / 2.0);
     
+    // world
+    Vec3 sphere_c = {0, 0, 4};
+    double sphere_r = 1;
+    
     // render
     
     for (int r = 0; r < image.H(); r++)
@@ -46,8 +51,14 @@ void rwmain()
             Ray ray = Ray(camera_pos, norm(p - camera_pos));
             
             int i = r * image.W() + c;
-            double f = (p.Y() + 1.0) * 0.5;
-            image[i] = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
+            Vec3& pixel = image[i];
+            if (ray_sphere_hit(ray, sphere_c, sphere_r)) {
+                pixel = {0,0,1};
+            }
+            else {
+                double f = (p.Y() + 1.0) * 0.5;
+                pixel = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
+            }
         }
     }
     

@@ -32,6 +32,7 @@
 		2CBD71B12CBA7B9200C14983 /* rwmain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rwmain.h; sourceTree = "<group>"; };
 		2CBD71B22CBA7B9200C14983 /* rwmain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rwmain.cpp; sourceTree = "<group>"; };
 		2CBD71B32CBA7B9200C14983 /* Vec3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vec3.h; sourceTree = "<group>"; };
+		2CBD71B72CBA91FA00C14983 /* geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = geometry.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -81,6 +82,7 @@
 				2CBD71B02CBA7B9200C14983 /* Ray.h */,
 				2CBD71B12CBA7B9200C14983 /* rwmain.h */,
 				2CBD71B32CBA7B9200C14983 /* Vec3.h */,
+				2CBD71B72CBA91FA00C14983 /* geometry.h */,
 			);
 			name = src;
 			path = ../../src;
