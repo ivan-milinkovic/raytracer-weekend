@@ -19,7 +19,7 @@ public:
     
     Sphere(Vec3 center, double r): center(center), r(r) { }
     
-    bool ray_hit(const Ray& ray, double d_min, double d_max, Hit& hit) {
+    bool hit(const Ray& ray, double d_min, double d_max, Hit& hit) {
         Vec3 OC = center - ray.Origin();
         double a = ray.Dir().len_sq();
         double h = dot(ray.Dir(), OC);
@@ -31,9 +31,9 @@ public:
         
         auto sqrtd = std::sqrt(dcr);
         auto root = (h - sqrtd) / a; // closer, smaller root
-        if (root < d_min || d_max < root) {
+        if (root <= d_min || d_max <= root) {
             root = (h + sqrtd) / a; // the other root
-            if (root < d_min || d_max < root)
+            if (root <= d_min || d_max <= root)
                 return false;
         }
 

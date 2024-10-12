@@ -30,7 +30,8 @@ public:
 
 State state = State();
 Image* getImage() { return state.image; }
-
+#define RAY_HIT_MIN_DISTANCE 0.2
+#define RAY_HIT_MAX_DISTANCE 100
 
 void init_image() {
     state.screen_aspect = 16.0 / 9.0;
@@ -44,17 +45,27 @@ void init_camera() {
     state.camera = new Camera(state.screen_W, state.screen_H);
 }
 
+void init_scene() {
+    SceneObject so(SceneObjectType_Sphere, new Sphere({0,0,4}, 1));
+    state.scene->objects.push_back( so );
+    
+    SceneObject so2(SceneObjectType_Sphere, new Sphere({-2,0,5}, 1));
+    state.scene->objects.push_back( so2 );
+    
+    SceneObject so3(SceneObjectType_Sphere, new Sphere({2,0,5}, 1));
+    state.scene->objects.push_back( so3 );
+}
+
 void rwmain()
 {
     init_image();
     init_camera();
+    init_scene();
     
     Image& image = *state.image;
     Camera& camera = *state.camera;
-    
-    // world
-    Sphere sphere({0,0,4}, 1);
-    
+    Scene& scene = *state.scene;
+
     // render
     
     auto t0 = std::chrono::high_resolution_clock::now();
@@ -63,18 +74,18 @@ void rwmain()
     {
         for (int c = 0; c < image.W(); c++)
         {
-            Vec3 viewport_point;
-            Ray ray = camera.make_ray(c, r, viewport_point);
-            
             int i = r * image.W() + c;
             Vec3& pixel = image[i];
             
+            Vec3 viewport_point;
+            Ray ray = camera.make_ray(c, r, viewport_point);
             Hit hit;
-            if (sphere.ray_hit(ray, 0.2, 100, hit))
+            if (scene.hit(ray, RAY_HIT_MIN_DISTANCE, RAY_HIT_MAX_DISTANCE, hit))
             {
                 pixel = 0.5 * Vec3AddScalar(hit.n, 1.0);
             }
-            else {
+            else
+            {
                 double f = (ray.Dir().Y() + 1.0) * 0.5;
                 pixel = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
             }
