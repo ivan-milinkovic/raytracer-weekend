@@ -9,6 +9,7 @@
 #define Scene_h
 
 #include "interval.h"
+#include "geometry.h"
 
 typedef enum {
     SceneObjectType_Sphere = 1

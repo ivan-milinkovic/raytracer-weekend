@@ -23,10 +23,16 @@ public:
         return min < n && n < max;
     }
     
+    double clamp(double n) const {
+        if (n < min) return min;
+        if (n > max) return max;
+        return n;
+    }
+    
     static const Interval empty, universe;
 };
 
-const Interval Interval::empty    = Interval(+infinity, -infinity);
-const Interval Interval::universe = Interval(-infinity, +infinity);
+inline const Interval Interval::empty    = Interval(+infinity, -infinity);
+inline const Interval Interval::universe = Interval(-infinity, +infinity);
 
 #endif /* interval_h */

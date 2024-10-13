@@ -1,9 +1,7 @@
 #include "image.h"
-#include "ray.h"
+#import "camera.h"
 #include "geometry.h"
 #include "scene.h"
-#import "camera.h"
-#import "interval.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.

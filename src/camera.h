@@ -8,6 +8,10 @@
 #ifndef camera_h
 #define camera_h
 
+#include "ray.h"
+#include "scene.h"
+#include "geometry.h"
+
 class Camera {
 public:
     Vec3 camera_pos = { 0, 0, 0 };
