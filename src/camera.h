@@ -18,15 +18,16 @@ public:
     Vec3 camera_fwd   = { 0, 0, 1 };
     Vec3 camera_right = { 1, 0, 0 };
     Vec3 camera_up    = { 0, 1, 0 };
-    Vec3 p0;
-    // pixel to pixel increments in viewport
-    double point_delta_x;
-    double point_delta_y;
+    Vec3 p00; // top left point in viewport
+    Vec3 point_delta; // pixel size in viewport
     
     // min and max distances for ray-geometry intersections
     double ray_hit_min = 0.2;
     double ray_hit_max = 100;
     
+    // multi-sampling
+    int samples_per_pixel = 10;
+    double samples_per_pixel_inv = 1.0 / samples_per_pixel;
 
     Camera(int screen_W, int screen_H) {
         
@@ -35,8 +36,9 @@ public:
         double viewport_W = 2.0;
         double viewport_H = viewport_W / real_aspect;
         
-        point_delta_x = viewport_W / (double) screen_W;
-        point_delta_y = viewport_H / (double) screen_H;
+        point_delta[0] = viewport_W / (double) screen_W;
+        point_delta[1] = viewport_H / (double) screen_H;
+        point_delta[2] = 0;
         
         Vec3 viewport_top_left =
             camera_pos
@@ -45,32 +47,62 @@ public:
             + camera_up * (viewport_H/2.0);
         
         // top left point in viewport representing pixel (0,0)
-        p0 = viewport_top_left
-           + camera_right * (point_delta_x / 2.0)
-           - camera_up * (point_delta_y / 2.0);
+        p00 = viewport_top_left
+            + camera_right * (point_delta.X() / 2.0)
+            - camera_up * (point_delta.Y() / 2.0);
+    }
+    
+    void render(const Scene& scene, Image& image) {
+        for (int row = 0; row < image.H(); row++)
+        {
+            for (int col = 0; col < image.W(); col++)
+            {
+                int i = row * image.W() + col;
+                Vec3& pixel = image[i];
+                
+                // No random
+                // Vec3 viewport_point;
+                // Ray ray = this->make_ray(col, row, viewport_point);
+                // pixel = this->ray_color(ray, scene);
+                
+                // random sampling within pixel size
+                for (int k = 0; k < samples_per_pixel; k++) {
+                    Vec3 viewport_point;
+                    Ray ray = this->make_ray_msaa(col, row, viewport_point);
+                    pixel += this->ray_color(ray, scene);
+                }
+                
+                pixel *= samples_per_pixel_inv; // average
+            }
+        }
     }
     
     Ray make_ray(int x, int y, Vec3& viewport_point) {
-        Vec3 p = p0 + (camera_right * (x * point_delta_x))
-                    - (camera_up * (y * point_delta_y));
+        Vec3 p = p00 + (camera_right * (x * point_delta.X()))
+                     - (camera_up * (y * point_delta.Y()));
         Ray ray = Ray(camera_pos, norm(p - camera_pos));
         viewport_point = p;
         return ray;
     }
     
-    void render(const Scene& scene, Image& image) {
-        for (int r = 0; r < image.H(); r++)
-        {
-            for (int c = 0; c < image.W(); c++)
-            {
-                Vec3 viewport_point;
-                Ray ray = this->make_ray(c, r, viewport_point);
-                
-                int i = r * image.W() + c;
-                Vec3& pixel = image[i];
-                pixel = this->ray_color(ray, scene);
-            }
-        }
+    // A ray with random direction offset within pixel size
+    Ray make_ray_msaa(int x, int y, Vec3& viewport_point) {
+        Vec3 offset = sample_unit_square() * point_delta;
+        Vec3 p = p00 + (camera_right * (x * point_delta.X()))
+                     - (camera_up * (y * point_delta.Y()))
+                     + offset;
+        Ray ray = Ray(camera_pos, norm(p - camera_pos));
+        viewport_point = p;
+        return ray;
+    }
+    
+    
+    // A random offset to apply to a pixel ray for MSAA.
+    // Random point within unit square between [-0.5, -0.5] and [0.5, 0.5]
+    Vec3 sample_unit_square() {
+        return Vec3(rw_random() - 0.5,
+                    rw_random() - 0.5,
+                    0);
     }
     
     Vec3 ray_color(const Ray& ray, const Scene& scene)
