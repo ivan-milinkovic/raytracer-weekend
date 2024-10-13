@@ -24,7 +24,7 @@ class Scene {
 public:
     std::vector<SceneObject> objects;
     
-    bool hit(const Ray& ray, const Interval& limits, Hit& hit) {
+    bool hit(const Ray& ray, const Interval& limits, Hit& hit) const {
         double closest_so_far = limits.max;
         Hit tmp_hit;
         bool has_hit = false;

@@ -19,6 +19,10 @@ public:
     double point_delta_x;
     double point_delta_y;
     
+    // min and max distances for ray-geometry intersections
+    double ray_hit_min = 0.2;
+    double ray_hit_max = 100;
+    
 
     Camera(int screen_W, int screen_H) {
         
@@ -49,7 +53,42 @@ public:
         viewport_point = p;
         return ray;
     }
+    
+    void render(const Scene& scene, Image& image) {
+        for (int r = 0; r < image.H(); r++)
+        {
+            for (int c = 0; c < image.W(); c++)
+            {
+                Vec3 viewport_point;
+                Ray ray = this->make_ray(c, r, viewport_point);
+                
+                int i = r * image.W() + c;
+                Vec3& pixel = image[i];
+                pixel = this->ray_color(ray, scene);
+            }
+        }
+    }
+    
+    Vec3 ray_color(const Ray& ray, const Scene& scene)
+    {
+        Vec3 color;
+        Hit hit;
+        if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit))
+        {
+            color = 0.5 * Vec3AddScalar(hit.n, 1.0);
+            
+            // print_csv(hit.n);
+            // print_csv(hit.p, hit.p + hit.n);
+        }
+        else // background
+        {
+            double f = (ray.Dir().Y() + 1.0) * 0.5;
+            color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
+        }
+        return color;
+    }
 };
+
 
 
 #endif /* camera_h */
