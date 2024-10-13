@@ -1,7 +1,6 @@
-#include <iostream>
 #include "rwmain.h"
 #include "ppm.h"
-#include "Image.h"
+#include "image.h"
 
 int main(int argc, const char * argv[]) {
     rwmain();

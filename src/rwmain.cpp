@@ -1,8 +1,8 @@
-#include "Image.h"
-#include "Ray.h"
+#include "image.h"
+#include "ray.h"
 #include "geometry.h"
-#include "Scene.h"
-#import "Camera.h"
+#include "scene.h"
+#import "camera.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.
@@ -30,8 +30,10 @@ public:
 
 State state = State();
 Image* getImage() { return state.image; }
-#define RAY_HIT_MIN_DISTANCE 0.2
-#define RAY_HIT_MAX_DISTANCE 100
+
+// min and max distances for ray-geometry intersections
+#define ray_hit_min 0.2
+#define ray_hit_max 100
 
 void init_image() {
     state.screen_aspect = 16.0 / 9.0;
@@ -46,15 +48,18 @@ void init_camera() {
 }
 
 void init_scene() {
-    SceneObject so(SceneObjectType_Sphere, new Sphere({0,0,4}, 1));
+    SceneObject so(SceneObjectType_Sphere, new Sphere({0,0,3}, 1));
     state.scene->objects.push_back( so );
     
-    SceneObject so2(SceneObjectType_Sphere, new Sphere({-2,0,5}, 1));
-    state.scene->objects.push_back( so2 );
-    
-    SceneObject so3(SceneObjectType_Sphere, new Sphere({2,0,5}, 1));
-    state.scene->objects.push_back( so3 );
+//    SceneObject so2(SceneObjectType_Sphere, new Sphere({-2,0,5}, 1));
+//    state.scene->objects.push_back( so2 );
+//    
+//    SceneObject so3(SceneObjectType_Sphere, new Sphere({2,0,5}, 1));
+//    state.scene->objects.push_back( so3 );
 }
+
+
+Vec3 ray_color(const Ray& ray);
 
 void rwmain()
 {
@@ -64,7 +69,6 @@ void rwmain()
     
     Image& image = *state.image;
     Camera& camera = *state.camera;
-    Scene& scene = *state.scene;
 
     // render
     
@@ -74,25 +78,32 @@ void rwmain()
     {
         for (int c = 0; c < image.W(); c++)
         {
-            int i = r * image.W() + c;
-            Vec3& pixel = image[i];
-            
             Vec3 viewport_point;
             Ray ray = camera.make_ray(c, r, viewport_point);
-            Hit hit;
-            if (scene.hit(ray, RAY_HIT_MIN_DISTANCE, RAY_HIT_MAX_DISTANCE, hit))
-            {
-                pixel = 0.5 * Vec3AddScalar(hit.n, 1.0);
-            }
-            else
-            {
-                double f = (ray.Dir().Y() + 1.0) * 0.5;
-                pixel = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
-            }
+            
+            int i = r * image.W() + c;
+            Vec3& pixel = image[i];
+            pixel = ray_color(ray);
         }
     }
     
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
     std::cout << dt << "ms\n";
+}
+
+Vec3 ray_color(const Ray& ray)
+{
+    Vec3 color;
+    Hit hit;
+    if (state.scene->hit(ray, ray_hit_min, ray_hit_max, hit))
+    {
+        color = 0.5 * Vec3AddScalar(hit.n, 1.0);
+    }
+    else
+    {
+        double f = (ray.Dir().Y() + 1.0) * 0.5;
+        color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
+    }
+    return color;
 }

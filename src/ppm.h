@@ -3,7 +3,7 @@
 
 #include <filesystem>
 #include <fstream>
-#include "Vec3.h"
+#include "vec3.h"
 #include "color.h"
 
 std::filesystem::path ppm_file_path() {

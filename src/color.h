@@ -2,7 +2,7 @@
 #define color_h
 
 #include <iostream>
-#include "Vec3.h"
+#include "vec3.h"
 
 void write_color(std::ostream& stream, const Vec3& color) {
     auto r = color.X();
