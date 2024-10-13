@@ -22,11 +22,12 @@ public:
     Vec3 point_delta; // pixel size in viewport
     
     // min and max distances for ray-geometry intersections
-    double ray_hit_min = 0.2;
-    double ray_hit_max = 100;
+    double ray_hit_min = 0.005;
+    double ray_hit_max = 200;
+    int max_bounces = 10;
     
     // multi-sampling
-    int samples_per_pixel = 10;
+    int samples_per_pixel = 4;
     double samples_per_pixel_inv = 1.0 / samples_per_pixel;
 
     Camera(int screen_W, int screen_H) {
@@ -69,7 +70,7 @@ public:
                 for (int k = 0; k < samples_per_pixel; k++) {
                     Vec3 viewport_point;
                     Ray ray = this->make_ray_msaa(col, row, viewport_point);
-                    pixel += this->ray_color(ray, scene);
+                    pixel += this->ray_color(ray, max_bounces, scene);
                 }
                 
                 pixel *= samples_per_pixel_inv; // average
@@ -105,13 +106,19 @@ public:
                     0);
     }
     
-    Vec3 ray_color(const Ray& ray, const Scene& scene)
+    Vec3 ray_color(const Ray& ray, int bounce_num, const Scene& scene)
     {
+        if (bounce_num <= 0) {
+            return Vec3(0,0,0);
+        }
+        
         Vec3 color;
         Hit hit;
         if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit))
         {
-            color = 0.5 * Vec3AddScalar(hit.n, 1.0);
+            // Vec3 local_color = 0.5 * Vec3AddScalar(hit.n, 1.0); // normal visualization
+            Ray reflected_ray = Ray( hit.p, random_vec3_on_hemisphere(hit.n) );
+            color = 0.5 * ray_color(reflected_ray, bounce_num-1, scene);
             
             // print_csv(hit.n);
             // print_csv(hit.p, hit.p + hit.n);
@@ -124,7 +131,5 @@ public:
         return color;
     }
 };
-
-
 
 #endif /* camera_h */

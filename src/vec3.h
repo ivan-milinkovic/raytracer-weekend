@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "util.h"
 
 class Vec3
 {
@@ -45,6 +46,16 @@ public:
     double len() const {
         return std::sqrt(len_sq());
     }
+    
+    // [0, 1)
+    static Vec3 random() {
+        return Vec3(rw_random(), rw_random(), rw_random());
+    }
+    
+    static Vec3 random(double min, double max) {
+        return Vec3(rw_random(min, max), rw_random(min, max), rw_random(min, max));
+    }
+    
 };
 
 inline Vec3 Vec3AddScalar(const Vec3& v, double s) {
@@ -115,6 +126,14 @@ inline void print_csv(const Vec3& v) {
 inline void print_csv(const Vec3& v0, const Vec3& v1) {
     std::cout << v0.X() << ',' << v0.Y() << ',' << v0.Z() << ',';
     std::cout << v1.X() << ',' << v1.Y() << ',' << v1.Z() << std::endl;
+}
+
+inline Vec3 random_vec3_on_hemisphere(const Vec3& normal) {
+    Vec3 r = norm( Vec3::random(-1, 1) );
+    if ( dot(r, normal) < 0 ) {
+        r *= -1;
+    }
+    return r;
 }
 
 #endif /* Vec3_h */

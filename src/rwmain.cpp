@@ -43,7 +43,7 @@ void init_camera() {
 }
 
 void init_scene() {
-    SceneObject so(SceneObjectType_Sphere, new Sphere({0,0,3}, 1));
+    SceneObject so(SceneObjectType_Sphere, new Sphere( { 0, 0, 3 }, 1));
     state.scene->objects.push_back( so );
     
 //    SceneObject so2(SceneObjectType_Sphere, new Sphere({-2,0,5}, 1));
@@ -51,6 +51,9 @@ void init_scene() {
 //    
 //    SceneObject so3(SceneObjectType_Sphere, new Sphere({2,0,5}, 1));
 //    state.scene->objects.push_back( so3 );
+    
+    SceneObject so4(SceneObjectType_Sphere, new Sphere( { 0, -101, 3 }, 100));
+    state.scene->objects.push_back( so4 );
 }
 
 void init() {
