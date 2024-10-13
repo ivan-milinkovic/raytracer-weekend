@@ -99,8 +99,11 @@ Vec3 ray_color(const Ray& ray)
     if (state.scene->hit(ray, ray_hit_min, ray_hit_max, hit))
     {
         color = 0.5 * Vec3AddScalar(hit.n, 1.0);
+        
+        // print_csv(hit.n);
+        // print_csv(hit.p, hit.p + hit.n);
     }
-    else
+    else // background
     {
         double f = (ray.Dir().Y() + 1.0) * 0.5;
         color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));

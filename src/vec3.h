@@ -108,4 +108,13 @@ inline Vec3 norm(const Vec3& v) {
     return v / v.len();
 }
 
+inline void print_csv(const Vec3& v) {
+    std::cout << v.X() << ',' << v.Y() << ',' << v.Z() << std::endl;
+}
+
+inline void print_csv(const Vec3& v0, const Vec3& v1) {
+    std::cout << v0.X() << ',' << v0.Y() << ',' << v0.Z() << ',';
+    std::cout << v1.X() << ',' << v1.Y() << ',' << v1.Z() << std::endl;
+}
+
 #endif /* Vec3_h */

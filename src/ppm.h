@@ -5,10 +5,10 @@
 #include <fstream>
 #include "vec3.h"
 #include "color.h"
+#include "util.h"
 
 std::filesystem::path ppm_file_path() {
-    auto path = std::filesystem::path(__FILE__);
-    path.remove_filename();
+    auto path = out_dir();
     path = path / "..";
     path /= "out.ppm";
     return path;

@@ -12,4 +12,10 @@ inline double rad_from_deg(double degrees) {
     return degrees * deg_to_rad;
 }
 
+std::filesystem::path out_dir() {
+    auto path = std::filesystem::path(__FILE__);
+    path.remove_filename();
+    return path;
+}
+
 #endif /* util_h */
