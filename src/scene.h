@@ -8,6 +8,8 @@
 #ifndef Scene_h
 #define Scene_h
 
+#include "interval.h"
+
 typedef enum {
     SceneObjectType_Sphere = 1
 } SceneObjectType;
@@ -22,8 +24,8 @@ class Scene {
 public:
     std::vector<SceneObject> objects;
     
-    bool hit(const Ray& ray, double d_min, double d_max, Hit& hit) {
-        double closest_so_far = d_max;
+    bool hit(const Ray& ray, const Interval& limits, Hit& hit) {
+        double closest_so_far = limits.max;
         Hit tmp_hit;
         bool has_hit = false;
         
@@ -32,7 +34,7 @@ public:
             {
                 case SceneObjectType_Sphere:
                     Sphere* sphere = static_cast<Sphere*>(sceneObject.object);
-                    if (sphere->hit(ray, d_min, closest_so_far, tmp_hit)) {
+                    if (sphere->hit(ray, Interval(limits.min, closest_so_far), tmp_hit)) {
                         closest_so_far = hit.d; // it is closer because closest_so_far limit
                         hit = tmp_hit;
                         has_hit = true;

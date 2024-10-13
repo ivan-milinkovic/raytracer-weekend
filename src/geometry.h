@@ -3,6 +3,7 @@
 
 #include "ray.h"
 #include "vec3.h"
+#include "interval.h"
 
 class Hit {
 public:
@@ -19,7 +20,7 @@ public:
     
     Sphere(Vec3 center, double r): center(center), r(r) { }
     
-    bool hit(const Ray& ray, double d_min, double d_max, Hit& hit) {
+    bool hit(const Ray& ray, Interval limits, Hit& hit) {
         Vec3 OC = center - ray.Origin();
         double a = ray.Dir().len_sq();
         double h = dot(ray.Dir(), OC);
@@ -31,9 +32,9 @@ public:
         
         auto sqrtd = std::sqrt(dcr);
         auto root = (h - sqrtd) / a; // closer, smaller root
-        if (root <= d_min || d_max <= root) {
+        if (!limits.surrounds(root)) {
             root = (h + sqrtd) / a; // the other root
-            if (root <= d_min || d_max <= root)
+            if (!limits.surrounds(root))
                 return false;
         }
 

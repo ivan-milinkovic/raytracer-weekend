@@ -3,6 +3,7 @@
 #include "geometry.h"
 #include "scene.h"
 #import "camera.h"
+#import "interval.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.
@@ -96,7 +97,7 @@ Vec3 ray_color(const Ray& ray)
 {
     Vec3 color;
     Hit hit;
-    if (state.scene->hit(ray, ray_hit_min, ray_hit_max, hit))
+    if (state.scene->hit(ray, Interval(ray_hit_min, ray_hit_max), hit))
     {
         color = 0.5 * Vec3AddScalar(hit.n, 1.0);
         

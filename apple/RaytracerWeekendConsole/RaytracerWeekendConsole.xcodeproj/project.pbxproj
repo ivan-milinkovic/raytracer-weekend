@@ -38,6 +38,7 @@
 		2CBD71BE2CBACCF100C14983 /* scene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = scene.h; sourceTree = "<group>"; };
 		2CBD71BF2CBACFD000C14983 /* camera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		2CBD71C02CBBD2BF00C14983 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		2CBD71C12CBC13C500C14983 /* interval.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = interval.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -80,18 +81,19 @@
 		2CBD71B42CBA7B9200C14983 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				2CBD71BB2CBAA57700C14983 /* main.cpp */,
-				2CBD71B12CBA7B9200C14983 /* rwmain.h */,
-				2CBD71B22CBA7B9200C14983 /* rwmain.cpp */,
+				2CBD71BF2CBACFD000C14983 /* camera.h */,
 				2CBD71AD2CBA7B9200C14983 /* color.h */,
+				2CBD71B72CBA91FA00C14983 /* geometry.h */,
 				2CBD71AE2CBA7B9200C14983 /* image.h */,
+				2CBD71C12CBC13C500C14983 /* interval.h */,
+				2CBD71BB2CBAA57700C14983 /* main.cpp */,
 				2CBD71AF2CBA7B9200C14983 /* ppm.h */,
 				2CBD71B02CBA7B9200C14983 /* ray.h */,
-				2CBD71B32CBA7B9200C14983 /* vec3.h */,
-				2CBD71B72CBA91FA00C14983 /* geometry.h */,
+				2CBD71B12CBA7B9200C14983 /* rwmain.h */,
+				2CBD71B22CBA7B9200C14983 /* rwmain.cpp */,
 				2CBD71BE2CBACCF100C14983 /* scene.h */,
-				2CBD71BF2CBACFD000C14983 /* camera.h */,
 				2CBD71C02CBBD2BF00C14983 /* util.h */,
+				2CBD71B32CBA7B9200C14983 /* vec3.h */,
 			);
 			name = src;
 			path = ../../src;
