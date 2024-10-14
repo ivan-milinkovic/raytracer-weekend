@@ -24,6 +24,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2CB356DF2CBD958C009D3EB0 /* material.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		2CBD718F2CBA787600C14983 /* RaytracerWeekendConsole */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RaytracerWeekendConsole; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CBD71AD2CBA7B9200C14983 /* color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = color.h; sourceTree = "<group>"; };
 		2CBD71AE2CBA7B9200C14983 /* image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
@@ -94,6 +95,7 @@
 				2CBD71BE2CBACCF100C14983 /* scene.h */,
 				2CBD71C02CBBD2BF00C14983 /* util.h */,
 				2CBD71B32CBA7B9200C14983 /* vec3.h */,
+				2CB356DF2CBD958C009D3EB0 /* material.h */,
 			);
 			name = src;
 			path = ../../src;

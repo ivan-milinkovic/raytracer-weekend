@@ -47,15 +47,29 @@ public:
         return std::sqrt(len_sq());
     }
     
+    bool is_near_zero() {
+        static double e = 1e-8;
+        return (std::fabs(v[0]) < e)
+            && (std::fabs(v[1]) < e)
+            && (std::fabs(v[2]) < e);
+    }
+    
     // [0, 1)
-    static Vec3 random() {
+    inline static Vec3 random() {
         return Vec3(rw_random(), rw_random(), rw_random());
     }
     
-    static Vec3 random(double min, double max) {
+    inline static Vec3 random(double min, double max) {
         return Vec3(rw_random(min, max), rw_random(min, max), rw_random(min, max));
     }
     
+    inline static Vec3 zero() {
+        return Vec3(0, 0, 0);
+    }
+    
+    inline static Vec3 ones() {
+        return Vec3(1, 1, 1);
+    }
 };
 
 inline Vec3 Vec3AddScalar(const Vec3& v, double s) {
@@ -90,7 +104,7 @@ inline Vec3 operator*(double s, const Vec3 v) {
 
 inline Vec3 operator*(const Vec3& v1, const Vec3& v2) {
     return Vec3(v1.v[0] * v2.v[0],
-                v2.v[1] * v2.v[1],
+                v1.v[1] * v2.v[1],
                 v1.v[2] * v2.v[2]);
 }
 
@@ -117,6 +131,22 @@ inline Vec3 cross(const Vec3& v1, const Vec3& v2) {
 
 inline Vec3 norm(const Vec3& v) {
     return v / v.len();
+}
+
+inline Vec3 reflect(const Vec3& v, const Vec3& n) {
+    return v - dot(v, n) * n * 2;
+}
+
+inline Vec3 refract(const Vec3& v, const Vec3& n, double eta_over_eta) {
+    double cos_vn = std::fmin( dot(-v, n), 1.0 );
+    Vec3 r_out_perp = eta_over_eta * (v + (cos_vn * n));
+    Vec3 r_out_parallel = -std::sqrt( std::fabs(1.0 - r_out_perp.len_sq()) ) * n;
+    return r_out_perp + r_out_parallel;
+}
+
+inline Vec3 refract(const Vec3& v, const Vec3& n, double eta_from, double eta_to) {
+    double eta_over_eta = eta_from / eta_to;
+    return refract(v, n, eta_over_eta);
 }
 
 inline void print_csv(const Vec3& v) {

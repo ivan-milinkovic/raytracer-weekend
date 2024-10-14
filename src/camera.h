@@ -12,6 +12,7 @@
 #include "scene.h"
 #include "geometry.h"
 #include "color.h"
+#include "material.h"
 
 const int conf_samples_per_pixel = 10;
 const int conf_max_bounces = 10;
@@ -58,6 +59,7 @@ public:
     }
     
     void render(const Scene& scene, Image& image) {
+        
         for (int row = 0; row < image.H(); row++)
         {
             for (int col = 0; col < image.W(); col++)
@@ -76,7 +78,6 @@ public:
                     Ray ray = this->make_ray_msaa(col, row, viewport_point);
                     pixel += this->ray_color(ray, max_bounces, scene);
                 }
-                
                 pixel *= samples_per_pixel_inv; // average
                 
                 gamma_correct(pixel);
@@ -122,26 +123,19 @@ public:
         Hit hit;
         if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit))
         {
-            // The simple diffuse model - reflect uniformly around a hemisphere
-            // Ray reflected_ray = Ray( hit.p, random_vec3_on_hemisphere(hit.n) );
-            
-            // True Lambertian Reflection - more rays closer to the normal
-            // Imagine a unit sphere above p: centered at p + n, tangent to / touching p
-            // Make a random point on the unit sphere above p: ps = p + (n + random_unit)
-            // Reflecton dir: ps - p = (p + (n + rs)) - p = n + rs
-            // Distribution is denser around normal, as the sphere is lifted above p
-            // Since the sphere is touching p, no rays can go inside (through p), only outward
-            Vec3 reflected_dir = norm(hit.n + Vec3::random(-1, 1));
-            Ray reflected_ray = Ray( hit.p, reflected_dir );
-            color = 0.5 * ray_color(reflected_ray, bounce_num-1, scene);
-            
-            // print_csv(hit.n);
-            // print_csv(hit.p, hit.p + hit.n);
+            Vec3 attenuation;
+            Ray scattered;
+            if (hit.material->visit_scatter(ray, hit, attenuation, scattered)) {
+                Vec3 bounced_color = ray_color(scattered, bounce_num-1, scene);
+                color = attenuation * bounced_color;
+            } else {
+                color = Vec3::zero();
+            }
         }
         else // background
         {
-            double f = (ray.Dir().Y() + 1.0) * 0.5;
-            color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0, 0.3, 0.8));
+            double f = 0.5 * (ray.Dir().Y() + 1.0);
+            color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0.5, 0.7, 1.0));
         }
         return color;
     }

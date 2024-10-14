@@ -4,12 +4,15 @@
 #include "ray.h"
 #include "vec3.h"
 #include "interval.h"
+class Material;
 
 class Hit {
 public:
     Vec3 p;
     Vec3 n;
     double d; // distance from ray origin
+    
+    Material* material;
     bool is_front;
 };
 
@@ -17,8 +20,9 @@ class Sphere {
 public:
     Vec3 center;
     double r;
+    Material* material;
     
-    Sphere(Vec3 center, double r): center(center), r(r) { }
+    Sphere(Vec3 center, double r, Material* material): center(center), r(r), material(material) { }
     
     bool hit(const Ray& ray, Interval limits, Hit& hit) {
         Vec3 OC = center - ray.Origin();
@@ -43,6 +47,7 @@ public:
         hit.n = (hit.p - center) / r;
         hit.is_front = dot(ray.Dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
+        hit.material = material;
         
         return true;
     }

@@ -1,5 +1,5 @@
 #include "image.h"
-#import "camera.h"
+#include "camera.h"
 #include "geometry.h"
 #include "scene.h"
 
@@ -14,6 +14,7 @@ public:
     Image* image;
     Scene* scene;
     Camera* camera;
+    std::vector<Material*> materials;
     
     double screen_aspect;
     int screen_W;
@@ -43,17 +44,33 @@ void init_camera() {
 }
 
 void init_scene() {
-    SceneObject so(SceneObjectType_Sphere, new Sphere( { 0, 0, 3 }, 1));
-    state.scene->objects.push_back( so );
     
-//    SceneObject so2(SceneObjectType_Sphere, new Sphere({-2,0,5}, 1));
-//    state.scene->objects.push_back( so2 );
-//    
-//    SceneObject so3(SceneObjectType_Sphere, new Sphere({2,0,5}, 1));
-//    state.scene->objects.push_back( so3 );
+    auto material_ground = new LambertianMaterial ( { 0.5, 0.5, 0.5 } );
+    auto material_center = new LambertianMaterial ( { 0.1, 0.2, 0.5 } );
+    auto material_left   = new DielectricMaterial ( 1.5 );
+    auto material_bubble = new DielectricMaterial ( 1.0 / 1.5 );
+    auto material_right  = new MetalMaterial      ( { 0.8, 0.6, 0.2 }, 0.16 );
     
-    SceneObject so4(SceneObjectType_Sphere, new Sphere( { 0, -101, 3 }, 100));
-    state.scene->objects.push_back( so4 );
+    SceneObject center  (1, SceneObjectType_Sphere, new Sphere( { 0, 0, 3 }, 1, material_center));
+    SceneObject left    (2, SceneObjectType_Sphere, new Sphere( {-2, 0, 3 }, 1, material_left));
+    SceneObject bubble  (3, SceneObjectType_Sphere, new Sphere( {-2, 0, 3 }, 0.75, material_bubble));
+    SceneObject right   (4, SceneObjectType_Sphere, new Sphere( { 2, 0, 3 }, 1, material_right));
+    SceneObject ground  (5, SceneObjectType_Sphere, new Sphere( { 0, -101, 3 }, 100, material_ground));
+    
+    state.materials.push_back(material_ground);
+    state.materials.push_back(material_center);
+    state.materials.push_back(material_left);
+    state.materials.push_back(material_bubble);
+    state.materials.push_back(material_right);
+    
+    state.scene->objects.push_back( center );
+    state.scene->objects.push_back( left );
+    state.scene->objects.push_back( bubble );
+    state.scene->objects.push_back( right );
+    state.scene->objects.push_back( ground );
+    
+    material_left->id = 1;
+    material_bubble->id = 2;
 }
 
 void init() {
