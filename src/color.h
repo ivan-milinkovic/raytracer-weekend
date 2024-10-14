@@ -5,7 +5,7 @@
 #include "vec3.h"
 #include "interval.h"
 
-void write_color(std::ostream& stream, const Vec3& color) {
+inline void write_color(std::ostream& stream, const Vec3& color) {
     auto r = color.X();
     auto g = color.Y();
     auto b = color.Z();
@@ -20,5 +20,17 @@ void write_color(std::ostream& stream, const Vec3& color) {
     stream << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
 
+inline double linear_to_gamma(double linear_value) {
+    // inverse gamma 2
+    if (linear_value < 0)
+        return 0;
+    return std::sqrt(linear_value);
+}
+
+inline void gamma_correct(Vec3& color) {
+    color.v[0] = linear_to_gamma(color.v[0]);
+    color.v[1] = linear_to_gamma(color.v[1]);
+    color.v[2] = linear_to_gamma(color.v[2]);
+}
 
 #endif /* color_h */

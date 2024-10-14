@@ -11,6 +11,10 @@
 #include "ray.h"
 #include "scene.h"
 #include "geometry.h"
+#include "color.h"
+
+const int conf_samples_per_pixel = 10;
+const int conf_max_bounces = 10;
 
 class Camera {
 public:
@@ -24,10 +28,10 @@ public:
     // min and max distances for ray-geometry intersections
     double ray_hit_min = 0.005;
     double ray_hit_max = 200;
-    int max_bounces = 10;
+    int max_bounces = conf_max_bounces;
     
     // multi-sampling
-    int samples_per_pixel = 10;
+    int samples_per_pixel = conf_samples_per_pixel;
     double samples_per_pixel_inv = 1.0 / samples_per_pixel;
 
     Camera(int screen_W, int screen_H) {
@@ -74,6 +78,8 @@ public:
                 }
                 
                 pixel *= samples_per_pixel_inv; // average
+                
+                gamma_correct(pixel);
             }
         }
     }
