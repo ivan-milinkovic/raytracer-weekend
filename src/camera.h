@@ -27,7 +27,7 @@ public:
     int max_bounces = 10;
     
     // multi-sampling
-    int samples_per_pixel = 4;
+    int samples_per_pixel = 10;
     double samples_per_pixel_inv = 1.0 / samples_per_pixel;
 
     Camera(int screen_W, int screen_H) {
@@ -116,8 +116,17 @@ public:
         Hit hit;
         if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit))
         {
-            // Vec3 local_color = 0.5 * Vec3AddScalar(hit.n, 1.0); // normal visualization
-            Ray reflected_ray = Ray( hit.p, random_vec3_on_hemisphere(hit.n) );
+            // The simple diffuse model - reflect uniformly around a hemisphere
+            // Ray reflected_ray = Ray( hit.p, random_vec3_on_hemisphere(hit.n) );
+            
+            // True Lambertian Reflection - more rays closer to the normal
+            // Imagine a unit sphere above p: centered at p + n, tangent to / touching p
+            // Make a random point on the unit sphere above p: ps = p + (n + random_unit)
+            // Reflecton dir: ps - p = (p + (n + rs)) - p = n + rs
+            // Distribution is denser around normal, as the sphere is lifted above p
+            // Since the sphere is touching p, no rays can go inside (through p), only outward
+            Vec3 reflected_dir = norm(hit.n + Vec3::random(-1, 1));
+            Ray reflected_ray = Ray( hit.p, reflected_dir );
             color = 0.5 * ray_color(reflected_ray, bounce_num-1, scene);
             
             // print_csv(hit.n);
