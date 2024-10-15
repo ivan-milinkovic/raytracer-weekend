@@ -13,18 +13,15 @@
 #include "geometry.h"
 #include "color.h"
 #include "material.h"
+#include "util.h"
 
 const int conf_samples_per_pixel = 10;
 const int conf_max_bounces = 10;
 
 class Camera {
 public:
-    Vec3 camera_pos = { 0, 0, 0 };
-    Vec3 camera_fwd   = { 0, 0, 1 };
-    Vec3 camera_right = { 1, 0, 0 };
-    Vec3 camera_up    = { 0, 1, 0 };
-    Vec3 p00; // top left point in viewport
-    Vec3 point_delta; // pixel size in viewport
+    double focal_len = 1.0;
+    double vfov_deg = 70;
     
     // min and max distances for ray-geometry intersections
     double ray_hit_min = 0.005;
@@ -34,18 +31,49 @@ public:
     // multi-sampling
     int samples_per_pixel = conf_samples_per_pixel;
     double samples_per_pixel_inv = 1.0 / samples_per_pixel;
-
+    
+    double viewport_H;
+    double viewport_W;
+    
+    Vec3 p00; // top left point in viewport
+    Vec3 point_delta; // pixel size in viewport
+    
+    Vec3 camera_pos = { 0, 0, 0 };
+    Vec3 camera_fwd   = { 0, 0, 1 };
+    Vec3 camera_right = { 1, 0, 0 };
+    Vec3 camera_up    = { 0, 1, 0 };
+    Vec3 world_up     = { 0, 1, 0 }; // upright space
+    
+    
     Camera(int screen_W, int screen_H) {
         
         double real_aspect = screen_W / (double) screen_H;
-        double focal_len = 1.0;
-        double viewport_W = 2.0;
-        double viewport_H = viewport_W / real_aspect;
+        double vfov_rad = rad_from_deg(vfov_deg);
+        double h = std::tan(vfov_rad/2); // height from viewport middle to viewport top
+        viewport_H = 2 * h * focal_len;
+        viewport_W = viewport_H * real_aspect;
         
         point_delta[0] = viewport_W / (double) screen_W;
         point_delta[1] = viewport_H / (double) screen_H;
         point_delta[2] = 0;
         
+        update_p00();
+    }
+    
+    void look_at(const Vec3& v_look_at) {
+        look_at(camera_pos, v_look_at);
+    }
+    
+    void look_at(const Vec3& from, const Vec3& v_look_at) {
+        camera_pos = Vec3(from);
+        camera_fwd = norm( v_look_at - camera_pos );
+        // left handed
+        camera_right = norm( cross(world_up, camera_fwd) );
+        camera_up = norm( cross(camera_fwd, camera_right) );
+        update_p00();
+    }
+    
+    void update_p00() {
         Vec3 viewport_top_left =
             camera_pos
             + camera_fwd * focal_len

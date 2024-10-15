@@ -68,9 +68,6 @@ void init_scene() {
     state.scene->objects.push_back( bubble );
     state.scene->objects.push_back( right );
     state.scene->objects.push_back( ground );
-    
-    material_left->id = 1;
-    material_bubble->id = 2;
 }
 
 void init() {
@@ -88,6 +85,8 @@ void rwmain()
     init();
     
     auto t0 = std::chrono::high_resolution_clock::now();
+    
+    state.camera->look_at({ -2, 2, -1 }, { -0.3, 0.2, 2 });
     
     render();
     
