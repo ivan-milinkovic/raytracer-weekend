@@ -14,9 +14,15 @@ inline double rad_from_deg(double degrees) {
     return degrees * deg_to_rad;
 }
 
-inline std::filesystem::path out_dir() {
+inline std::filesystem::path src_dir() {
     auto path = std::filesystem::path(__FILE__);
     path.remove_filename();
+    return path;
+}
+
+inline std::filesystem::path root_dir() {
+    auto path = src_dir();
+    path = path / "..";
     return path;
 }
 

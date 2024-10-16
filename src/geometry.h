@@ -25,6 +25,9 @@ public:
     Sphere(Vec3 center, double r, Material* material): center(center), r(r), material(material) { }
     
     bool hit(const Ray& ray, Interval limits, Hit& hit) {
+        
+        return intersect(ray, limits, hit);
+        
         Vec3 OC = center - ray.Origin();
         double a = ray.Dir().len_sq();
         double h = dot(ray.Dir(), OC);
@@ -51,34 +54,68 @@ public:
         
         return true;
     }
+    
+    // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
+    
+    inline bool intersect(const Ray &ray, Interval limits, Hit& hit) const
+    {
+        double t0, t1; // solutions for t if the ray intersects
+#if 1
+        // Geometric solution
+        Vec3 L = center - ray.Origin();
+        double tca = dot(L, ray.Dir());
+        // if (tca < 0) return false;
+        double d2 = dot(L, L) - tca * tca;
+        if (d2 > r*r) return false;
+        double thc = sqrt(r*r - d2);
+        t0 = tca - thc;
+        t1 = tca + thc;
+#else
+        // Analytic solution
+        Vec3 L = ray.Origin() - center;
+        double a = dot(ray.Dir(), ray.Dir());
+        double b = 2 * dot(ray.Dir(), L);
+        double c = dot(L,L) - r*r;
+        if (!solveQuadratic(a, b, c, t0, t1)) return false;
+#endif
+        double d = t0;
+        if (!limits.surrounds(t0)) {
+            d = t1;
+            if (!limits.surrounds(d))
+                return false;
+        }
+
+        if (!limits.surrounds(d)) {
+            return false;
+        }
+        
+        hit.d = d;
+        hit.p = ray.at(hit.d);
+        hit.n = (hit.p - center) / r;
+        hit.is_front = dot(ray.Dir(), hit.n) < 0;
+        hit.n = hit.is_front ? hit.n : -1 * hit.n;
+        hit.material = material;
+
+        return true;
+    }
+    
+    inline bool solveQuadratic(const double &a, const double &b, const double &c, double &x0, double &x1) const
+    {
+        double discr = b * b - 4 * a * c;
+        if (discr < 0) return false;
+        else if (discr == 0) x0 = x1 = - 0.5 * b / a;
+        else {
+            float q = (b > 0) ?
+                -0.5 * (b + sqrt(discr)) :
+                -0.5 * (b - sqrt(discr));
+            x0 = q / a;
+            x1 = c / q;
+        }
+        if (x0 > x1) std::swap(x0, x1);
+        
+        return true;
+    }
 };
 
-
-
-double ray_to_sphere_distance(Ray ray, Vec3 C, double r) {
-    Vec3 OC = C - ray.Origin();
-    double a = ray.Dir().len_sq();
-    double h = dot(ray.Dir(), OC);
-    double c = OC.len_sq() - r*r;
-    double discriminant = h*h - a*c;
-    if (discriminant < 0) {
-        return -1;
-    } else {
-        return (h - std::sqrt(discriminant)) / a;
-    }
-}
-
-//double ray_to_sphere_distance0(Ray ray, Vec3 C, double r) {
-//    Vec3 OC = C - ray.Origin();
-//    double a = dot(ray.Dir(), ray.Dir());
-//    double b = -2 * dot(ray.Dir(), OC);
-//    double c = dot(OC, OC) - r*r;
-//    double discriminant = b*b - 4*a*c;
-//    if (discriminant < 0) {
-//        return -1;
-//    } else {
-//        return (-b - std::sqrt(discriminant)) / (2*a);
-//    }
-//}
 
 #endif /* geometry_h */

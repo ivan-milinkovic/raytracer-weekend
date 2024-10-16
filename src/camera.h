@@ -8,6 +8,7 @@
 #ifndef camera_h
 #define camera_h
 
+#include <fstream>
 #include "ray.h"
 #include "scene.h"
 #include "geometry.h"
@@ -20,11 +21,15 @@ const int conf_max_bounces = 10;
 
 class Camera {
 public:
-    double focal_len = 1.0;
+    double focal_len;
     double vfov_deg = 70;
     
+    double focus_dist = 1; // focus plane distance
+    double defocus_angle = 1; // angle variation amount through each pixel
+    double defocus_radius;
+    
     // min and max distances for ray-geometry intersections
-    double ray_hit_min = 0.005;
+    double ray_hit_min = 0.0005;
     double ray_hit_max = 200;
     int max_bounces = conf_max_bounces;
     
@@ -44,8 +49,18 @@ public:
     Vec3 camera_up    = { 0, 1, 0 };
     Vec3 world_up     = { 0, 1, 0 }; // upright space
     
+    int screen_W;
+    int screen_H;
     
     Camera(int screen_W, int screen_H) {
+        this->screen_W = screen_W;
+        this->screen_H = screen_H;
+        setup();
+    }
+    
+    void setup() {
+        focal_len = focus_dist;
+        defocus_radius = focus_dist * std::tan( rad_from_deg(defocus_angle / 2.0) );
         
         double real_aspect = screen_W / (double) screen_H;
         double vfov_rad = rad_from_deg(vfov_deg);
@@ -61,10 +76,10 @@ public:
     }
     
     void look_at(const Vec3& v_look_at) {
-        look_at(camera_pos, v_look_at);
+        look_from_at(camera_pos, v_look_at);
     }
     
-    void look_at(const Vec3& from, const Vec3& v_look_at) {
+    void look_from_at(const Vec3& from, const Vec3& v_look_at) {
         camera_pos = Vec3(from);
         camera_fwd = norm( v_look_at - camera_pos );
         // left handed
@@ -87,6 +102,7 @@ public:
     }
     
     void render(const Scene& scene, Image& image) {
+        // return test(scene);
         
         for (int row = 0; row < image.H(); row++)
         {
@@ -95,15 +111,9 @@ public:
                 int i = row * image.W() + col;
                 Vec3& pixel = image[i];
                 
-                // No random
-                // Vec3 viewport_point;
-                // Ray ray = this->make_ray(col, row, viewport_point);
-                // pixel = this->ray_color(ray, scene);
-                
-                // random sampling within pixel size
                 for (int k = 0; k < samples_per_pixel; k++) {
                     Vec3 viewport_point;
-                    Ray ray = this->make_ray_msaa(col, row, viewport_point);
+                    Ray ray = this->make_ray(col, row, viewport_point);
                     pixel += this->ray_color(ray, max_bounces, scene);
                 }
                 pixel *= samples_per_pixel_inv; // average
@@ -113,32 +123,41 @@ public:
         }
     }
     
+    // A ray with random direction offset within a pixel square
     Ray make_ray(int x, int y, Vec3& viewport_point) {
-        Vec3 p = p00 + (camera_right * (x * point_delta.X()))
-                     - (camera_up * (y * point_delta.Y()));
-        Ray ray = Ray(camera_pos, norm(p - camera_pos));
-        viewport_point = p;
+        
+        // point on the image plane
+        Vec3 offset_aa = sample_unit_square();
+        Vec3 point = p00;
+        point +=  camera_right * (x * point_delta.X() + point_delta.X() * offset_aa.X());
+        point += -camera_up    * (y * point_delta.Y() + point_delta.Y() * offset_aa.Y());
+        
+        // ray origin
+        Vec3 origin = camera_pos;
+        if (defocus_angle > 0) {
+            Vec3 offset_defocus = defocus_radius * sample_unit_disk();
+            origin += camera_right * offset_defocus.X();
+            origin += camera_up    * offset_defocus.Y();
+        }
+        // origin = point; // visualize the focus plane
+        
+        Ray ray = Ray(origin, norm(point - origin));
+        viewport_point = point;
         return ray;
     }
     
-    // A ray with random direction offset within pixel size
-    Ray make_ray_msaa(int x, int y, Vec3& viewport_point) {
-        Vec3 offset = sample_unit_square() * point_delta;
-        Vec3 p = p00 + (camera_right * (x * point_delta.X()))
-                     - (camera_up * (y * point_delta.Y()))
-                     + offset;
-        Ray ray = Ray(camera_pos, norm(p - camera_pos));
-        viewport_point = p;
-        return ray;
-    }
-    
-    
-    // A random offset to apply to a pixel ray for MSAA.
+    // A random offset to apply to a pixel ray for AA.
     // Random point within unit square between [-0.5, -0.5] and [0.5, 0.5]
     Vec3 sample_unit_square() {
-        return Vec3(rw_random() - 0.5,
-                    rw_random() - 0.5,
-                    0);
+        return Vec3(rw_random() - 0.5, rw_random() - 0.5, 0);
+    }
+    
+    Vec3 sample_unit_disk () {
+        Vec3 v = Vec3(rw_random(-1, 1), rw_random(-1, 1), 0);
+        if (v.len() > 1) {
+            v = norm(v);
+        }
+        return v;
     }
     
     Vec3 ray_color(const Ray& ray, int bounce_num, const Scene& scene)
@@ -166,6 +185,28 @@ public:
             color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0.5, 0.7, 1.0));
         }
         return color;
+    }
+    
+    void test(const Scene& scene) {
+        auto path = root_dir();
+        path = path / "debug" / "lines.csv";
+        
+        std::ofstream file(path);
+        std::cout << "Writing debug csv to:\n" << path << std::endl;
+        
+        std::vector<Vec3> hits;
+        for (int k = 0; k < 1; k++) {
+            Vec3 viewport_point;
+            Ray ray = this->make_ray(screen_W / 2, screen_H / 2, viewport_point);
+            Hit hit;
+            if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit)) {
+                hits.push_back(hit.p);
+            }
+            print_csv({ray.Origin(), viewport_point, hit.p}, file);
+        }
+        std::cout << std::endl;
+        file.close();
+        return;
     }
 };
 

@@ -16,7 +16,7 @@ public:
     const Vec3& Dir() const { return dir; }
     
     Vec3 at(double d) const {
-        return origin + d * dir;
+        return origin + dir * d;
     }    
 };
 

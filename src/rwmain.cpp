@@ -41,6 +41,18 @@ void init_image() {
 
 void init_camera() {
     state.camera = new Camera(state.screen_W, state.screen_H);
+    
+//    state.camera->vfov_deg = 70;
+//    state.camera->focus_dist = 1;
+//    state.camera->defocus_angle = 0;
+//    state.camera->setup();
+//    state.camera->look_from_at({ 0, 0, 0 }, { 0, 0, 1 });
+    
+    state.camera->vfov_deg = 40;
+    state.camera->focus_dist = 4.7;
+    state.camera->defocus_angle = 4;
+    state.camera->setup();
+    state.camera->look_from_at({ -4.5,0,0.5 }, { 0,0,2 });
 }
 
 void init_scene() {
@@ -85,8 +97,6 @@ void rwmain()
     init();
     
     auto t0 = std::chrono::high_resolution_clock::now();
-    
-    state.camera->look_at({ -2, 2, -1 }, { -0.3, 0.2, 2 });
     
     render();
     

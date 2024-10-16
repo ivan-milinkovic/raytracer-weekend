@@ -8,8 +8,7 @@
 #include "util.h"
 
 std::filesystem::path ppm_file_path() {
-    auto path = out_dir();
-    path = path / "..";
+    auto path = root_dir();
     path /= "out.ppm";
     return path;
 }

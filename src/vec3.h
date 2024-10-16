@@ -153,9 +153,16 @@ inline void print_csv(const Vec3& v) {
     std::cout << v.X() << ',' << v.Y() << ',' << v.Z() << std::endl;
 }
 
-inline void print_csv(const Vec3& v0, const Vec3& v1) {
-    std::cout << v0.X() << ',' << v0.Y() << ',' << v0.Z() << ',';
-    std::cout << v1.X() << ',' << v1.Y() << ',' << v1.Z() << std::endl;
+inline void print_csv(const Vec3& v0, const Vec3& v1, std::ostream& stream) {
+    stream << v0.X() << ',' << v0.Y() << ',' << v0.Z() << ',';
+    stream << v1.X() << ',' << v1.Y() << ',' << v1.Z() << std::endl;
+}
+
+inline void print_csv(const std::initializer_list<Vec3> vs, std::ostream& stream) {
+    for(Vec3 v: vs) {
+        stream << v.X() << ',' << v.Y() << ',' << v.Z() << ',';
+    }
+    stream << std::endl;
 }
 
 inline Vec3 random_vec3_on_hemisphere(const Vec3& normal) {

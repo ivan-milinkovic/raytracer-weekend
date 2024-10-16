@@ -1,10 +1,3 @@
-//
-//  Scene.h
-//  RaytracerWeekendConsole
-//
-//  Created by Ivan Milinkovic on 12.10.24..
-//
-
 #ifndef Scene_h
 #define Scene_h
 
