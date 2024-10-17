@@ -16,8 +16,8 @@
 #include "material.h"
 #include "util.h"
 
-const int conf_samples_per_pixel = 10;
-const int conf_max_bounces = 10;
+#define PRINT_PROGRESS 1
+
 
 class Camera {
 public:
@@ -31,11 +31,11 @@ public:
     // min and max distances for ray-geometry intersections
     double ray_hit_min = 0.0005;
     double ray_hit_max = 200;
-    int max_bounces = conf_max_bounces;
+    int max_bounces = 10;
     
     // multi-sampling
-    int samples_per_pixel = conf_samples_per_pixel;
-    double samples_per_pixel_inv = 1.0 / samples_per_pixel;
+    int samples_per_pixel = 10;
+    double samples_per_pixel_inv;
     
     double viewport_H;
     double viewport_W;
@@ -59,6 +59,8 @@ public:
     }
     
     void setup() {
+        samples_per_pixel_inv = 1 / (double) samples_per_pixel;
+        
         focal_len = focus_dist;
         defocus_radius = focus_dist * std::tan( rad_from_deg(defocus_angle / 2.0) );
         
@@ -120,7 +122,18 @@ public:
                 
                 gamma_correct(pixel);
             }
+            
+            #if PRINT_PROGRESS
+            double f = std::fabs((double)row / (double) image.H());
+            double r = std::floor(f/0.1) * 0.1;
+            if (f > 0 && f-r < 0.002)
+                std::cout << (int)(r * 100) << "% ";
+            #endif
         }
+        
+        #if PRINT_PROGRESS
+        std::cout << std::endl;
+        #endif
     }
     
     // A ray with random direction offset within a pixel square

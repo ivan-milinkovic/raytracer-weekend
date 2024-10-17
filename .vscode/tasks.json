@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "build macos",
+            "label": "build macos optimized",
             "command": "/usr/bin/clang++",
             "args": [
                 "-std=c++23",
@@ -10,6 +10,7 @@
                 "-fansi-escape-codes",
                 "-g",
                 "${workspaceFolder}/src/*.cpp",
+                "-O3",
                 "-o",
                 "${workspaceFolder}/build/raytracer-weekend"
             ],
