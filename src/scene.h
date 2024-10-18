@@ -27,6 +27,7 @@ public:
         bool has_hit = false;
         
         for (const SceneObject& sceneObject : objects) {
+            // not using inheritance to avoid vtable dynamic dispatch
             switch (sceneObject.type)
             {
                 case SceneObjectType_Sphere: {

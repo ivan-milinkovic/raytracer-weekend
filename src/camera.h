@@ -16,6 +16,8 @@
 #include "material.h"
 #include "util.h"
 
+#include <thread>
+
 #define PRINT_PROGRESS 1
 
 
@@ -103,6 +105,73 @@ public:
             - camera_up * (point_delta.Y() / 2.0);
     }
     
+    // multi-threaded: 660ms, down from 3700ms single-threaded, 5.6x speed-up
+    void render(const Scene& scene, Image& image)
+    {
+        // hardware_concurrency is 10 for M1 pro
+        const int cores = std::thread::hardware_concurrency();
+        
+        // 10 x 1 performs the best on M1 pro for 600x337 image size
+        const int tile_rows = cores; // std::ceil(std::sqrt(cores));
+        const int tile_cols = 1;     // std::max(cores - tile_rows, 1);
+        const int tile_height = image.H() / tile_rows;
+        const int tile_width  = image.W() / tile_cols;
+        
+        std::vector<std::thread*> threads;
+        for (int j = 0; j < tile_rows; j++) {
+            for (int i = 0; i < tile_cols; i++) {
+                
+                int x_start = i * tile_width;
+                int twidth = tile_width;
+                if(i >= tile_rows - 1) {
+                    twidth = image.W() - x_start;
+                }
+                
+                int y_start = j * tile_height;
+                int theight = tile_height;
+                if(j >= tile_rows - 1) {
+                    theight = image.H() - y_start;
+                }
+                
+                // printf("(%d,%d) %d x %d \n", x_start, y_start, width, height);
+                auto thread = new std::thread([this, &image, &scene, y_start, theight](){
+                    render_tile(scene, image, 0, image.W(), y_start, theight);
+                });
+                threads.push_back(thread);
+            }
+        }
+        
+        for (int i=0; i<threads.size(); i++) {
+            std::thread* t = threads[i];
+            t->join();
+        }
+    }
+    
+    void render_tile(const Scene& scene, Image& image,
+                     int x_start, int width,
+                     int y_start, int height)
+    {
+        for (int row = y_start; row < y_start + height; row++)
+        {
+            for (int col = x_start; col < x_start + width; col++)
+            {
+                int i = row * image.W() + col;
+                Vec3& pixel = image[i];
+                
+                for (int k = 0; k < samples_per_pixel; k++) {
+                    Vec3 viewport_point;
+                    Ray ray = this->make_ray(col, row, viewport_point);
+                    pixel += this->ray_color(ray, max_bounces, scene);
+                }
+                pixel *= samples_per_pixel_inv; // average
+                
+                gamma_correct(pixel);
+            }
+        }
+    }
+    
+    /*
+    // Single-threaded
     void render(const Scene& scene, Image& image) {
         // return test(scene);
         
@@ -135,6 +204,8 @@ public:
         std::cout << std::endl;
         #endif
     }
+    */
+    
     
     // A ray with random direction offset within a pixel square
     Ray make_ray(int x, int y, Vec3& viewport_point) {
@@ -166,6 +237,8 @@ public:
     }
     
     Vec3 sample_unit_disk () {
+        // This approach shifts probability towards the disk edge,
+        // because it samples the square - more points outside of disk
         Vec3 v = Vec3(rw_random(-1, 1), rw_random(-1, 1), 0);
         if (v.len() > 1) {
             v = norm(v);

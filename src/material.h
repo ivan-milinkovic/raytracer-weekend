@@ -108,6 +108,7 @@ public:
 
 
 bool Material::visit_scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
+    // Using static dispatch instead of inheritance vtable dynamic dispatch
     switch (type) {
         case MaterialType_Lambertian: {
             LambertianMaterial* lm = static_cast<LambertianMaterial*>(this);
