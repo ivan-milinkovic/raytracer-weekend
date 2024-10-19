@@ -80,12 +80,6 @@ void init_scene_3_balls() {
     auto right  = make_shared<Sphere>( Vec3( 2, 0, 3), 1, material_right);
     auto ground = make_shared<Sphere>( Vec3( 0, -101, 3), 100, material_ground);
     
-    state.scene->materials.push_back(material_ground);
-    state.scene->materials.push_back(material_center);
-    state.scene->materials.push_back(material_left);
-    state.scene->materials.push_back(material_bubble);
-    state.scene->materials.push_back(material_right);
-    
     state.scene->objects.push_back( center );
     state.scene->objects.push_back( left );
     state.scene->objects.push_back( bubble );
@@ -120,11 +114,6 @@ void init_scene_bouncing_balls() {
     state.scene->objects.push_back( make_shared<Sphere>( Vec3(0, 1, 0), 1, material1) );
     state.scene->objects.push_back( make_shared<Sphere>( Vec3(-4, 1, 0), 1, material2) );
     state.scene->objects.push_back( make_shared<Sphere>( Vec3(4, 1, 0), 1, material3) );
-    
-    state.scene->materials.push_back(material_ground);
-    state.scene->materials.push_back(material1);
-    state.scene->materials.push_back(material2);
-    state.scene->materials.push_back(material3);
     
     for (int a = -11; a < 11; a++)
     {

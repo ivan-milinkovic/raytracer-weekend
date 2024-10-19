@@ -13,8 +13,7 @@ using std::vector;
 class Scene {
 public:
     vector<shared_ptr<Hittable>> objects;
-    vector<shared_ptr<Material>> materials;
-    BVH_Node* bvh_root; // 2x speed up
+    BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
     
     bool hit(const Ray& ray, const Interval& limits, Hit& hit) const {
         return bvh_root->hit(ray, limits, hit);

@@ -3,6 +3,8 @@
 
 #include "vec3.h"
 class Material;
+class Ray;
+class Interval;
 class AABB;
 
 class Hit {
@@ -30,18 +32,9 @@ public:
     virtual inline bool hit(const Ray& ray, const Interval& interval, Hit& hit) const = 0;
     virtual inline AABB bounding_box() const = 0;
     
-    
-    // avoiding v-tables, not faster
-    /*
-    inline bool hit(const Ray& ray, const Interval& interval, Hit& hit) const {
-        return hit_impl(this, ray, interval, hit);
-    }
-    
-    inline const AABB* bounding_box() const {
-        return get_bbox_impl(this);
-    }
-     */
+    // Tried avoiding v-tables, but wasn't much faster, time is spent elsewhere.
+    // Also, hard to do static dispatch at this point,
+    // because logic is in headers, and cyclic dependencies cause errors
 };
-
 
 #endif /* hittable_h */

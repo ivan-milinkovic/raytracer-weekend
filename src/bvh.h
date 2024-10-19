@@ -1,6 +1,7 @@
 #ifndef bvh_h
 #define bvh_h
 
+#include <algorithm>
 #include "aabb.h"
 #include "geometry.h"
 
