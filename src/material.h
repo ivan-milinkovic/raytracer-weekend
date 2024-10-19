@@ -1,6 +1,8 @@
 #ifndef material_h
 #define material_h
 
+#include "texture.h"
+
 typedef enum {
     MaterialType_Lambertian,
     MaterialType_Metal,
@@ -21,8 +23,12 @@ public:
 
 class LambertianMaterial: public Material {
 public:
-    Vec3 albedo;
-    LambertianMaterial(const Vec3& albedo): Material(MaterialType_Lambertian), albedo(albedo) { }
+    
+    LambertianMaterial(const Vec3& albedo)
+    : Material(MaterialType_Lambertian), tex(std::make_shared<ColorTexture>(albedo)) { }
+    
+    LambertianMaterial(shared_ptr<Texture> tex)
+    : Material(MaterialType_Lambertian), tex(tex) { }
     
     bool scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
         Vec3 scattered_dir = norm(hit.n + Vec3::random(-1, 1));
@@ -30,10 +36,13 @@ public:
             scattered_dir = hit.n;
         }
         Ray scattered_ray = Ray( hit.p, scattered_dir, ray.time() );
-        attenuation = albedo;
+        attenuation = tex->value(hit.u, hit.v, hit.p);
         scattered = scattered_ray;
         return true;
     }
+    
+private:
+    shared_ptr<Texture> tex;
     
     // True Lambertian Reflection - more rays closer to the normal
     // Imagine a unit sphere above p: centered at p + n, tangent to / touching p

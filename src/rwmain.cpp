@@ -69,6 +69,7 @@ inline void render() {
 void init_scene_3_balls() {
     
     auto material_ground = make_shared<LambertianMaterial> ( Vec3(0.5, 0.5, 0.5) );
+    
     auto material_center = make_shared<LambertianMaterial> ( Vec3(0.1, 0.2, 0.5) );
     auto material_left   = make_shared<DielectricMaterial> ( 1.5 );
     auto material_bubble = make_shared<DielectricMaterial> ( 1.0 / 1.5 );
@@ -105,7 +106,10 @@ void init_scene_3_balls() {
 
 void init_scene_bouncing_balls() {
     
-    auto material_ground = make_shared<LambertianMaterial>( Vec3(0.5, 0.5, 0.5) );
+    // auto material_ground = make_shared<LambertianMaterial>( Vec3(0.5, 0.5, 0.5) );
+    auto texture_checker = make_shared<CheckerTexture>(0.32, Vec3(0.05, 0.05, .4), Vec3(.9, .9, .9));
+    auto material_ground = make_shared<LambertianMaterial> ( texture_checker );
+    
     auto material1 = make_shared<DielectricMaterial> ( 1.5 );
     auto material2 = make_shared<LambertianMaterial> ( Vec3(0.4, 0.2, 0.1) );
     auto material3 = make_shared<MetalMaterial> ( Vec3(0.7, 0.6, 0.5), 0.0 );

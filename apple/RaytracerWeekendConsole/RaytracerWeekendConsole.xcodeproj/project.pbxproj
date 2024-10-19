@@ -28,6 +28,7 @@
 		2CB356E22CC39AB4009D3EB0 /* aabb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aabb.h; sourceTree = "<group>"; };
 		2CB356E32CC3B131009D3EB0 /* bvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bvh.h; sourceTree = "<group>"; };
 		2CB356E42CC3B749009D3EB0 /* hittable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable.h; sourceTree = "<group>"; };
+		2CB356EC2CC4410A009D3EB0 /* texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
 		2CBD718F2CBA787600C14983 /* RaytracerWeekendConsole */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RaytracerWeekendConsole; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CBD71AD2CBA7B9200C14983 /* color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = color.h; sourceTree = "<group>"; };
 		2CBD71AE2CBA7B9200C14983 /* image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
@@ -102,6 +103,7 @@
 				2CBD71AF2CBA7B9200C14983 /* ppm.h */,
 				2CBD71C02CBBD2BF00C14983 /* util.h */,
 				2CBD71B32CBA7B9200C14983 /* vec3.h */,
+				2CB356EC2CC4410A009D3EB0 /* texture.h */,
 			);
 			name = src;
 			path = ../../src;
