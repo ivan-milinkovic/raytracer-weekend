@@ -1,59 +1,36 @@
 #ifndef Scene_h
 #define Scene_h
 
+#include <memory>
 #include "interval.h"
 #include "geometry.h"
-
-typedef enum {
-    SceneObjectType_Sphere = 1
-} SceneObjectType;
-
-
-class SceneObject {
-public:
-    int id;
-    SceneObjectType type;
-    void* object;
-};
-
+#include "bvh.h"
+#include "hittable.h"
+#include "material.h"
+#include "free_impl.h"
 
 class Scene {
 public:
-    std::vector<SceneObject> objects;
+    std::vector<Hittable*> objects;
+    std::vector<Material*> materials;
+    BVH_Node* bvh_root; // 2x speed up
     
     bool hit(const Ray& ray, const Interval& limits, Hit& hit) const {
-        double closest_so_far = limits.max;
-        Hit current_hit;
-        bool has_hit = false;
-        
-        for (const SceneObject& sceneObject : objects) {
-            // not using inheritance to avoid vtable dynamic dispatch
-            switch (sceneObject.type)
-            {
-                case SceneObjectType_Sphere: {
-                    Sphere* sphere = static_cast<Sphere*>(sceneObject.object);
-                    if (sphere->hit(ray, Interval(limits.min, closest_so_far), current_hit)) {
-                        hit = current_hit;
-                        closest_so_far = current_hit.d;
-                        has_hit = true;
-                    }
-                    break;
-                }
-            }
+        return bvh_root->hit(ray, limits, hit);
+    }
+    
+    void make_bvh() {
+        std::vector<std::shared_ptr<Hittable>> hittables;
+        for (Hittable* h : objects) {
+            hittables.push_back( std::shared_ptr<Hittable>(h) );
         }
-        return has_hit;
+        bvh_root = new BVH_Node(hittables);
     }
     
     ~Scene() {
-        for ( SceneObject& sceneObject : objects) {
-            switch (sceneObject.type)
-            {
-                case SceneObjectType_Sphere:
-                    Sphere* sphere = static_cast<Sphere*>(sceneObject.object);
-                    delete sphere;
-                    break;
-            }
-        }
+        delete_hittables(objects);
+        delete_materials(materials);
+//        delete bvh_root;
     }
 };
 

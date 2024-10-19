@@ -36,4 +36,9 @@ inline double rw_random(double min, double max) {
     return min + (max - min) * rw_random();
 }
 
+// [min,max]
+inline int rw_random_int(int min, int max) {
+    return int(rw_random(min, max+1));
+}
+
 #endif /* util_h */

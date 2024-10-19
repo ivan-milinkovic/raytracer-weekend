@@ -14,7 +14,6 @@ public:
     Image* image;
     Scene* scene;
     Camera* camera;
-    std::vector<Material*> materials;
     
     double screen_aspect;
     int screen_W;
@@ -78,23 +77,25 @@ void init_scene_1() {
     auto material_bubble = new DielectricMaterial ( 1.0 / 1.5 );
     auto material_right  = new MetalMaterial      ( { 0.8, 0.6, 0.2 }, 0.16 );
     
-    SceneObject center  (1, SceneObjectType_Sphere, new Sphere( { 0, 0, 3 }, 1, material_center));
-    SceneObject left    (2, SceneObjectType_Sphere, new Sphere( {-2, 0, 3 }, 1, material_left));
-    SceneObject bubble  (3, SceneObjectType_Sphere, new Sphere( {-2, 0, 3 }, 0.75, material_bubble));
-    SceneObject right   (4, SceneObjectType_Sphere, new Sphere( { 2, 0, 3 }, 1, material_right));
-    SceneObject ground  (5, SceneObjectType_Sphere, new Sphere( { 0, -101, 3 }, 100, material_ground));
+    Hittable* center = new Sphere( { 0, 0, 3 }, 1, material_center);
+    Hittable* left   = new Sphere( {-2, 0, 3 }, 1, material_left);
+    Hittable* bubble = new Sphere( {-2, 0, 3 }, 0.75, material_bubble);
+    Hittable* right  = new Sphere( { 2, 0, 3 }, 1, material_right);
+    Hittable* ground = new Sphere( { 0, -101, 3 }, 100, material_ground);
     
-    state.materials.push_back(material_ground);
-    state.materials.push_back(material_center);
-    state.materials.push_back(material_left);
-    state.materials.push_back(material_bubble);
-    state.materials.push_back(material_right);
+    state.scene->materials.push_back(material_ground);
+    state.scene->materials.push_back(material_center);
+    state.scene->materials.push_back(material_left);
+    state.scene->materials.push_back(material_bubble);
+    state.scene->materials.push_back(material_right);
     
     state.scene->objects.push_back( center );
     state.scene->objects.push_back( left );
     state.scene->objects.push_back( bubble );
     state.scene->objects.push_back( right );
     state.scene->objects.push_back( ground );
+    
+    state.scene->make_bvh();
     
     state.camera = new Camera(state.screen_W, state.screen_H);
     
@@ -114,28 +115,19 @@ void init_scene_1() {
 void init_scene_2() {
     
     auto material_ground = new LambertianMaterial ( { 0.5, 0.5, 0.5 } );
-    state.scene->objects.push_back(
-        SceneObject(0, SceneObjectType_Sphere,
-                    new Sphere( { 0, -1000, 3 }, 1000, material_ground))
-    );
-    
     auto material1 = new DielectricMaterial ( 1.5 );
-    state.scene->objects.push_back(
-        SceneObject(0, SceneObjectType_Sphere,
-                    new Sphere( { 0, 1, 0 }, 1, material1))
-    );
-    
     auto material2 = new LambertianMaterial ( { 0.4, 0.2, 0.1 } );
-    state.scene->objects.push_back(
-        SceneObject(0, SceneObjectType_Sphere,
-                    new Sphere( { -4, 1, 0 }, 1, material2))
-    );
-    
     auto material3 = new MetalMaterial ( { 0.7, 0.6, 0.5 }, 0.0 );
-    state.scene->objects.push_back(
-        SceneObject(0, SceneObjectType_Sphere,
-                    new Sphere( { 4, 1, 0 }, 1, material3))
-    );
+
+    state.scene->objects.push_back( new Sphere( { 0, -1000, 3 }, 1000, material_ground) );
+    state.scene->objects.push_back( new Sphere( { 0, 1, 0 }, 1, material1) );
+    state.scene->objects.push_back( new Sphere( { -4, 1, 0 }, 1, material2) );
+    state.scene->objects.push_back( new Sphere( { 4, 1, 0 }, 1, material3) );
+    
+    state.scene->materials.push_back(material_ground);
+    state.scene->materials.push_back(material1);
+    state.scene->materials.push_back(material2);
+    state.scene->materials.push_back(material3);
     
     for (int a = -11; a < 11; a++)
     {
@@ -150,33 +142,26 @@ void init_scene_2() {
                 {
                     Vec3 color = Vec3::random() * Vec3::random();
                     mat = new LambertianMaterial ( color );
-                    Vec3 velocity = { 0, 0.2, 0 };
-                    state.scene->objects.push_back(
-                        SceneObject(0, SceneObjectType_Sphere,
-                                    new Sphere( center, velocity, 0.2, mat))
-                    );
+                    Vec3 center2 = center + Vec3(0, 0.3, 0);
+                    state.scene->objects.push_back( new Sphere( center, center2, 0.2, mat) );
                 }
                 else if (mat_dist < 0.95)
                 {
                     Vec3 color = Vec3::random(0.5, 1);
                     double fuzz = rw_random(0, 0.5);
                     mat = new MetalMaterial ( color, fuzz );
-                    state.scene->objects.push_back(
-                        SceneObject(0, SceneObjectType_Sphere,
-                                    new Sphere( center, 0.2, mat))
-                    );
+                    state.scene->objects.push_back( new Sphere( center, 0.2, mat) );
                 }
                 else
                 {
                     mat = new DielectricMaterial ( 1.5 );
-                    state.scene->objects.push_back(
-                        SceneObject(0, SceneObjectType_Sphere,
-                                    new Sphere( center, 0.2, mat))
-                    );
+                    state.scene->objects.push_back( new Sphere( center, 0.2, mat) );
                 }
             }
         }
     }
+    
+    state.scene->make_bvh();
     
     state.camera = new Camera(state.screen_W, state.screen_H);
     state.camera->vfov_deg = 20;

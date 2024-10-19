@@ -280,15 +280,13 @@ public:
         std::ofstream file(path);
         std::cout << "Writing debug csv to:\n" << path << std::endl;
         
-        std::vector<Vec3> hits;
         for (int k = 0; k < 1; k++) {
             Vec3 viewport_point;
             Ray ray = this->make_ray(screen_W / 2, screen_H / 2, viewport_point);
             Hit hit;
-            if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit)) {
-                hits.push_back(hit.p);
-            }
-            print_csv({ray.origin(), viewport_point, hit.p}, file);
+            // auto color = ray_color(ray, max_bounces, scene);
+            scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit);
+            // print_csv({ray.origin(), viewport_point, hit.p}, file);
         }
         std::cout << std::endl;
         file.close();

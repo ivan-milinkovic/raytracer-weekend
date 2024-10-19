@@ -25,6 +25,12 @@
 
 /* Begin PBXFileReference section */
 		2CB356DF2CBD958C009D3EB0 /* material.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
+		2CB356E22CC39AB4009D3EB0 /* aabb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aabb.h; sourceTree = "<group>"; };
+		2CB356E32CC3B131009D3EB0 /* bvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bvh.h; sourceTree = "<group>"; };
+		2CB356E42CC3B749009D3EB0 /* hittable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable.h; sourceTree = "<group>"; };
+		2CB356E52CC3BB78009D3EB0 /* polymorphism.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = polymorphism.h; sourceTree = "<group>"; };
+		2CB356E62CC3C0E3009D3EB0 /* free_impl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = free_impl.h; sourceTree = "<group>"; };
+		2CB356E92CC3C758009D3EB0 /* polymorphism.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = polymorphism.cpp; sourceTree = "<group>"; };
 		2CBD718F2CBA787600C14983 /* RaytracerWeekendConsole */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RaytracerWeekendConsole; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CBD71AD2CBA7B9200C14983 /* color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = color.h; sourceTree = "<group>"; };
 		2CBD71AE2CBA7B9200C14983 /* image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
@@ -82,20 +88,26 @@
 		2CBD71B42CBA7B9200C14983 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				2CBD71BF2CBACFD000C14983 /* camera.h */,
-				2CBD71AD2CBA7B9200C14983 /* color.h */,
-				2CBD71B72CBA91FA00C14983 /* geometry.h */,
-				2CBD71AE2CBA7B9200C14983 /* image.h */,
-				2CBD71C12CBC13C500C14983 /* interval.h */,
 				2CBD71BB2CBAA57700C14983 /* main.cpp */,
-				2CBD71AF2CBA7B9200C14983 /* ppm.h */,
-				2CBD71B02CBA7B9200C14983 /* ray.h */,
 				2CBD71B12CBA7B9200C14983 /* rwmain.h */,
 				2CBD71B22CBA7B9200C14983 /* rwmain.cpp */,
+				2CBD71BF2CBACFD000C14983 /* camera.h */,
 				2CBD71BE2CBACCF100C14983 /* scene.h */,
+				2CB356E42CC3B749009D3EB0 /* hittable.h */,
+				2CB356E32CC3B131009D3EB0 /* bvh.h */,
+				2CBD71B02CBA7B9200C14983 /* ray.h */,
+				2CBD71B72CBA91FA00C14983 /* geometry.h */,
+				2CB356DF2CBD958C009D3EB0 /* material.h */,
+				2CB356E22CC39AB4009D3EB0 /* aabb.h */,
+				2CBD71AD2CBA7B9200C14983 /* color.h */,
+				2CBD71AE2CBA7B9200C14983 /* image.h */,
+				2CBD71C12CBC13C500C14983 /* interval.h */,
+				2CBD71AF2CBA7B9200C14983 /* ppm.h */,
 				2CBD71C02CBBD2BF00C14983 /* util.h */,
 				2CBD71B32CBA7B9200C14983 /* vec3.h */,
-				2CB356DF2CBD958C009D3EB0 /* material.h */,
+				2CB356E62CC3C0E3009D3EB0 /* free_impl.h */,
+				2CB356E52CC3BB78009D3EB0 /* polymorphism.h */,
+				2CB356E92CC3C758009D3EB0 /* polymorphism.cpp */,
 			);
 			name = src;
 			path = ../../src;

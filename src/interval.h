@@ -11,7 +11,12 @@ public:
     
     Interval(double min, double max) : min(min), max(max) {}
     
-    double size() {
+    Interval(const Interval& a, const Interval& b) {
+        min = a.min <= b.min ? a.min : b.min;
+        max = a.max >= b.max ? a.max : b.max;
+    }
+    
+    double size() const {
         return max - min;
     }
     
@@ -21,6 +26,11 @@ public:
     
     bool surrounds(double n) {
         return min < n && n < max;
+    }
+    
+    Interval expanded(double d) {
+        double d_half = d * 0.5;
+        return Interval(min - d_half, max + d_half);
     }
     
     double clamp(double n) const {

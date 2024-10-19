@@ -4,38 +4,49 @@
 #include "ray.h"
 #include "vec3.h"
 #include "interval.h"
-class Material;
+#include "aabb.h"
+#include "hittable.h"
 
 // 0 - original RT weekend, 1 - scratch-a-pixel geometric (fastest), 2 - scratch-a-pixel analytic
 #define HIT_IMPL 1
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 
 
-class Hit {
-public:
-    Vec3 p;
-    Vec3 n;
-    double d; // distance from ray origin
-    
-    Material* material;
-    bool is_front;
-};
-
-
-class Sphere {
+class Sphere: public Hittable { // clang crashes without public inheritance
 public:
     Vec3 center;
     double r;
     Material* material;
+    Vec3 center2; // next frame center
     Vec3 velocity;
+    AABB bbox;
     
-    Sphere(const Vec3& center, double r, Material* material): center(center), r(r), material(material) { }
-    Sphere(const Vec3& center, const Vec3& velocity, double r, Material* material): center(center), r(r), material(material), velocity(velocity) { }
+    Sphere(const Vec3& center, double r, Material* material)
+    : center(center), r(r), material(material),
+      Hittable(HittableType_Sphere)
+    {
+        Vec3 rv = Vec3(r,r,r);
+        bbox = AABB(center - rv, center + rv);
+    }
     
+    Sphere(const Vec3& center, const Vec3& center2, double r, Material* material)
+    : center(center), r(r), material(material), center2(center2),
+      Hittable(HittableType_Sphere)
+    {
+        velocity = center2 - center;
+        Vec3 rv = Vec3(r,r,r);
+        AABB box0 = AABB(center - rv, center + rv);
+        AABB box1 = AABB(center2 - rv, center2 + rv);
+        bbox = AABB(box0, box1);
+    }
+    
+    AABB bounding_box() const override {
+        return bbox;
+    }
     
 #if HIT_IMPL == 1
     
-    bool hit(const Ray& ray, Interval limits, Hit& hit) const {
+    bool hit(const Ray& ray, const Interval& limits, Hit& hit) const override {
         // manual inline is slower, why?
         return intersect(ray, limits, hit);
 
@@ -44,9 +55,9 @@ public:
     // Geometric solution
     inline bool intersect(const Ray &ray, Interval limits, Hit& hit) const
     {
-        Vec3 center2 = center + velocity * ray.time();
+        Vec3 center_dt = center + velocity * ray.time();
         double t0, t1; // solutions for t if the ray intersects
-        Vec3 L = center2 - ray.origin();
+        Vec3 L = center_dt - ray.origin();
         double tca = dot(L, ray.dir());
         // if (tca < 0) return false;
         double d2 = dot(L, L) - tca * tca;
@@ -62,7 +73,7 @@ public:
         }
         hit.d = d;
         hit.p = ray.at(hit.d);
-        hit.n = (hit.p - center2) / r;
+        hit.n = (hit.p - center_dt) / r;
         hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
@@ -74,8 +85,8 @@ public:
     // https://github.com/RayTracing/raytracing.github.io/
     bool hit(const Ray& ray, Interval limits, Hit& hit) {
         
-        Vec3 center2 = center + velocity * ray.time();
-        Vec3 OC = center2 - ray.origin();
+        Vec3 center_dt = center + velocity * ray.time();
+        Vec3 OC = center_dt - ray.origin();
         double a = ray.dir().len_sq();
         double h = dot(ray.dir(), OC);
         double c = OC.len_sq() - r*r;
@@ -94,7 +105,7 @@ public:
 
         hit.d = root;
         hit.p = ray.at(hit.d);
-        hit.n = (hit.p - center2) / r;
+        hit.n = (hit.p - center_dt) / r;
         hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
@@ -109,9 +120,9 @@ public:
     // Analytic solution
     inline bool hit(const Ray &ray, Interval limits, Hit& hit) const
     {
-        Vec3 center2 = center + velocity * ray.time();
+        Vec3 center_dt = center + velocity * ray.time();
         double t0, t1; // solutions for t if the ray intersects
-        Vec3 L = ray.origin() - center2;
+        Vec3 L = ray.origin() - center_dt;
         double a = dot(ray.dir(), ray.dir());
         double b = 2 * dot(ray.dir(), L);
         double c = dot(L,L) - r*r;
@@ -124,7 +135,7 @@ public:
         }
         hit.d = d;
         hit.p = ray.at(hit.d);
-        hit.n = (hit.p - center2) / r;
+        hit.n = (hit.p - center_dt) / r;
         hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
