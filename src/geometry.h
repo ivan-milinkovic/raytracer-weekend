@@ -42,8 +42,8 @@ public:
     {
         double t0, t1; // solutions for t if the ray intersects
         
-        Vec3 L = center - ray.Origin();
-        double tca = dot(L, ray.Dir());
+        Vec3 L = center2 - ray.origin();
+        double tca = dot(L, ray.dir());
         // if (tca < 0) return false;
         double d2 = dot(L, L) - tca * tca;
         if (d2 > r*r) return false;
@@ -59,7 +59,7 @@ public:
         hit.d = d;
         hit.p = ray.at(hit.d);
         hit.n = (hit.p - center) / r;
-        hit.is_front = dot(ray.Dir(), hit.n) < 0;
+        hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
         return true;
@@ -71,8 +71,9 @@ public:
     bool hit(const Ray& ray, Interval limits, Hit& hit) {
 
         Vec3 OC = center - ray.Origin();
-        double a = ray.Dir().len_sq();
-        double h = dot(ray.Dir(), OC);
+        Vec3 OC = center - ray.origin();
+        double a = ray.dir().len_sq();
+        double h = dot(ray.dir(), OC);
         double c = OC.len_sq() - r*r;
 
         double dcr = h*h - a*c; // discriminant
@@ -90,7 +91,7 @@ public:
         hit.d = root;
         hit.p = ray.at(hit.d);
         hit.n = (hit.p - center) / r;
-        hit.is_front = dot(ray.Dir(), hit.n) < 0;
+        hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
         
@@ -105,9 +106,9 @@ public:
     inline bool hit(const Ray &ray, Interval limits, Hit& hit) const
     {
         double t0, t1; // solutions for t if the ray intersects
-        Vec3 L = ray.Origin() - center;
-        double a = dot(ray.Dir(), ray.Dir());
-        double b = 2 * dot(ray.Dir(), L);
+        Vec3 L = ray.origin() - center;
+        double a = dot(ray.dir(), ray.dir());
+        double b = 2 * dot(ray.dir(), L);
         double c = dot(L,L) - r*r;
         if (!solveQuadratic(a, b, c, t0, t1)) return false;
         double d = t0;
@@ -119,7 +120,7 @@ public:
         hit.d = d;
         hit.p = ray.at(hit.d);
         hit.n = (hit.p - center) / r;
-        hit.is_front = dot(ray.Dir(), hit.n) < 0;
+        hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
 

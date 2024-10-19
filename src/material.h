@@ -57,7 +57,7 @@ public:
         fuzz( fuzz <= 1 ? fuzz : 1 ) { }
     
     bool scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
-        Vec3 reflected_dir = norm(reflect(ray.Dir(), hit.n));
+        Vec3 reflected_dir = norm(reflect(ray.dir(), hit.n));
         reflected_dir = norm(reflected_dir + fuzz * Vec3::random(-1, 1));
         Ray reflected_ray = Ray( hit.p, reflected_dir );
         attenuation = albedo;
@@ -79,7 +79,7 @@ public:
         attenuation = { 1, 1, 1 };
         double ri = hit.is_front ? ( 1.0 / refraction_index ) : refraction_index;
         
-        Vec3 unit_dir = norm(ray.Dir());
+        Vec3 unit_dir = norm(ray.dir());
         double cos_rn = std::fmin( dot(-unit_dir, hit.n), 1.0 );
         double sin_rn = std::sqrt( 1 - cos_rn * cos_rn );
         

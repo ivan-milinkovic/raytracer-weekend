@@ -5,18 +5,19 @@
 
 class Ray {
 private:
-    Vec3 origin;
-    Vec3 dir;
+    Vec3 _origin;
+    Vec3 _dir;
+    double _time;
     
 public:
-    Ray(const Vec3& origin, const Vec3& dir): origin(origin), dir(norm(dir)) { }
+    Ray(const Vec3& origin, const Vec3& dir): _origin(origin), _dir(norm(dir)) { }
     Ray() { }
     
-    const Vec3& Origin() const { return origin; }
-    const Vec3& Dir() const { return dir; }
+    const Vec3& origin() const { return _origin; }
+    const Vec3& dir() const { return _dir; }
     
     Vec3 at(double d) const {
-        return origin + dir * d;
+        return _origin + _dir * d;
     }    
 };
 

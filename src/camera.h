@@ -267,7 +267,7 @@ public:
         }
         else // background
         {
-            double f = 0.5 * (ray.Dir().Y() + 1.0);
+            double f = 0.5 * (ray.dir().Y() + 1.0);
             color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0.5, 0.7, 1.0));
         }
         return color;
@@ -288,7 +288,7 @@ public:
             if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit)) {
                 hits.push_back(hit.p);
             }
-            print_csv({ray.Origin(), viewport_point, hit.p}, file);
+            print_csv({ray.origin(), viewport_point, hit.p}, file);
         }
         std::cout << std::endl;
         file.close();
