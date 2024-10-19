@@ -11,7 +11,7 @@ public:
     Vec3 n;
     double d; // distance from ray origin
     
-    Material* material = nullptr;
+    std::shared_ptr<Material> material;
     bool is_front;
 };
 

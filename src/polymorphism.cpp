@@ -1,3 +1,4 @@
+/*
 #include "hittable.h"
 #include "bvh.h"
 #include "polymorphism.h"
@@ -36,3 +37,4 @@ AABB get_bbox_impl(const Hittable* object) {
     }
     return AABB();
 }
+*/

@@ -2,17 +2,18 @@
 #define Scene_h
 
 #include <memory>
+using std::shared_ptr;
+using std::vector;
 #include "interval.h"
 #include "geometry.h"
 #include "bvh.h"
 #include "hittable.h"
 #include "material.h"
-#include "free_impl.h"
 
 class Scene {
 public:
-    std::vector<Hittable*> objects;
-    std::vector<Material*> materials;
+    vector<shared_ptr<Hittable>> objects;
+    vector<shared_ptr<Material>> materials;
     BVH_Node* bvh_root; // 2x speed up
     
     bool hit(const Ray& ray, const Interval& limits, Hit& hit) const {
@@ -20,18 +21,9 @@ public:
     }
     
     void make_bvh() {
-        std::vector<std::shared_ptr<Hittable>> hittables;
-        for (Hittable* h : objects) {
-            hittables.push_back( std::shared_ptr<Hittable>(h) );
-        }
-        bvh_root = new BVH_Node(hittables);
+        bvh_root = new BVH_Node(objects);
     }
     
-    ~Scene() {
-        delete_hittables(objects);
-        delete_materials(materials);
-//        delete bvh_root;
-    }
 };
 
 #endif /* Scene_h */

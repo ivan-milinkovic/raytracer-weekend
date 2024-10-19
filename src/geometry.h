@@ -1,6 +1,7 @@
 #ifndef geometry_h
 #define geometry_h
 
+#include <memory>
 #include "ray.h"
 #include "vec3.h"
 #include "interval.h"
@@ -16,12 +17,12 @@ class Sphere: public Hittable { // clang crashes without public inheritance
 public:
     Vec3 center;
     double r;
-    Material* material;
+    std::shared_ptr<Material> material;
     Vec3 center2; // next frame center
     Vec3 velocity;
     AABB bbox;
     
-    Sphere(const Vec3& center, double r, Material* material)
+    Sphere(const Vec3& center, double r, std::shared_ptr<Material> material)
     : center(center), r(r), material(material),
       Hittable(HittableType_Sphere)
     {
@@ -29,7 +30,7 @@ public:
         bbox = AABB(center - rv, center + rv);
     }
     
-    Sphere(const Vec3& center, const Vec3& center2, double r, Material* material)
+    Sphere(const Vec3& center, const Vec3& center2, double r, std::shared_ptr<Material> material)
     : center(center), r(r), material(material), center2(center2),
       Hittable(HittableType_Sphere)
     {

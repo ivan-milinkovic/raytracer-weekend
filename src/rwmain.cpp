@@ -1,3 +1,5 @@
+#include <memory>
+using std::make_shared;
 #include "image.h"
 #include "camera.h"
 #include "geometry.h"
@@ -11,30 +13,23 @@
 
 class State {
 public:
-    Image* image;
-    Scene* scene;
-    Camera* camera;
+    std::unique_ptr<Image> image;
+    std::unique_ptr<Scene> scene;
+    std::unique_ptr<Camera> camera;
     
     double screen_aspect;
     int screen_W;
     int screen_H;
-    
-    ~State() {
-        delete image;
-        delete scene;
-        delete camera;
-    }
-    
 };
 
 State state = State();
-Image* getImage() { return state.image; }
+Image* getImage() { return state.image.get(); }
 
 
 void init();
 void init_image();
-void init_scene_1();
-void init_scene_2();
+void init_scene_3_balls();
+void init_scene_bouncing_balls();
 void render();
 
 
@@ -53,35 +48,37 @@ void rwmain()
 
 void init() {
     init_image();
-//    init_scene_1();
-    init_scene_2();
+    switch(2) {
+        case 1: init_scene_3_balls(); break;
+        case 2: init_scene_bouncing_balls(); break;
+    }
 }
 
 void init_image() {
     state.screen_aspect = 16.0 / 9.0;
     state.screen_W = 600;
     state.screen_H = (int) (state.screen_W / state.screen_aspect);
-    state.image = new Image(state.screen_W, state.screen_H);
-    state.scene = new Scene();
+    state.image = std::make_unique<Image>(state.screen_W, state.screen_H);
+    state.scene = std::make_unique<Scene>();
 }
 
 inline void render() {
     state.camera->render(*state.scene, *state.image);
 }
 
-void init_scene_1() {
+void init_scene_3_balls() {
     
-    auto material_ground = new LambertianMaterial ( { 0.5, 0.5, 0.5 } );
-    auto material_center = new LambertianMaterial ( { 0.1, 0.2, 0.5 } );
-    auto material_left   = new DielectricMaterial ( 1.5 );
-    auto material_bubble = new DielectricMaterial ( 1.0 / 1.5 );
-    auto material_right  = new MetalMaterial      ( { 0.8, 0.6, 0.2 }, 0.16 );
+    auto material_ground = make_shared<LambertianMaterial> ( Vec3(0.5, 0.5, 0.5) );
+    auto material_center = make_shared<LambertianMaterial> ( Vec3(0.1, 0.2, 0.5) );
+    auto material_left   = make_shared<DielectricMaterial> ( 1.5 );
+    auto material_bubble = make_shared<DielectricMaterial> ( 1.0 / 1.5 );
+    auto material_right  = make_shared<MetalMaterial>      ( Vec3(0.8, 0.6, 0.2), 0.16 );
     
-    Hittable* center = new Sphere( { 0, 0, 3 }, 1, material_center);
-    Hittable* left   = new Sphere( {-2, 0, 3 }, 1, material_left);
-    Hittable* bubble = new Sphere( {-2, 0, 3 }, 0.75, material_bubble);
-    Hittable* right  = new Sphere( { 2, 0, 3 }, 1, material_right);
-    Hittable* ground = new Sphere( { 0, -101, 3 }, 100, material_ground);
+    auto center = make_shared<Sphere>( Vec3( 0, 0, 3), 1, material_center);
+    auto left   = make_shared<Sphere>( Vec3(-2, 0, 3), 1, material_left);
+    auto bubble = make_shared<Sphere>( Vec3(-2, 0, 3), 0.75, material_bubble);
+    auto right  = make_shared<Sphere>( Vec3( 2, 0, 3), 1, material_right);
+    auto ground = make_shared<Sphere>( Vec3( 0, -101, 3), 100, material_ground);
     
     state.scene->materials.push_back(material_ground);
     state.scene->materials.push_back(material_center);
@@ -97,7 +94,7 @@ void init_scene_1() {
     
     state.scene->make_bvh();
     
-    state.camera = new Camera(state.screen_W, state.screen_H);
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
     
     state.camera->vfov_deg = 70;
     state.camera->focus_dist = 1;
@@ -112,17 +109,17 @@ void init_scene_1() {
 //    state.camera->look_from_at({ -4.5,0,0.5 }, { 0,0,2 });
 }
 
-void init_scene_2() {
+void init_scene_bouncing_balls() {
     
-    auto material_ground = new LambertianMaterial ( { 0.5, 0.5, 0.5 } );
-    auto material1 = new DielectricMaterial ( 1.5 );
-    auto material2 = new LambertianMaterial ( { 0.4, 0.2, 0.1 } );
-    auto material3 = new MetalMaterial ( { 0.7, 0.6, 0.5 }, 0.0 );
+    auto material_ground = make_shared<LambertianMaterial>( Vec3(0.5, 0.5, 0.5) );
+    auto material1 = make_shared<DielectricMaterial> ( 1.5 );
+    auto material2 = make_shared<LambertianMaterial> ( Vec3(0.4, 0.2, 0.1) );
+    auto material3 = make_shared<MetalMaterial> ( Vec3(0.7, 0.6, 0.5), 0.0 );
 
-    state.scene->objects.push_back( new Sphere( { 0, -1000, 3 }, 1000, material_ground) );
-    state.scene->objects.push_back( new Sphere( { 0, 1, 0 }, 1, material1) );
-    state.scene->objects.push_back( new Sphere( { -4, 1, 0 }, 1, material2) );
-    state.scene->objects.push_back( new Sphere( { 4, 1, 0 }, 1, material3) );
+    state.scene->objects.push_back( make_shared<Sphere>( Vec3(0, -1000, 3), 1000, material_ground) );
+    state.scene->objects.push_back( make_shared<Sphere>( Vec3(0, 1, 0), 1, material1) );
+    state.scene->objects.push_back( make_shared<Sphere>( Vec3(-4, 1, 0), 1, material2) );
+    state.scene->objects.push_back( make_shared<Sphere>( Vec3(4, 1, 0), 1, material3) );
     
     state.scene->materials.push_back(material_ground);
     state.scene->materials.push_back(material1);
@@ -137,25 +134,24 @@ void init_scene_2() {
             if ((center - Vec3(4, 0.2, 0)).len() > 0.9)
             {
                 auto mat_dist = rw_random();
-                Material* mat;
                 if (mat_dist < 0.8)
                 {
                     Vec3 color = Vec3::random() * Vec3::random();
-                    mat = new LambertianMaterial ( color );
+                    auto mat = make_shared<LambertianMaterial>( color );
                     Vec3 center2 = center + Vec3(0, 0.3, 0);
-                    state.scene->objects.push_back( new Sphere( center, center2, 0.2, mat) );
+                    state.scene->objects.push_back( make_shared<Sphere>( center, center2, 0.2, mat) );
                 }
                 else if (mat_dist < 0.95)
                 {
                     Vec3 color = Vec3::random(0.5, 1);
                     double fuzz = rw_random(0, 0.5);
-                    mat = new MetalMaterial ( color, fuzz );
-                    state.scene->objects.push_back( new Sphere( center, 0.2, mat) );
+                    auto mat = make_shared<MetalMaterial>( color, fuzz );
+                    state.scene->objects.push_back( make_shared<Sphere>( center, 0.2, mat) );
                 }
                 else
                 {
-                    mat = new DielectricMaterial ( 1.5 );
-                    state.scene->objects.push_back( new Sphere( center, 0.2, mat) );
+                    auto mat = make_shared<DielectricMaterial> ( 1.5 );
+                    state.scene->objects.push_back( make_shared<Sphere>( center, 0.2, mat) );
                 }
             }
         }
@@ -163,7 +159,7 @@ void init_scene_2() {
     
     state.scene->make_bvh();
     
-    state.camera = new Camera(state.screen_W, state.screen_H);
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
     state.camera->vfov_deg = 20;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.6;
