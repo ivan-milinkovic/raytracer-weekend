@@ -6,6 +6,11 @@
 #include "interval.h"
 class Material;
 
+// 0 - original RT weekend, 1 - scratch-a-pixel geometric (fastest), 2 - scratch-a-pixel analytic
+#define HIT_IMPL 1
+// https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
+
+
 class Hit {
 public:
     Vec3 p;
@@ -24,10 +29,47 @@ public:
     
     Sphere(Vec3 center, double r, Material* material): center(center), r(r), material(material) { }
     
+#if HIT_IMPL == 1
+    
     bool hit(const Ray& ray, Interval limits, Hit& hit) {
-        
+        // manual inline is slower, why?
         return intersect(ray, limits, hit);
+
+    }
+    
+    // Geometric solution
+    inline bool intersect(const Ray &ray, Interval limits, Hit& hit) const
+    {
+        double t0, t1; // solutions for t if the ray intersects
         
+        Vec3 L = center - ray.Origin();
+        double tca = dot(L, ray.Dir());
+        // if (tca < 0) return false;
+        double d2 = dot(L, L) - tca * tca;
+        if (d2 > r*r) return false;
+        double thc = sqrt(r*r - d2);
+        t0 = tca - thc;
+        t1 = tca + thc;
+        double d = t0;
+        if (!limits.surrounds(t0)) {
+            d = t1;
+            if (!limits.surrounds(d))
+                return false;
+        }
+        hit.d = d;
+        hit.p = ray.at(hit.d);
+        hit.n = (hit.p - center) / r;
+        hit.is_front = dot(ray.Dir(), hit.n) < 0;
+        hit.n = hit.is_front ? hit.n : -1 * hit.n;
+        hit.material = material;
+        return true;
+    }
+#endif
+    
+#if HIT_IMPL == 0
+    // https://github.com/RayTracing/raytracing.github.io/
+    bool hit(const Ray& ray, Interval limits, Hit& hit) {
+
         Vec3 OC = center - ray.Origin();
         double a = ray.Dir().len_sq();
         double h = dot(ray.Dir(), OC);
@@ -55,40 +97,25 @@ public:
         return true;
     }
     
-    // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
+#endif
     
-    inline bool intersect(const Ray &ray, Interval limits, Hit& hit) const
+    
+#if HIT_IMPL == 2
+    // Analytic solution
+    inline bool hit(const Ray &ray, Interval limits, Hit& hit) const
     {
         double t0, t1; // solutions for t if the ray intersects
-#if 1
-        // Geometric solution
-        Vec3 L = center - ray.Origin();
-        double tca = dot(L, ray.Dir());
-        // if (tca < 0) return false;
-        double d2 = dot(L, L) - tca * tca;
-        if (d2 > r*r) return false;
-        double thc = sqrt(r*r - d2);
-        t0 = tca - thc;
-        t1 = tca + thc;
-#else
-        // Analytic solution
         Vec3 L = ray.Origin() - center;
         double a = dot(ray.Dir(), ray.Dir());
         double b = 2 * dot(ray.Dir(), L);
         double c = dot(L,L) - r*r;
         if (!solveQuadratic(a, b, c, t0, t1)) return false;
-#endif
         double d = t0;
         if (!limits.surrounds(t0)) {
             d = t1;
             if (!limits.surrounds(d))
                 return false;
         }
-
-        if (!limits.surrounds(d)) {
-            return false;
-        }
-        
         hit.d = d;
         hit.p = ray.at(hit.d);
         hit.n = (hit.p - center) / r;
@@ -115,6 +142,9 @@ public:
         
         return true;
     }
+    
+#endif
+    
 };
 
 
