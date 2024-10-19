@@ -150,22 +150,30 @@ void init_scene_2() {
                 {
                     Vec3 color = Vec3::random() * Vec3::random();
                     mat = new LambertianMaterial ( color );
+                    Vec3 velocity = { 0, 0.2, 0 };
+                    state.scene->objects.push_back(
+                        SceneObject(0, SceneObjectType_Sphere,
+                                    new Sphere( center, velocity, 0.2, mat))
+                    );
                 }
                 else if (mat_dist < 0.95)
                 {
                     Vec3 color = Vec3::random(0.5, 1);
                     double fuzz = rw_random(0, 0.5);
                     mat = new MetalMaterial ( color, fuzz );
+                    state.scene->objects.push_back(
+                        SceneObject(0, SceneObjectType_Sphere,
+                                    new Sphere( center, 0.2, mat))
+                    );
                 }
                 else
                 {
                     mat = new DielectricMaterial ( 1.5 );
+                    state.scene->objects.push_back(
+                        SceneObject(0, SceneObjectType_Sphere,
+                                    new Sphere( center, 0.2, mat))
+                    );
                 }
-                
-                state.scene->objects.push_back(
-                    SceneObject(0, SceneObjectType_Sphere,
-                                new Sphere( center, 0.2, mat))
-                );
             }
         }
     }

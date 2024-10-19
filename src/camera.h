@@ -224,9 +224,9 @@ public:
             origin += camera_up    * offset_defocus.Y();
         }
         // origin = point; // visualize the focus plane
-        
-        Ray ray = Ray(origin, norm(point - origin));
+        double time = rw_random();
         viewport_point = point;
+        Ray ray = Ray(origin, norm(point - origin), time);
         return ray;
     }
     

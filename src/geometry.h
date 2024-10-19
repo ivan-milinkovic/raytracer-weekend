@@ -21,17 +21,21 @@ public:
     bool is_front;
 };
 
+
 class Sphere {
 public:
     Vec3 center;
     double r;
     Material* material;
+    Vec3 velocity;
     
-    Sphere(Vec3 center, double r, Material* material): center(center), r(r), material(material) { }
+    Sphere(const Vec3& center, double r, Material* material): center(center), r(r), material(material) { }
+    Sphere(const Vec3& center, const Vec3& velocity, double r, Material* material): center(center), r(r), material(material), velocity(velocity) { }
+    
     
 #if HIT_IMPL == 1
     
-    bool hit(const Ray& ray, Interval limits, Hit& hit) {
+    bool hit(const Ray& ray, Interval limits, Hit& hit) const {
         // manual inline is slower, why?
         return intersect(ray, limits, hit);
 
@@ -40,8 +44,8 @@ public:
     // Geometric solution
     inline bool intersect(const Ray &ray, Interval limits, Hit& hit) const
     {
+        Vec3 center2 = center + velocity * ray.time();
         double t0, t1; // solutions for t if the ray intersects
-        
         Vec3 L = center2 - ray.origin();
         double tca = dot(L, ray.dir());
         // if (tca < 0) return false;
@@ -58,7 +62,7 @@ public:
         }
         hit.d = d;
         hit.p = ray.at(hit.d);
-        hit.n = (hit.p - center) / r;
+        hit.n = (hit.p - center2) / r;
         hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
@@ -69,9 +73,9 @@ public:
 #if HIT_IMPL == 0
     // https://github.com/RayTracing/raytracing.github.io/
     bool hit(const Ray& ray, Interval limits, Hit& hit) {
-
-        Vec3 OC = center - ray.Origin();
-        Vec3 OC = center - ray.origin();
+        
+        Vec3 center2 = center + velocity * ray.time();
+        Vec3 OC = center2 - ray.origin();
         double a = ray.dir().len_sq();
         double h = dot(ray.dir(), OC);
         double c = OC.len_sq() - r*r;
@@ -90,7 +94,7 @@ public:
 
         hit.d = root;
         hit.p = ray.at(hit.d);
-        hit.n = (hit.p - center) / r;
+        hit.n = (hit.p - center2) / r;
         hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;
@@ -105,8 +109,9 @@ public:
     // Analytic solution
     inline bool hit(const Ray &ray, Interval limits, Hit& hit) const
     {
+        Vec3 center2 = center + velocity * ray.time();
         double t0, t1; // solutions for t if the ray intersects
-        Vec3 L = ray.origin() - center;
+        Vec3 L = ray.origin() - center2;
         double a = dot(ray.dir(), ray.dir());
         double b = 2 * dot(ray.dir(), L);
         double c = dot(L,L) - r*r;
@@ -119,7 +124,7 @@ public:
         }
         hit.d = d;
         hit.p = ray.at(hit.d);
-        hit.n = (hit.p - center) / r;
+        hit.n = (hit.p - center2) / r;
         hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
         hit.material = material;

@@ -29,7 +29,7 @@ public:
         if (scattered_dir.is_near_zero()) {
             scattered_dir = hit.n;
         }
-        Ray scattered_ray = Ray( hit.p, scattered_dir );
+        Ray scattered_ray = Ray( hit.p, scattered_dir, ray.time() );
         attenuation = albedo;
         scattered = scattered_ray;
         return true;
@@ -59,7 +59,7 @@ public:
     bool scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
         Vec3 reflected_dir = norm(reflect(ray.dir(), hit.n));
         reflected_dir = norm(reflected_dir + fuzz * Vec3::random(-1, 1));
-        Ray reflected_ray = Ray( hit.p, reflected_dir );
+        Ray reflected_ray = Ray( hit.p, reflected_dir, ray.time() );
         attenuation = albedo;
         scattered = reflected_ray;
         return true;
@@ -92,7 +92,7 @@ public:
             scattered_dir = refract(unit_dir, hit.n, ri);
         
         scattered_dir = norm(scattered_dir);
-        scattered = Ray( hit.p, scattered_dir );
+        scattered = Ray( hit.p, scattered_dir, ray.time() );
         
         return true;
     }
