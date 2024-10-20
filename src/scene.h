@@ -5,7 +5,7 @@
 using std::shared_ptr;
 using std::vector;
 #include "interval.h"
-#include "geometry.h"
+#include "sphere.h"
 #include "bvh.h"
 #include "hittable.h"
 #include "material.h"

@@ -11,7 +11,7 @@
 #include <fstream>
 #include "ray.h"
 #include "scene.h"
-#include "geometry.h"
+#include "sphere.h"
 #include "color.h"
 #include "material.h"
 #include "util.h"

@@ -2,7 +2,7 @@
 using std::make_shared;
 #include "image.h"
 #include "camera.h"
-#include "geometry.h"
+#include "sphere.h"
 #include "scene.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:

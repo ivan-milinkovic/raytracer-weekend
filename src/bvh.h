@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include "aabb.h"
-#include "geometry.h"
+#include "sphere.h"
 
 // Bounding Volume Hierarchy
 class BVH_Node: public Hittable {
