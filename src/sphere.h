@@ -45,6 +45,13 @@ public:
         return bbox;
     }
     
+    static void get_uv(const Vec3& p, double& u, double& v) {
+        auto phi = std::atan2(-p.Z(), p.X()) + pi;
+        auto theta = std::acos(-p.Y());
+        u = phi / (2*pi);
+        v = theta / pi;
+    }
+    
 #if HIT_IMPL == 1
     
     bool hit(const Ray& ray, const Interval& limits, Hit& hit) const override {
@@ -77,6 +84,7 @@ public:
         hit.n = (hit.p - center_dt) / r;
         hit.is_front = dot(ray.dir(), hit.n) < 0;
         hit.n = hit.is_front ? hit.n : -1 * hit.n;
+        get_uv(hit.n, hit.u, hit.v);
         hit.material = material;
         return true;
     }

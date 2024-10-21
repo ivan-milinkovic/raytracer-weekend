@@ -24,6 +24,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C4E34D82CC59EB000EF2B6F /* rwimage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rwimage.h; sourceTree = "<group>"; };
+		2C4E34D92CC59F2200EF2B6F /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		2CB356DF2CBD958C009D3EB0 /* material.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		2CB356E22CC39AB4009D3EB0 /* aabb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aabb.h; sourceTree = "<group>"; };
 		2CB356E32CC3B131009D3EB0 /* bvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bvh.h; sourceTree = "<group>"; };
@@ -104,6 +106,8 @@
 				2CBD71C02CBBD2BF00C14983 /* util.h */,
 				2CBD71B32CBA7B9200C14983 /* vec3.h */,
 				2CB356EC2CC4410A009D3EB0 /* texture.h */,
+				2C4E34D82CC59EB000EF2B6F /* rwimage.h */,
+				2C4E34D92CC59F2200EF2B6F /* stb_image.h */,
 			);
 			name = src;
 			path = ../../src;

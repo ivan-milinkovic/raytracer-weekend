@@ -4,6 +4,7 @@ using std::make_shared;
 #include "camera.h"
 #include "sphere.h"
 #include "scene.h"
+#include "rwimage.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.
@@ -30,6 +31,7 @@ void init();
 void init_image();
 void init_scene_3_balls();
 void init_scene_bouncing_balls();
+void init_scene_earth();
 void render();
 
 
@@ -51,6 +53,7 @@ void init() {
     switch(2) {
         case 1: init_scene_3_balls(); break;
         case 2: init_scene_bouncing_balls(); break;
+        case 3: init_scene_earth(); break;
     }
 }
 
@@ -131,7 +134,7 @@ void init_scene_bouncing_balls() {
                 {
                     Vec3 color = Vec3::random() * Vec3::random();
                     auto mat = make_shared<LambertianMaterial>( color );
-                    Vec3 center2 = center + Vec3(0, 0.3, 0);
+                    Vec3 center2 = center + Vec3(0, 0.2, 0);
                     state.scene->objects.push_back( make_shared<Sphere>( center, center2, 0.2, mat) );
                 }
                 else if (mat_dist < 0.95)
@@ -160,4 +163,24 @@ void init_scene_bouncing_balls() {
     state.camera->max_bounces = 10;
     state.camera->setup();
     state.camera->look_from_at({ 13,2,3 }, { 0,0,0 });
+}
+
+void init_scene_earth()
+{
+    auto file_path = root_dir() / "res" / "tex.png";
+    auto earth_texture = make_shared<ImageTexture>(file_path.c_str());
+    state.scene->objects.push_back(
+        make_shared<Sphere>(Vec3(0, 0, 0), 2, make_shared<LambertianMaterial>(earth_texture))
+    );
+    
+    state.scene->make_bvh();
+    
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    state.camera->vfov_deg = 20;
+    state.camera->focus_dist = 10;
+    state.camera->defocus_angle = 0.0;
+    state.camera->samples_per_pixel = 10;
+    state.camera->max_bounces = 10;
+    state.camera->setup();
+    state.camera->look_from_at({ 0,0,-12 }, { 0,0,0 });
 }
