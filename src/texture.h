@@ -1,6 +1,7 @@
 #ifndef texture_h
 #define texture_h
 
+#include "perlin.h"
 
 class Texture {
 public:
@@ -72,6 +73,20 @@ public:
     
 private:
     RwImage image;
+};
+
+
+class PerlinTexture: public Texture {
+public:
+    PerlinTexture(double scale): scale(scale) { }
+    
+    Vec3 value(double u, double v, const Vec3 &p) const override {
+        return Vec3(.5, .5, .5) * (1 + std::sin(scale * p.Z() + 10 * noise.turb(p, 7)));
+    }
+    
+private:
+    Perlin noise;
+    double scale;
 };
 
 

@@ -32,6 +32,7 @@ void init_image();
 void init_scene_3_balls();
 void init_scene_bouncing_balls();
 void init_scene_earth();
+void init_scene_perlin_spheres();
 void render();
 
 
@@ -54,6 +55,7 @@ void init() {
         case 1: init_scene_3_balls(); break;
         case 2: init_scene_bouncing_balls(); break;
         case 3: init_scene_earth(); break;
+        case 4: init_scene_perlin_spheres(); break;
     }
 }
 
@@ -183,4 +185,26 @@ void init_scene_earth()
     state.camera->max_bounces = 10;
     state.camera->setup();
     state.camera->look_from_at({ 0,0,-12 }, { 0,0,0 });
+}
+
+void init_scene_perlin_spheres()
+{
+    auto perlin_texture = make_shared<PerlinTexture>(4);
+    state.scene->objects.push_back(
+        make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
+    );
+    state.scene->objects.push_back(
+        make_shared<Sphere>(Vec3(0,2,0), 2, make_shared<LambertianMaterial>(perlin_texture))
+    );
+    
+    state.scene->make_bvh();
+    
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    state.camera->vfov_deg = 20;
+    state.camera->focus_dist = 10;
+    state.camera->defocus_angle = 0.0;
+    state.camera->samples_per_pixel = 10;
+    state.camera->max_bounces = 10;
+    state.camera->setup();
+    state.camera->look_from_at({ 13,2,-3 }, { 0,0,0 });
 }
