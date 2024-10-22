@@ -7,6 +7,7 @@ typedef enum {
     MaterialType_Lambertian,
     MaterialType_Metal,
     MaterialType_Dielectric,
+    MaterialType_Diffuse,
 } MaterialType;
 
 
@@ -17,6 +18,7 @@ public:
     Material(MaterialType type): type(type) { }
     
     bool visit_scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered);
+    Vec3 visit_emitted(double u, double v, const Vec3& p);
 };
 
 
@@ -115,6 +117,23 @@ public:
 };
 
 
+class DiffuseLightMaterial: public Material {
+public:
+    DiffuseLightMaterial(shared_ptr<Texture> tex) : Material(MaterialType_Diffuse), tex(tex) {}
+    DiffuseLightMaterial(const Vec3& emit) : Material(MaterialType_Diffuse), tex(make_shared<ColorTexture>(emit)) {}
+
+    bool scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
+        return false;
+    }
+    
+    Vec3 emitted(double u, double v, const Vec3& p) const {
+        return tex->value(u, v, p);
+    }
+
+  private:
+    shared_ptr<Texture> tex;
+};
+
 
 bool Material::visit_scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
     // Using static dispatch instead of inheritance vtable dynamic dispatch
@@ -134,12 +153,30 @@ bool Material::visit_scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, 
             dm->scatter(ray, hit, attenuation, scattered);
             return true;
         }
+        case MaterialType_Diffuse: {
+            DiffuseLightMaterial* dm = static_cast<DiffuseLightMaterial*>(this);
+            dm->scatter(ray, hit, attenuation, scattered);
+            return true;
+        }
         default: {
-            std::cout << "Unhandled material in: " << __PRETTY_FUNCTION__ << std::endl;
+            std::cout << "Unhandled material in: " << __FUNCTION__ << std::endl;
             exit(1);
         }
     }
     return false;
+}
+
+Vec3 Material::visit_emitted(double u, double v, const Vec3& p) {
+    // Using static dispatch instead of inheritance vtable dynamic dispatch
+    switch (type) {
+        case MaterialType_Diffuse: {
+            DiffuseLightMaterial* dm = static_cast<DiffuseLightMaterial*>(this);
+            return dm->emitted(u, v, p);
+        }
+        default: {
+            return Vec3::zero();
+        }
+    }
 }
 
 #endif /* material_h */

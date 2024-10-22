@@ -27,12 +27,15 @@ public:
         
         zi.min = std::min(p1.Z(), p2.Z());
         zi.max = std::max(p1.Z(), p2.Z());
+        
+        apply_minimums();
     }
     
     AABB(const AABB& box0, const AABB& box1) {
         xi = Interval(box0.xi, box1.xi);
         yi = Interval(box0.yi, box1.yi);
         zi = Interval(box0.zi, box1.zi);
+        apply_minimums();
     }
     
     // Quads don't have thikness, so one bbox dimension will be 0 - apply min size
@@ -62,7 +65,7 @@ public:
             
             if (t0 > t1) std::swap(t0, t1);
             if (t0 > ray_dt.min) ray_dt.min = t0;
-            if (t0 < ray_dt.max) ray_dt.max = t1;
+            if (t1 < ray_dt.max) ray_dt.max = t1;
             
             if (ray_dt.max <= ray_dt.min) return false;
         }

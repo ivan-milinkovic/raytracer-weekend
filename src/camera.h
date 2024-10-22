@@ -31,13 +31,15 @@ public:
     double defocus_radius;
     
     // min and max distances for ray-geometry intersections
-    double ray_hit_min = 0.0005;
-    double ray_hit_max = 200;
+    double ray_hit_min = 0.001;
+    double ray_hit_max = infinity;
     int max_bounces = 10;
     
     // multi-sampling
     int samples_per_pixel = 10;
     double samples_per_pixel_inv;
+    
+    Vec3 background = Vec3::zero();
     
     double viewport_H;
     double viewport_W;
@@ -108,6 +110,8 @@ public:
     // multi-threaded: 660ms, down from 3700ms single-threaded, 5.6x speed-up
     void render(const Scene& scene, Image& image)
     {
+        // return test(scene);
+        
         // hardware_concurrency is 10 for M1 pro
         const int cores = std::thread::hardware_concurrency();
         
@@ -252,33 +256,31 @@ public:
             return Vec3(0,0,0);
         }
         
-        Vec3 color;
         Hit hit;
-        if (scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit))
-        {
-            Vec3 attenuation;
-            Ray scattered;
-            if (hit.material->visit_scatter(ray, hit, attenuation, scattered)) {
-                Vec3 bounced_color = ray_color(scattered, bounce_num-1, scene);
-                color = attenuation * bounced_color;
-            } else {
-                color = Vec3::zero();
-            }
+        if (!scene.hit(ray, Interval(ray_hit_min, ray_hit_max), hit)) {
+            return background;
+            // double f = 0.5 * (ray.dir().Y() + 1.0);
+            // return ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0.5, 0.7, 1.0));
         }
-        else // background
-        {
-            double f = 0.5 * (ray.dir().Y() + 1.0);
-            color = ((1-f) * Vec3(1, 1, 1)) + (f * Vec3(0.5, 0.7, 1.0));
+        
+        Vec3 attenuation;
+        Ray scattered;
+        Vec3 emission_color = hit.material->visit_emitted(hit.u, hit.v, hit.p);
+        if (!hit.material->visit_scatter(ray, hit, attenuation, scattered)) {
+            return emission_color;
         }
-        return color;
+        
+        Vec3 bounced_color = ray_color(scattered, bounce_num-1, scene);
+        Vec3 scatter_color = attenuation * bounced_color;
+        
+        return emission_color + scatter_color;
     }
     
     void test(const Scene& scene) {
-        auto path = root_dir();
-        path = path / "debug" / "lines.csv";
-        
-        std::ofstream file(path);
-        std::cout << "Writing debug csv to:\n" << path << std::endl;
+//        auto path = root_dir();
+//        path = path / "debug" / "lines.csv";
+//        std::ofstream file(path);
+//        std::cout << "Writing debug csv to:\n" << path << std::endl;
         
         for (int k = 0; k < 1; k++) {
             Vec3 viewport_point;
@@ -289,7 +291,7 @@ public:
             // print_csv({ray.origin(), viewport_point, hit.p}, file);
         }
         std::cout << std::endl;
-        file.close();
+//        file.close();
         return;
     }
 };

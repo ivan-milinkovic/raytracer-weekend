@@ -54,7 +54,8 @@ public:
     }
     
     bool hit(const Ray& ray, const Interval& interval, Hit& hit) const override {
-        if ( !bbox.hit(ray, interval) ) return false;
+        if ( !bbox.hit(ray, interval) )
+            return false;
         bool in_left = left->hit(ray, interval, hit);
         bool in_right = right->hit(ray, Interval(interval.min, in_left ? hit.d : interval.max), hit);
         return in_left || in_right;

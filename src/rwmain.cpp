@@ -35,6 +35,7 @@ void init_scene_bouncing_balls();
 void init_scene_earth();
 void init_scene_perlin_spheres();
 void init_scene_quads();
+void init_scene_light();
 void render();
 
 
@@ -53,12 +54,13 @@ void rwmain()
 
 void init() {
     init_image();
-    switch(1) {
+    switch(6) {
         case 1: init_scene_bouncing_balls(); break;
         case 2: init_scene_3_balls(); break;
         case 3: init_scene_earth(); break;
         case 4: init_scene_perlin_spheres(); break;
         case 5: init_scene_quads(); break;
+        case 6: init_scene_light(); break;
     }
 }
 
@@ -104,6 +106,7 @@ void init_scene_3_balls() {
     state.camera->defocus_angle = 0;
     state.camera->setup();
     state.camera->look_from_at({ 0, 0, 0 }, { 0, 0, 1 });
+    state.camera->background = Vec3(0.70, 0.80, 1.00);
     
 //    state.camera->vfov_deg = 40;
 //    state.camera->focus_dist = 4.7;
@@ -166,6 +169,7 @@ void init_scene_bouncing_balls() {
     state.camera->defocus_angle = 0.6;
     state.camera->samples_per_pixel = 10;
     state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
     state.camera->look_from_at({ 13,2,3 }, { 0,0,0 });
 }
@@ -186,6 +190,7 @@ void init_scene_earth()
     state.camera->defocus_angle = 0.0;
     state.camera->samples_per_pixel = 10;
     state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
     state.camera->look_from_at({ 0,0,-12 }, { 0,0,0 });
 }
@@ -208,6 +213,7 @@ void init_scene_perlin_spheres()
     state.camera->defocus_angle = 0.0;
     state.camera->samples_per_pixel = 10;
     state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
     state.camera->look_from_at({ 13,2,-3 }, { 0,0,0 });
 }
@@ -219,13 +225,12 @@ void init_scene_quads()
     auto right_blue   = make_shared<LambertianMaterial>(Vec3(0.2, 0.2, 1.0));
     auto upper_orange = make_shared<LambertianMaterial>(Vec3(1.0, 0.5, 0.0));
     auto lower_teal   = make_shared<LambertianMaterial>(Vec3(0.2, 0.8, 0.8));
-
-    // Quads
+    
     state.scene->objects.push_back(
         make_shared<Quad>( Vec3(-3,-2, 5), Vec3(0, 0,-4), Vec3(0, 4, 0), left_red)
     );
     state.scene->objects.push_back(
-        make_shared<Quad>( Vec3(-2,-2, 0), Vec3(4, 0, 0), Vec3(0, 4, 0), back_green)
+        make_shared<Quad>( Vec3(-2,-2, 5), Vec3(4, 0, 0), Vec3(0, 4, 0), back_green)
     );
     state.scene->objects.push_back(
         make_shared<Quad>( Vec3( 3,-2, 1), Vec3(0, 0, 4), Vec3(0, 4, 0), right_blue)
@@ -237,6 +242,13 @@ void init_scene_quads()
         make_shared<Quad>( Vec3(-2,-3, 5), Vec3(4, 0, 0), Vec3(0, 0,-4), lower_teal)
     );
     
+    state.scene->objects.push_back(
+        make_shared<Triangle>( Vec3(-1,-1,0), Vec3(1,0,0), Vec3(0,1,0), left_red)
+    );
+    state.scene->objects.push_back(
+        make_shared<Disk>( 0.5, Vec3(0.6,-1,0), Vec3(1,0,0), Vec3(0,1,0), lower_teal)
+    );
+    
     state.scene->make_bvh();
     
     state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
@@ -245,6 +257,39 @@ void init_scene_quads()
     state.camera->defocus_angle = 0.0;
     state.camera->samples_per_pixel = 10;
     state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
-    state.camera->look_from_at({ 0,0,-3 }, { 0,0,0 });
+    state.camera->look_from_at({ 0,0, -3 }, { 0,0,0 });
+}
+
+void init_scene_light()
+{
+    
+    auto perlin_texture = make_shared<PerlinTexture>(4);
+    state.scene->objects.push_back(
+        make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
+    );
+    state.scene->objects.push_back(
+        make_shared<Sphere>(Vec3(0,2,0), 2, make_shared<LambertianMaterial>(perlin_texture))
+    );
+
+    auto diffuse_light = make_shared<DiffuseLightMaterial>(Vec3(4,4,4));
+    state.scene->objects.push_back(
+        make_shared<Quad>(Vec3(3,1,2), Vec3(2,0,0), Vec3(0,2,0), diffuse_light)
+    );
+    state.scene->objects.push_back(
+        make_shared<Sphere>(Vec3(0,7,0), 2, diffuse_light)
+    );
+    
+    state.scene->make_bvh();
+    
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    state.camera->vfov_deg = 20;
+    state.camera->focus_dist = 10;
+    state.camera->defocus_angle = 0.0;
+    state.camera->samples_per_pixel = 10;
+    state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0,0,0);
+    state.camera->setup();
+    state.camera->look_from_at({ 26,3,-6 }, { 0,2,0 });
 }
