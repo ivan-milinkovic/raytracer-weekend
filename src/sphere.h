@@ -81,9 +81,8 @@ public:
         }
         hit.d = d;
         hit.p = ray.at(hit.d);
-        hit.n = (hit.p - center_dt) / r;
-        hit.is_front = dot(ray.dir(), hit.n) < 0;
-        hit.n = hit.is_front ? hit.n : -1 * hit.n;
+        Vec3 normal = (hit.p - center_dt) / r;
+        hit.set_normal(ray, normal);
         get_uv(hit.n, hit.u, hit.v);
         hit.material = material;
         return true;

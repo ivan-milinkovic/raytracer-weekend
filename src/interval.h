@@ -20,15 +20,15 @@ public:
         return max - min;
     }
     
-    bool contains(double n) {
+    bool contains(double n) const {
         return min <= n && n <= max;
     }
     
-    bool surrounds(double n) {
+    bool surrounds(double n) const {
         return min < n && n < max;
     }
     
-    Interval expanded(double d) {
+    Interval expanded(double d) const {
         double d_half = d * 0.5;
         return Interval(min - d_half, max + d_half);
     }

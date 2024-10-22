@@ -16,11 +16,17 @@ public:
     double u;
     double v;
     bool is_front;
+    
+    inline void set_normal(const Ray& r, const Vec3& outward_normal) {
+        is_front = dot(r.dir(), outward_normal) < 0;
+        n = is_front ? outward_normal : -outward_normal;
+    }
 };
 
 typedef enum {
-    HittableType_Sphere = 1,
-    HittableType_BVH_Node = 2
+    HittableType_BVH_Node = 1,
+    HittableType_Sphere,
+    HittableType_Quad,
 } HittableType;
 
 

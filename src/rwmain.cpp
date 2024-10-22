@@ -3,6 +3,7 @@ using std::make_shared;
 #include "image.h"
 #include "camera.h"
 #include "sphere.h"
+#include "quad.h"
 #include "scene.h"
 #include "rwimage.h"
 
@@ -33,6 +34,7 @@ void init_scene_3_balls();
 void init_scene_bouncing_balls();
 void init_scene_earth();
 void init_scene_perlin_spheres();
+void init_scene_quads();
 void render();
 
 
@@ -51,11 +53,12 @@ void rwmain()
 
 void init() {
     init_image();
-    switch(2) {
-        case 1: init_scene_3_balls(); break;
-        case 2: init_scene_bouncing_balls(); break;
+    switch(1) {
+        case 1: init_scene_bouncing_balls(); break;
+        case 2: init_scene_3_balls(); break;
         case 3: init_scene_earth(); break;
         case 4: init_scene_perlin_spheres(); break;
+        case 5: init_scene_quads(); break;
     }
 }
 
@@ -207,4 +210,41 @@ void init_scene_perlin_spheres()
     state.camera->max_bounces = 10;
     state.camera->setup();
     state.camera->look_from_at({ 13,2,-3 }, { 0,0,0 });
+}
+
+void init_scene_quads()
+{
+    auto left_red     = make_shared<LambertianMaterial>(Vec3(1.0, 0.2, 0.2));
+    auto back_green   = make_shared<LambertianMaterial>(Vec3(0.2, 1.0, 0.2));
+    auto right_blue   = make_shared<LambertianMaterial>(Vec3(0.2, 0.2, 1.0));
+    auto upper_orange = make_shared<LambertianMaterial>(Vec3(1.0, 0.5, 0.0));
+    auto lower_teal   = make_shared<LambertianMaterial>(Vec3(0.2, 0.8, 0.8));
+
+    // Quads
+    state.scene->objects.push_back(
+        make_shared<Quad>( Vec3(-3,-2, 5), Vec3(0, 0,-4), Vec3(0, 4, 0), left_red)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>( Vec3(-2,-2, 0), Vec3(4, 0, 0), Vec3(0, 4, 0), back_green)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>( Vec3( 3,-2, 1), Vec3(0, 0, 4), Vec3(0, 4, 0), right_blue)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>( Vec3(-2, 3, 1), Vec3(4, 0, 0), Vec3(0, 0, 4), upper_orange)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>( Vec3(-2,-3, 5), Vec3(4, 0, 0), Vec3(0, 0,-4), lower_teal)
+    );
+    
+    state.scene->make_bvh();
+    
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    state.camera->vfov_deg = 80;
+    state.camera->focus_dist = 10;
+    state.camera->defocus_angle = 0.0;
+    state.camera->samples_per_pixel = 10;
+    state.camera->max_bounces = 10;
+    state.camera->setup();
+    state.camera->look_from_at({ 0,0,-3 }, { 0,0,0 });
 }

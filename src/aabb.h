@@ -13,7 +13,9 @@ public:
     AABB() { }
     
     AABB(const Interval& xi, const Interval& yi, const Interval& zi)
-    : xi(xi), yi(yi), zi(zi) { }
+    : xi(xi), yi(yi), zi(zi) {
+        apply_minimums();
+    }
     
     AABB(const Vec3& p1, const Vec3& p2)
     {
@@ -31,6 +33,14 @@ public:
         xi = Interval(box0.xi, box1.xi);
         yi = Interval(box0.yi, box1.yi);
         zi = Interval(box0.zi, box1.zi);
+    }
+    
+    // Quads don't have thikness, so one bbox dimension will be 0 - apply min size
+    void apply_minimums() {
+        double delta = 0.00025;
+        if (xi.size() < delta) xi = xi.expanded(delta);
+        if (yi.size() < delta) yi = yi.expanded(delta);
+        if (zi.size() < delta) zi = zi.expanded(delta);
     }
     
     const Interval& axis_interval(int axis) const {
