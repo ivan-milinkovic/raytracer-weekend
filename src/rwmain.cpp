@@ -36,6 +36,7 @@ void init_scene_earth();
 void init_scene_perlin_spheres();
 void init_scene_quads();
 void init_scene_light();
+void init_scene_cornell_box();
 void render();
 
 
@@ -54,13 +55,14 @@ void rwmain()
 
 void init() {
     init_image();
-    switch(6) {
+    switch(1) {
         case 1: init_scene_bouncing_balls(); break;
         case 2: init_scene_3_balls(); break;
         case 3: init_scene_earth(); break;
         case 4: init_scene_perlin_spheres(); break;
         case 5: init_scene_quads(); break;
         case 6: init_scene_light(); break;
+        case 7: init_scene_cornell_box(); break;
     }
 }
 
@@ -292,4 +294,49 @@ void init_scene_light()
     state.camera->background = Vec3(0,0,0);
     state.camera->setup();
     state.camera->look_from_at({ 26,3,-6 }, { 0,2,0 });
+}
+
+void init_scene_cornell_box() {
+
+    auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
+    auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
+    auto green = make_shared<LambertianMaterial>   (Vec3(.12, .45, .15));
+    auto light = make_shared<DiffuseLightMaterial> (Vec3(15, 15, 15));
+
+    state.scene->objects.push_back(
+        make_shared<Quad>(Vec3(0,0,0), Vec3(0,555,0), Vec3(0,0,555), green)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>(Vec3(555,0,0), Vec3(0,555,0), Vec3(0,0,555), red)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>(Vec3(343, 554, 332), Vec3(-130,0,0), Vec3(0,0,-105), light)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>(Vec3(0,0,0), Vec3(555,0,0), Vec3(0,0,555), white)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>(Vec3(555,555,555), Vec3(-555,0,0), Vec3(0,0,-555), white)
+    );
+    state.scene->objects.push_back(
+        make_shared<Quad>(Vec3(0,0,555), Vec3(555,0,0), Vec3(0,555,0), white)
+    );
+    
+    auto box1 = box(Vec3(130, 0, 65), Vec3(295, 165, 230), white);
+    auto box2 = box(Vec3(265, 0, 295), Vec3(430, 330, 460), white);
+    state.scene->objects.insert( state.scene->objects.end(), box1.begin(), box1.end() );
+    state.scene->objects.insert( state.scene->objects.end(), box2.begin(), box2.end() );
+    
+    state.scene->make_bvh();
+    
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    state.camera->vfov_deg = 40;
+    state.camera->focus_dist = 10;
+    state.camera->defocus_angle = 0.0;
+    state.camera->samples_per_pixel = 50;
+    state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0,0,0);
+    state.camera->setup();
+    state.camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
+    
 }

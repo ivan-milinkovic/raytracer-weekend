@@ -66,6 +66,30 @@ private:
 };
 
 
+inline
+vector<shared_ptr<Hittable>>
+box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
+{
+    vector<shared_ptr<Hittable>> sides;
+    
+    // Construct the two opposite vertices with the minimum and maximum coordinates.
+    auto min = Vec3(std::fmin(a.X(),b.X()), std::fmin(a.Y(),b.Y()), std::fmin(a.Z(),b.Z()));
+    auto max = Vec3(std::fmax(a.X(),b.X()), std::fmax(a.Y(),b.Y()), std::fmax(a.Z(),b.Z()));
+    
+    auto dx = Vec3(max.X() - min.X(), 0, 0);
+    auto dy = Vec3(0, max.Y() - min.Y(), 0);
+    auto dz = Vec3(0, 0, max.Z() - min.Z());
+
+    sides.push_back(make_shared<Quad>( Vec3(min.X(), min.Y(), max.Z()),  dx,  dy, mat)); // front
+    sides.push_back(make_shared<Quad>( Vec3(max.X(), min.Y(), max.Z()), -dz,  dy, mat)); // right
+    sides.push_back(make_shared<Quad>( Vec3(max.X(), min.Y(), min.Z()), -dx,  dy, mat)); // back
+    sides.push_back(make_shared<Quad>( Vec3(min.X(), min.Y(), min.Z()),  dz,  dy, mat)); // left
+    sides.push_back(make_shared<Quad>( Vec3(min.X(), max.Y(), max.Z()),  dx, -dz, mat)); // top
+    sides.push_back(make_shared<Quad>( Vec3(min.X(), min.Y(), min.Z()),  dx,  dz, mat)); // bottom
+
+    return sides;
+}
+
 
 class Triangle: public Quad {
 public:
