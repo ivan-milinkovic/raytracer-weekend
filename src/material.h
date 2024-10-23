@@ -8,6 +8,7 @@ typedef enum {
     MaterialType_Metal,
     MaterialType_Dielectric,
     MaterialType_Diffuse,
+    MaterialType_Isotropic,
 } MaterialType;
 
 
@@ -135,28 +136,48 @@ public:
 };
 
 
+class IsotropicMaterial : public Material {
+  public:
+    IsotropicMaterial(const Vec3& albedo)
+        : Material(MaterialType_Isotropic), tex(make_shared<ColorTexture>(albedo)) { }
+    
+    IsotropicMaterial(shared_ptr<Texture> tex)
+        : Material(MaterialType_Isotropic), tex(tex) { }
+
+    bool scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered)
+    {
+        scattered = Ray(hit.p, random_unit_vector(), ray.time());
+        attenuation = tex->value(hit.u, hit.v, hit.p);
+        return true;
+    }
+
+  private:
+    shared_ptr<Texture> tex;
+};
+
+
 bool Material::visit_scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
     // Using static dispatch instead of inheritance vtable dynamic dispatch
     switch (type) {
         case MaterialType_Lambertian: {
             LambertianMaterial* lm = static_cast<LambertianMaterial*>(this);
-            lm->scatter(ray, hit, attenuation, scattered);
-            return true;
+            return lm->scatter(ray, hit, attenuation, scattered);
         }
         case MaterialType_Metal: {
             MetalMaterial* mm = static_cast<MetalMaterial*>(this);
-            mm->scatter(ray, hit, attenuation, scattered);
-            return true;
+            return mm->scatter(ray, hit, attenuation, scattered);
         }
         case MaterialType_Dielectric: {
             DielectricMaterial* dm = static_cast<DielectricMaterial*>(this);
-            dm->scatter(ray, hit, attenuation, scattered);
-            return true;
+            return dm->scatter(ray, hit, attenuation, scattered);
         }
         case MaterialType_Diffuse: {
             DiffuseLightMaterial* dm = static_cast<DiffuseLightMaterial*>(this);
-            dm->scatter(ray, hit, attenuation, scattered);
-            return true;
+            return dm->scatter(ray, hit, attenuation, scattered);
+        }
+        case MaterialType_Isotropic: {
+            IsotropicMaterial* im = static_cast<IsotropicMaterial*>(this);
+            return im->scatter(ray, hit, attenuation, scattered);
         }
         default: {
             std::cout << "Unhandled material in: " << __FUNCTION__ << std::endl;

@@ -120,6 +120,11 @@ public:
         const int tile_cols = 1;     // std::max(cores - tile_rows, 1);
         const int tile_height = image.H() / tile_rows;
         const int tile_width  = image.W() / tile_cols;
+        int tile_id = 1;
+        
+        #if PRINT_PROGRESS
+        printf("%d tiles\n", tile_rows*tile_cols);
+        #endif
         
         std::vector<std::thread*> threads;
         for (int j = 0; j < tile_rows; j++) {
@@ -137,9 +142,9 @@ public:
                     theight = image.H() - y_start;
                 }
                 
-                // printf("(%d,%d) %d x %d \n", x_start, y_start, width, height);
-                auto thread = new std::thread([this, &image, &scene, y_start, theight](){
-                    render_tile(scene, image, 0, image.W(), y_start, theight);
+                int tid = tile_id++;
+                auto thread = new std::thread([this, &image, &scene, y_start, theight, tid](){
+                    render_tile(scene, image, 0, image.W(), y_start, theight, tid);
                 });
                 threads.push_back(thread);
             }
@@ -153,7 +158,8 @@ public:
     
     void render_tile(const Scene& scene, Image& image,
                      int x_start, int width,
-                     int y_start, int height)
+                     int y_start, int height,
+                     int tile_id)
     {
         for (int row = y_start; row < y_start + height; row++)
         {
@@ -172,44 +178,10 @@ public:
                 gamma_correct(pixel);
             }
         }
-    }
-    
-    /*
-    // Single-threaded
-    void render(const Scene& scene, Image& image) {
-        // return test(scene);
-        
-        for (int row = 0; row < image.H(); row++)
-        {
-            for (int col = 0; col < image.W(); col++)
-            {
-                int i = row * image.W() + col;
-                Vec3& pixel = image[i];
-                
-                for (int k = 0; k < samples_per_pixel; k++) {
-                    Vec3 viewport_point;
-                    Ray ray = this->make_ray(col, row, viewport_point);
-                    pixel += this->ray_color(ray, max_bounces, scene);
-                }
-                pixel *= samples_per_pixel_inv; // average
-                
-                gamma_correct(pixel);
-            }
-            
-            #if PRINT_PROGRESS
-            double f = std::fabs((double)row / (double) image.H());
-            double r = std::floor(f/0.1) * 0.1;
-            if (f > 0 && f-r < 0.002)
-                std::cout << (int)(r * 100) << "% ";
-            #endif
-        }
-        
         #if PRINT_PROGRESS
-        std::cout << std::endl;
+        printf("tile %d done\n", tile_id);
         #endif
     }
-    */
-    
     
     // A ray with random direction offset within a pixel square
     Ray make_ray(int x, int y, Vec3& viewport_point) {

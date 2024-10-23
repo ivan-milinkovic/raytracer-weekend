@@ -7,6 +7,7 @@ using std::make_shared;
 #include "scene.h"
 #include "rwimage.h"
 #include "hittable_list.h"
+#include "constant_medium.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.
@@ -30,14 +31,15 @@ Image* getImage() { return state.image.get(); }
 
 
 void init();
-void init_image();
 void init_scene_3_balls();
 void init_scene_bouncing_balls();
-void init_scene_earth();
+void init_scene_texture();
 void init_scene_perlin_spheres();
 void init_scene_quads();
 void init_scene_light();
 void init_scene_cornell_box();
+void init_scene_cornell_smoke();
+void init_scene_book_2();
 void render();
 
 
@@ -55,21 +57,22 @@ void rwmain()
 }
 
 void init() {
-    init_image();
     switch(1) {
         case 1: init_scene_bouncing_balls(); break;
         case 2: init_scene_3_balls(); break;
-        case 3: init_scene_earth(); break;
+        case 3: init_scene_texture(); break;
         case 4: init_scene_perlin_spheres(); break;
         case 5: init_scene_quads(); break;
         case 6: init_scene_light(); break;
         case 7: init_scene_cornell_box(); break;
+        case 8: init_scene_cornell_smoke(); break;
+        case 9: init_scene_book_2(); break;
     }
 }
 
-void init_image() {
-    state.screen_aspect = 16.0 / 9.0;
-    state.screen_W = 600;
+void init_image(int width, double aspect) {
+    state.screen_aspect = aspect;
+    state.screen_W = width;
     state.screen_H = (int) (state.screen_W / state.screen_aspect);
     state.image = std::make_unique<Image>(state.screen_W, state.screen_H);
     state.scene = std::make_unique<Scene>();
@@ -79,7 +82,9 @@ inline void render() {
     state.camera->render(*state.scene, *state.image);
 }
 
-void init_scene_3_balls() {
+void init_scene_3_balls()
+{
+    init_image(600, 16 / 9.0);
     
     auto material_ground = make_shared<LambertianMaterial> ( Vec3(0.5, 0.5, 0.5) );
     
@@ -94,11 +99,11 @@ void init_scene_3_balls() {
     auto right  = make_shared<Sphere>( Vec3( 2, 0, 3), 1, material_right);
     auto ground = make_shared<Sphere>( Vec3( 0, -101, 3), 100, material_ground);
     
-    state.scene->objects.push_back( center );
-    state.scene->objects.push_back( left );
-    state.scene->objects.push_back( bubble );
-    state.scene->objects.push_back( right );
-    state.scene->objects.push_back( ground );
+    state.scene->add( center );
+    state.scene->add( left );
+    state.scene->add( bubble );
+    state.scene->add( right );
+    state.scene->add( ground );
     
     state.scene->make_bvh();
     
@@ -118,7 +123,9 @@ void init_scene_3_balls() {
 //    state.camera->look_from_at({ -4.5,0,0.5 }, { 0,0,2 });
 }
 
-void init_scene_bouncing_balls() {
+void init_scene_bouncing_balls()
+{
+    init_image(600, 16 / 9.0);
     
     // auto material_ground = make_shared<LambertianMaterial>( Vec3(0.5, 0.5, 0.5) );
     auto texture_checker = make_shared<CheckerTexture>(0.32, Vec3(0.05, 0.05, .4), Vec3(.9, .9, .9));
@@ -128,10 +135,10 @@ void init_scene_bouncing_balls() {
     auto material2 = make_shared<LambertianMaterial> ( Vec3(0.4, 0.2, 0.1) );
     auto material3 = make_shared<MetalMaterial> ( Vec3(0.7, 0.6, 0.5), 0.0 );
 
-    state.scene->objects.push_back( make_shared<Sphere>( Vec3(0, -1000, 3), 1000, material_ground) );
-    state.scene->objects.push_back( make_shared<Sphere>( Vec3(0, 1, 0), 1, material1) );
-    state.scene->objects.push_back( make_shared<Sphere>( Vec3(-4, 1, 0), 1, material2) );
-    state.scene->objects.push_back( make_shared<Sphere>( Vec3(4, 1, 0), 1, material3) );
+    state.scene->add( make_shared<Sphere>( Vec3(0, -1000, 3), 1000, material_ground) );
+    state.scene->add( make_shared<Sphere>( Vec3(0, 1, 0), 1, material1) );
+    state.scene->add( make_shared<Sphere>( Vec3(-4, 1, 0), 1, material2) );
+    state.scene->add( make_shared<Sphere>( Vec3(4, 1, 0), 1, material3) );
     
     for (int a = -11; a < 11; a++)
     {
@@ -146,19 +153,19 @@ void init_scene_bouncing_balls() {
                     Vec3 color = Vec3::random() * Vec3::random();
                     auto mat = make_shared<LambertianMaterial>( color );
                     Vec3 center2 = center + Vec3(0, 0.2, 0);
-                    state.scene->objects.push_back( make_shared<Sphere>( center, center2, 0.2, mat) );
+                    state.scene->add( make_shared<Sphere>( center, center2, 0.2, mat) );
                 }
                 else if (mat_dist < 0.95)
                 {
                     Vec3 color = Vec3::random(0.5, 1);
                     double fuzz = rw_random(0, 0.5);
                     auto mat = make_shared<MetalMaterial>( color, fuzz );
-                    state.scene->objects.push_back( make_shared<Sphere>( center, 0.2, mat) );
+                    state.scene->add( make_shared<Sphere>( center, 0.2, mat) );
                 }
                 else
                 {
                     auto mat = make_shared<DielectricMaterial> ( 1.5 );
-                    state.scene->objects.push_back( make_shared<Sphere>( center, 0.2, mat) );
+                    state.scene->add( make_shared<Sphere>( center, 0.2, mat) );
                 }
             }
         }
@@ -177,12 +184,14 @@ void init_scene_bouncing_balls() {
     state.camera->look_from_at({ 13,2,3 }, { 0,0,0 });
 }
 
-void init_scene_earth()
+void init_scene_texture()
 {
+    init_image(600, 16 / 9.0);
+    
     auto file_path = root_dir() / "res" / "tex.png";
-    auto earth_texture = make_shared<ImageTexture>(file_path.c_str());
-    state.scene->objects.push_back(
-        make_shared<Sphere>(Vec3(0, 0, 0), 2, make_shared<LambertianMaterial>(earth_texture))
+    auto texture = make_shared<ImageTexture>(file_path.c_str());
+    state.scene->add(
+        make_shared<Sphere>(Vec3(0, 0, 0), 2, make_shared<LambertianMaterial>(texture))
     );
     
     state.scene->make_bvh();
@@ -200,11 +209,13 @@ void init_scene_earth()
 
 void init_scene_perlin_spheres()
 {
+    init_image(600, 16 / 9.0);
+    
     auto perlin_texture = make_shared<PerlinTexture>(4);
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Sphere>(Vec3(0,2,0), 2, make_shared<LambertianMaterial>(perlin_texture))
     );
     
@@ -223,32 +234,34 @@ void init_scene_perlin_spheres()
 
 void init_scene_quads()
 {
+    init_image(600, 16 / 9.0);
+    
     auto left_red     = make_shared<LambertianMaterial>(Vec3(1.0, 0.2, 0.2));
     auto back_green   = make_shared<LambertianMaterial>(Vec3(0.2, 1.0, 0.2));
     auto right_blue   = make_shared<LambertianMaterial>(Vec3(0.2, 0.2, 1.0));
     auto upper_orange = make_shared<LambertianMaterial>(Vec3(1.0, 0.5, 0.0));
     auto lower_teal   = make_shared<LambertianMaterial>(Vec3(0.2, 0.8, 0.8));
     
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>( Vec3(-3,-2, 5), Vec3(0, 0,-4), Vec3(0, 4, 0), left_red)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>( Vec3(-2,-2, 5), Vec3(4, 0, 0), Vec3(0, 4, 0), back_green)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>( Vec3( 3,-2, 1), Vec3(0, 0, 4), Vec3(0, 4, 0), right_blue)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>( Vec3(-2, 3, 1), Vec3(4, 0, 0), Vec3(0, 0, 4), upper_orange)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>( Vec3(-2,-3, 5), Vec3(4, 0, 0), Vec3(0, 0,-4), lower_teal)
     );
     
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Triangle>( Vec3(-1,-1,0), Vec3(1,0,0), Vec3(0,1,0), left_red)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Disk>( 0.5, Vec3(0.6,-1,0), Vec3(1,0,0), Vec3(0,1,0), lower_teal)
     );
     
@@ -267,20 +280,21 @@ void init_scene_quads()
 
 void init_scene_light()
 {
+    init_image(600, 16 / 9.0);
     
     auto perlin_texture = make_shared<PerlinTexture>(4);
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Sphere>(Vec3(0,2,0), 2, make_shared<LambertianMaterial>(perlin_texture))
     );
 
     auto diffuse_light = make_shared<DiffuseLightMaterial>(Vec3(4,4,4));
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>(Vec3(3,1,2), Vec3(2,0,0), Vec3(0,2,0), diffuse_light)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Sphere>(Vec3(0,7,0), 2, diffuse_light)
     );
     
@@ -297,48 +311,45 @@ void init_scene_light()
     state.camera->look_from_at({ 26,3,-6 }, { 0,2,0 });
 }
 
-void init_scene_cornell_box() {
-
+void init_scene_cornell_box()
+{
+    init_image(600, 16 / 9.0);
+    
     auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
     auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
     auto green = make_shared<LambertianMaterial>   (Vec3(.12, .45, .15));
     auto light = make_shared<DiffuseLightMaterial> (Vec3(15, 15, 15));
 
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>(Vec3(0,0,0), Vec3(0,555,0), Vec3(0,0,555), green)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>(Vec3(555,0,0), Vec3(0,555,0), Vec3(0,0,555), red)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>(Vec3(343, 554, 332), Vec3(-130,0,0), Vec3(0,0,-105), light)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>(Vec3(0,0,0), Vec3(555,0,0), Vec3(0,0,555), white)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>(Vec3(555,555,555), Vec3(-555,0,0), Vec3(0,0,-555), white)
     );
-    state.scene->objects.push_back(
+    state.scene->add(
         make_shared<Quad>(Vec3(0,0,555), Vec3(555,0,0), Vec3(0,555,0), white)
     );
     
-//    auto box1 = box(Vec3(130, 0, 65), Vec3(295, 165, 230), white);
-//    auto box2 = box(Vec3(265, 0, 295), Vec3(430, 330, 460), white);
-//    state.scene->objects.insert( state.scene->objects.end(), box1.begin(), box1.end() );
-//    state.scene->objects.insert( state.scene->objects.end(), box2.begin(), box2.end() );
-    
-    vector<shared_ptr<Hittable>> b1 = box(Vec3(0,0,0), Vec3(165,330,165), white);
+    vector<shared_ptr<Hittable>> b1 = make_box(Vec3(0,0,0), Vec3(165,330,165), white);
     shared_ptr<Hittable> box1 = std::make_shared<HittableList>(b1);
     box1 = make_shared<RotateY>(box1, 15);
     box1 = make_shared<Translate>(box1, Vec3(265,0,295));
-    state.scene->objects.push_back(box1);
+    state.scene->add(box1);
     
-    vector<shared_ptr<Hittable>> b2 = box(Vec3(0,0,0), Vec3(165,165,165), white);
+    vector<shared_ptr<Hittable>> b2 = make_box(Vec3(0,0,0), Vec3(165,165,165), white);
     shared_ptr<Hittable> box2 = std::make_shared<HittableList>(b2);
     box2 = make_shared<RotateY>(box2, -18);
     box2 = make_shared<Translate>(box2, Vec3(130,0,65));
-    state.scene->objects.push_back(box2);
+    state.scene->add(box2);
     
     state.scene->make_bvh();
     
@@ -352,4 +363,144 @@ void init_scene_cornell_box() {
     state.camera->setup();
     state.camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
     
+}
+
+void init_scene_cornell_smoke()
+{
+    init_image(600, 16 / 9.0);
+    
+    auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
+    auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
+    auto green = make_shared<LambertianMaterial>   (Vec3(.12, .45, .15));
+    auto light = make_shared<DiffuseLightMaterial> (Vec3(15, 15, 15));
+
+    state.scene->add(
+        make_shared<Quad>(Vec3(0,0,0), Vec3(0,555,0), Vec3(0,0,555), green)
+    );
+    state.scene->add(
+        make_shared<Quad>(Vec3(555,0,0), Vec3(0,555,0), Vec3(0,0,555), red)
+    );
+    state.scene->add(
+        make_shared<Quad>(Vec3(343, 554, 332), Vec3(-130,0,0), Vec3(0,0,-105), light)
+    );
+    state.scene->add(
+        make_shared<Quad>(Vec3(0,0,0), Vec3(555,0,0), Vec3(0,0,555), white)
+    );
+    state.scene->add(
+        make_shared<Quad>(Vec3(555,555,555), Vec3(-555,0,0), Vec3(0,0,-555), white)
+    );
+    state.scene->add(
+        make_shared<Quad>(Vec3(0,0,555), Vec3(555,0,0), Vec3(0,555,0), white)
+    );
+    
+    vector<shared_ptr<Hittable>> b1 = make_box(Vec3(0,0,0), Vec3(165,330,165), white);
+    shared_ptr<Hittable> box1 = std::make_shared<HittableList>(b1);
+    box1 = make_shared<RotateY>(box1, 15);
+    box1 = make_shared<Translate>(box1, Vec3(265,0,295));
+    auto smoke_box_1 = make_shared<ConstantMedium>(box1, 0.01, Vec3(0,0,0));
+    state.scene->add(smoke_box_1);
+    
+    vector<shared_ptr<Hittable>> b2 = make_box(Vec3(0,0,0), Vec3(165,165,165), white);
+    shared_ptr<Hittable> box2 = std::make_shared<HittableList>(b2);
+    box2 = make_shared<RotateY>(box2, -18);
+    box2 = make_shared<Translate>(box2, Vec3(130,0,65));
+    auto smoke_box_2 = make_shared<ConstantMedium>(box2, 0.01, Vec3(1,1,1));
+    state.scene->add(smoke_box_2);
+    
+    state.scene->make_bvh();
+    
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    state.camera->vfov_deg = 40;
+    state.camera->focus_dist = 10;
+    state.camera->defocus_angle = 0.0;
+    state.camera->samples_per_pixel = 30;
+    state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0,0,0);
+    state.camera->setup();
+    state.camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
+}
+
+
+void init_scene_book_2()
+{
+    init_image(600, 1.0);
+    
+    auto light_material = make_shared<DiffuseLightMaterial>(Vec3(7, 7, 7));
+    state.scene->add(make_shared<Quad>(Vec3(123,554,147), Vec3(300,0,0), Vec3(0,0,265), light_material));
+    
+    auto boxes1 = make_shared<HittableList>();
+    auto ground_material = make_shared<LambertianMaterial>(Vec3(0.48, 0.83, 0.53));
+
+    int boxes_per_side = 20;
+    for (int i = 0; i < boxes_per_side; i++) {
+        for (int j = 0; j < boxes_per_side; j++) {
+            auto w = 100.0;
+            auto x0 = -1000.0 + i*w;
+            auto z0 = -1000.0 + j*w;
+            auto y0 = 0.0;
+            auto x1 = x0 + w;
+            auto y1 = rw_random(1, 101);
+            auto z1 = z0 + w;
+            
+            boxes1->add(make_box_2(Vec3(x0,y0,z0), Vec3(x1,y1,z1), ground_material));
+        }
+    }
+    state.scene->add(boxes1);
+    
+    // top right sphere
+    auto center1 = Vec3(400, 400, 200);
+    auto center2 = center1 + Vec3(30,0,0);
+    auto sphere_material = make_shared<LambertianMaterial>(Vec3(0.7, 0.3, 0.1));
+    state.scene->add(make_shared<Sphere>(center1, center2, 50, sphere_material));
+    
+    // bottom middle sphere
+    state.scene->add(make_shared<Sphere>(Vec3(260, 150, 45), 50,
+                                         make_shared<DielectricMaterial>(1.5)));
+    
+    // bottom left sphere
+    state.scene->add(make_shared<Sphere>(Vec3(0, 150, 145), 50,
+                                         make_shared<MetalMaterial>(Vec3(0.8, 0.8, 0.9), 1.0)));
+    
+    // bottom right sphere
+    auto boundary = make_shared<Sphere>(Vec3(360,150,145), 70, make_shared<DielectricMaterial>(1.5));
+    state.scene->add(boundary);
+    
+    // full scene volumetric
+//    state.scene->add(make_shared<ConstantMedium>(boundary, 0.2, Vec3(0.2, 0.4, 0.9)));
+//    boundary = make_shared<Sphere>(Vec3(0,0,0), 5000, make_shared<DielectricMaterial>(1.5));
+//    state.scene->add(make_shared<ConstantMedium>(boundary, .0001, Vec3(1,1,1)));
+
+    // left middle textured sphere
+    auto file_path = root_dir() / "res" / "tex.png";
+    auto texture_mat = make_shared<LambertianMaterial>(make_shared<ImageTexture>(file_path.c_str()));
+    state.scene->add(make_shared<Sphere>(Vec3(400,200,400), 100, texture_mat));
+    
+    // middle noise sphere
+    auto perlin_texture = make_shared<PerlinTexture>(0.2);
+    state.scene->add(make_shared<Sphere>(Vec3(220,280,300), 80, make_shared<LambertianMaterial>(perlin_texture)));
+
+    // bubbles
+    HittableList boxes2;
+    auto white = make_shared<LambertianMaterial>(Vec3(.73, .73, .73));
+    int ns = 1000;
+    for (int j = 0; j < ns; j++) {
+        boxes2.add(make_shared<Sphere>(Vec3::random(0,165), 10, white));
+    }
+    state.scene->add(make_shared<Translate>(
+        make_shared<RotateY>(make_shared<BVH_Node>(boxes2), 15),
+        Vec3(-100,270,395)
+        )
+    );
+    
+    state.scene->make_bvh();
+    
+    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    state.camera->vfov_deg = 40;
+    state.camera->focus_dist = 10;
+    state.camera->defocus_angle = 0.0;
+    state.camera->samples_per_pixel = 10; // 1 - 5s, 10 - 36s, 60 - 5min
+    state.camera->max_bounces = 10;
+    state.camera->background = Vec3(0,0,0);
+    state.camera->setup();
+    state.camera->look_from_at({ 478, 278, -600 }, { 278, 278, 0 });
 }

@@ -15,7 +15,11 @@ class HittableList : public Hittable {
     HittableList(shared_ptr<Hittable> object): Hittable(HittableType_List) {
         add(object);
     }
-    HittableList(vector<shared_ptr<Hittable>> objects): Hittable(HittableType_List), objects(objects) { }
+    HittableList(vector<shared_ptr<Hittable>> objects): Hittable(HittableType_List), objects(objects) {
+        for (auto obj: objects) {
+            add(obj); // add updates the bounding box
+        }
+    }
 
     void clear() { objects.clear(); }
 

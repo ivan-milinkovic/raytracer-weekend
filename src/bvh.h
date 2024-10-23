@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "aabb.h"
 #include "sphere.h"
+#include "hittable_list.h"
+
 
 // Bounding Volume Hierarchy
 class BVH_Node: public Hittable {
@@ -15,9 +17,9 @@ public:
     BVH_Node() : Hittable(HittableType_BVH_Node) {}
     
     BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects)
-    : BVH_Node(objects, 0, objects.size()) {
-        
-    }
+    : BVH_Node(objects, 0, objects.size()) { }
+    
+    BVH_Node(HittableList list) : BVH_Node(list.objects, 0, list.objects.size()) { }
     
     BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects, size_t start, size_t end)
     : Hittable(HittableType_BVH_Node) {

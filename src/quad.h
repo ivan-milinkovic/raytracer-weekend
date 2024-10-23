@@ -2,6 +2,7 @@
 #define quad_h
 
 #include "hittable.h"
+#include "hittable_list.h"
 #include "vec3.h"
 #include "aabb.h"
 #include "interval.h"
@@ -68,7 +69,7 @@ private:
 
 inline
 vector<shared_ptr<Hittable>>
-box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
+make_box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
 {
     vector<shared_ptr<Hittable>> sides;
     
@@ -88,6 +89,15 @@ box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
     sides.push_back(make_shared<Quad>( Vec3(min.X(), min.Y(), min.Z()),  dx,  dz, mat)); // bottom
 
     return sides;
+}
+
+
+
+inline
+shared_ptr<HittableList>
+make_box_2(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
+{
+    return make_shared<HittableList>(make_box(a, b, mat));
 }
 
 

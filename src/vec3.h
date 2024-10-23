@@ -173,4 +173,8 @@ inline Vec3 random_vec3_on_hemisphere(const Vec3& normal) {
     return r;
 }
 
+inline static Vec3 random_unit_vector() {
+    return norm(Vec3::random(-1, 1));
+}
+
 #endif /* Vec3_h */

@@ -30,6 +30,7 @@ typedef enum {
     HittableType_RotateY,
     HittableType_Sphere,
     HittableType_Quad,
+    HittableType_ConstantMedium,
 } HittableType;
 
 

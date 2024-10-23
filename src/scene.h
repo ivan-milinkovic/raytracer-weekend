@@ -15,6 +15,14 @@ public:
     vector<shared_ptr<Hittable>> objects;
     BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
     
+    void add(shared_ptr<Hittable> obj) {
+        objects.push_back(obj);
+    }
+    
+    void add(vector<shared_ptr<Hittable>> objs) {
+        objects.insert(objects.end(), objs.begin(), objs.end());
+    }
+    
     bool hit(const Ray& ray, const Interval& limits, Hit& hit) const {
         return bvh_root->hit(ray, limits, hit);
     }
