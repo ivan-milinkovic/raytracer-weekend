@@ -28,6 +28,7 @@
 		2C4E34D92CC59F2200EF2B6F /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		2C4E34DA2CC6CBD200EF2B6F /* perlin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = perlin.h; sourceTree = "<group>"; };
 		2C4E34DB2CC76FA500EF2B6F /* quad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = quad.h; sourceTree = "<group>"; };
+		2C9533022CC8BCB9001E67A2 /* hittable_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable_list.h; sourceTree = "<group>"; };
 		2CB356DF2CBD958C009D3EB0 /* material.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		2CB356E22CC39AB4009D3EB0 /* aabb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aabb.h; sourceTree = "<group>"; };
 		2CB356E32CC3B131009D3EB0 /* bvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bvh.h; sourceTree = "<group>"; };
@@ -112,6 +113,7 @@
 				2C4E34D82CC59EB000EF2B6F /* rwimage.h */,
 				2C4E34D92CC59F2200EF2B6F /* stb_image.h */,
 				2C4E34DA2CC6CBD200EF2B6F /* perlin.h */,
+				2C9533022CC8BCB9001E67A2 /* hittable_list.h */,
 			);
 			name = src;
 			path = ../../src;

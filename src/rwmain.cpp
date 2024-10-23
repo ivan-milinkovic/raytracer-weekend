@@ -6,6 +6,7 @@ using std::make_shared;
 #include "quad.h"
 #include "scene.h"
 #include "rwimage.h"
+#include "hittable_list.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.
@@ -322,10 +323,22 @@ void init_scene_cornell_box() {
         make_shared<Quad>(Vec3(0,0,555), Vec3(555,0,0), Vec3(0,555,0), white)
     );
     
-    auto box1 = box(Vec3(130, 0, 65), Vec3(295, 165, 230), white);
-    auto box2 = box(Vec3(265, 0, 295), Vec3(430, 330, 460), white);
-    state.scene->objects.insert( state.scene->objects.end(), box1.begin(), box1.end() );
-    state.scene->objects.insert( state.scene->objects.end(), box2.begin(), box2.end() );
+//    auto box1 = box(Vec3(130, 0, 65), Vec3(295, 165, 230), white);
+//    auto box2 = box(Vec3(265, 0, 295), Vec3(430, 330, 460), white);
+//    state.scene->objects.insert( state.scene->objects.end(), box1.begin(), box1.end() );
+//    state.scene->objects.insert( state.scene->objects.end(), box2.begin(), box2.end() );
+    
+    vector<shared_ptr<Hittable>> b1 = box(Vec3(0,0,0), Vec3(165,330,165), white);
+    shared_ptr<Hittable> box1 = std::make_shared<HittableList>(b1);
+    box1 = make_shared<RotateY>(box1, 15);
+    box1 = make_shared<Translate>(box1, Vec3(265,0,295));
+    state.scene->objects.push_back(box1);
+    
+    vector<shared_ptr<Hittable>> b2 = box(Vec3(0,0,0), Vec3(165,165,165), white);
+    shared_ptr<Hittable> box2 = std::make_shared<HittableList>(b2);
+    box2 = make_shared<RotateY>(box2, -18);
+    box2 = make_shared<Translate>(box2, Vec3(130,0,65));
+    state.scene->objects.push_back(box2);
     
     state.scene->make_bvh();
     
@@ -333,7 +346,7 @@ void init_scene_cornell_box() {
     state.camera->vfov_deg = 40;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 50;
+    state.camera->samples_per_pixel = 30;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0,0,0);
     state.camera->setup();
