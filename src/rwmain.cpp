@@ -189,7 +189,7 @@ void init_scene_texture()
     init_image(600, 16 / 9.0);
     
     auto file_path = root_dir() / "res" / "tex.png";
-    auto texture = make_shared<ImageTexture>(file_path.c_str());
+    auto texture = make_shared<ImageTexture>(file_path.string().c_str());
     state.scene->add(
         make_shared<Sphere>(Vec3(0, 0, 0), 2, make_shared<LambertianMaterial>(texture))
     );
@@ -472,7 +472,7 @@ void init_scene_book_2()
 
     // left middle textured sphere
     auto file_path = root_dir() / "res" / "tex.png";
-    auto texture_mat = make_shared<LambertianMaterial>(make_shared<ImageTexture>(file_path.c_str()));
+    auto texture_mat = make_shared<LambertianMaterial>(make_shared<ImageTexture>(file_path.string().c_str()));
     state.scene->add(make_shared<Sphere>(Vec3(400,200,400), 100, texture_mat));
     
     // middle noise sphere

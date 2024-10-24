@@ -6,7 +6,7 @@
 #include <cstdlib>
 
 const double infinity = std::numeric_limits<double>::infinity();
-const double pi = M_PI;
+const double pi = 3.14159265358979323846;
 
 const double deg_to_rad = pi / 180.0;
 

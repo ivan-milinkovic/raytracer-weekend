@@ -42,8 +42,8 @@ public:
     static const Interval empty, universe;
 };
 
-inline const Interval Interval::empty    = Interval(+infinity, -infinity);
-inline const Interval Interval::universe = Interval(-infinity, +infinity);
+const Interval Interval::empty    = Interval(+infinity, -infinity);
+const Interval Interval::universe = Interval(-infinity, +infinity);
 
 Interval operator+(const Interval& interval, double displacement) {
     return Interval(interval.min + displacement, interval.max + displacement);
