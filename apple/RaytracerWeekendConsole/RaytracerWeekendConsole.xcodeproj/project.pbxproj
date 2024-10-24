@@ -30,6 +30,8 @@
 		2C4E34DB2CC76FA500EF2B6F /* quad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = quad.h; sourceTree = "<group>"; };
 		2C9533022CC8BCB9001E67A2 /* hittable_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable_list.h; sourceTree = "<group>"; };
 		2C9533032CC8C4B7001E67A2 /* constant_medium.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = constant_medium.h; sourceTree = "<group>"; };
+		2C9533042CCAA180001E67A2 /* vec3_apple_simd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vec3_apple_simd.h; sourceTree = "<group>"; };
+		2C9533052CCAA955001E67A2 /* vec3_switch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vec3_switch.h; sourceTree = "<group>"; };
 		2CB356DF2CBD958C009D3EB0 /* material.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		2CB356E22CC39AB4009D3EB0 /* aabb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aabb.h; sourceTree = "<group>"; };
 		2CB356E32CC3B131009D3EB0 /* bvh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bvh.h; sourceTree = "<group>"; };
@@ -110,6 +112,8 @@
 				2CBD71AF2CBA7B9200C14983 /* ppm.h */,
 				2CBD71C02CBBD2BF00C14983 /* util.h */,
 				2CBD71B32CBA7B9200C14983 /* vec3.h */,
+				2C9533042CCAA180001E67A2 /* vec3_apple_simd.h */,
+				2C9533052CCAA955001E67A2 /* vec3_switch.h */,
 				2CB356EC2CC4410A009D3EB0 /* texture.h */,
 				2C4E34D82CC59EB000EF2B6F /* rwimage.h */,
 				2C4E34D92CC59F2200EF2B6F /* stb_image.h */,

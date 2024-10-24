@@ -74,9 +74,9 @@ public:
         viewport_H = 2 * h * focal_len;
         viewport_W = viewport_H * real_aspect;
         
-        point_delta[0] = viewport_W / (double) screen_W;
-        point_delta[1] = viewport_H / (double) screen_H;
-        point_delta[2] = 0;
+        point_delta.set(0, viewport_W / (double) screen_W);
+        point_delta.set(1, viewport_H / (double) screen_H);
+        point_delta.set(2, 0);
         
         update_p00();
     }

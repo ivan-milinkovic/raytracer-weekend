@@ -101,8 +101,8 @@ class RotateY : public Hittable {
                     Vec3 tester(newx, y, newz);
 
                     for (int c = 0; c < 3; c++) {
-                        min[c] = std::fmin(min[c], tester[c]);
-                        max[c] = std::fmax(max[c], tester[c]);
+                        min.set(c, std::fmin(min[c], tester[c]));
+                        max.set(c, std::fmax(max[c], tester[c]));
                     }
                 }
             }
