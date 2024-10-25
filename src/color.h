@@ -33,9 +33,9 @@ inline double linear_to_gamma(double linear_value) {
 }
 
 inline void gamma_correct(Vec3& color) {
-    color.v[0] = linear_to_gamma(color.v[0]);
-    color.v[1] = linear_to_gamma(color.v[1]);
-    color.v[2] = linear_to_gamma(color.v[2]);
+    color.set(0, linear_to_gamma(color.X()));
+    color.set(1, linear_to_gamma(color.Y()));
+    color.set(2, linear_to_gamma(color.Z()));
 }
 
 #endif /* color_h */

@@ -41,6 +41,9 @@
     <ClInclude Include="..\..\src\texture.h" />
     <ClInclude Include="..\..\src\util.h" />
     <ClInclude Include="..\..\src\vec3.h" />
+    <ClInclude Include="..\..\src\vec3_apple_simd.h" />
+    <ClInclude Include="..\..\src\vec3_switch.h" />
+    <ClInclude Include="..\..\src\vec3_win_simd.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />

@@ -2,8 +2,8 @@
 #define Vec3_h
 
 #include "vec3_switch.h"
-#include "vec3_apple_simd.h"
-//#include "vec3_win_simd.h"
+#include "vec3_apple_simd.h" // slower
+#include "vec3_win_simd.h" // slower
 
 
 #ifndef VEC3_SIMD

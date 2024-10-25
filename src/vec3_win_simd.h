@@ -1,53 +1,56 @@
-#ifndef Vec3_apple_simd_h
-#define Vec3_apple_simd_h
+#ifndef Vec3_win_simd_h
+#define Vec3_win_simd_h
 
-#ifdef VEC3_APPLE_SIMD
+#ifdef VEC3_WIN_SIMD
 
-#include <simd/vector.h>
+// https://gist.github.com/bangonkali/52137c168f9bb0aaf003
+
 #include <iostream>
 #include "util.h"
+#include <intrin.h>
 
 class Vec3
 {
 public:
-    simd_double3 v;
+    __m128 v;
     Vec3(): v{0,0,0} {}
-    Vec3(simd_double3 sv): v(sv) {}
-    Vec3(double x, double y, double z): v{x,y,z} {}
+    Vec3(__m128 sv): v(sv) {}
+    Vec3(double x, double y, double z) : v{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z) } {}
     
-    inline double X() const { return v[0]; }
-    inline double Y() const { return v[1]; }
-    inline double Z() const { return v[2]; }
+    inline double X() const { return v.m128_f32[0]; }
+    inline double Y() const { return v.m128_f32[1]; }
+    inline double Z() const { return v.m128_f32[2]; }
     
     Vec3 operator -() const {
-        return Vec3(-v[0], -v[1], -v[2]);
+        return Vec3(-v.m128_f32[0], -v.m128_f32[1], -v.m128_f32[2]);
     }
     
-    inline double operator[] (int i) const { return v[i]; }
+    inline double operator[] (int i) const { return v.m128_f32[i]; }
 //    inline double& operator[] (int i) { return v[i]; }
-    inline void set(int i, double val) { v[i] = val; }
+    inline void set(int i, double val) { v.m128_f32[i] = static_cast<float>(val); }
     
     Vec3& operator+=(Vec3 v2) {
-        v += v2.v;
+        v = _mm_add_ps(v, v2.v);
         return *this;
     }
     
     Vec3& operator*=(double s) {
-        v *= s;
+        v = _mm_mul_ps(v, _mm_set1_ps(static_cast<float>(s)));
         return *this;
     }
     
     double len_sq() const {
-        return simd_length_squared(v);
+        auto v2 = _mm_mul_ps(v, v);
+        return v2.m128_f32[0] + v2.m128_f32[1] + v2.m128_f32[2];
     }
     
     double len() const {
-        return simd_length(v);
+        return std::sqrt(len_sq());
     }
     
     bool is_near_zero() {
         static double e = 1e-8;
-        return simd_length(simd_abs(v)) < e;
+        return fabs(v.m128_f32[0]) < e && fabs(v.m128_f32[1]) < e && fabs(v.m128_f32[2]) < e;
     }
     
     // [0, 1)
@@ -69,58 +72,63 @@ public:
 };
 
 inline Vec3 Vec3AddScalar(const Vec3& v, double s) {
-    return v.v + s;
+    return _mm_add_ps(v.v, _mm_set1_ps(static_cast<float>(s)));
 }
 
 inline Vec3 operator+(const Vec3& v1, const Vec3& v2) {
-    return v1.v + v2.v;
+    return _mm_add_ps(v1.v, v2.v);
 }
 
 inline Vec3 operator-(const Vec3& v1, const Vec3& v2) {
-    return v1.v - v2.v;
+    return _mm_sub_ps(v1.v, v2.v);
 }
 
 inline Vec3 operator*(const Vec3& v, double s) {
-    return v.v * s;
+    return _mm_mul_ps(v.v, _mm_set1_ps(static_cast<float>(s)));
 }
 
 inline Vec3 operator*(double s, const Vec3 v) {
-    return v.v * s;
+    return _mm_mul_ps(v.v, _mm_set1_ps(static_cast<float>(s)));
 }
 
 inline Vec3 operator*(const Vec3& v1, const Vec3& v2) {
-    return v1.v * v2.v;
+    return _mm_mul_ps(v1.v, v2.v);
 }
 
 inline Vec3 operator/(const Vec3& v, double s) {
-    return v.v / s;
+    return _mm_mul_ps(v.v, _mm_set1_ps(static_cast<float>(1.0/s)));
 }
 
 
 inline std::ostream& operator<<(std::ostream& out, const Vec3& v) {
-    return out << '[' << v.v[0] << ' ' << v.v[1] << ' ' << v.v[2] << ']';
+    return out << '[' << v.v.m128_f32[0] << ' ' << v.v.m128_f32[1] << ' ' << v.v.m128_f32[2] << ']';
 }
 
 inline double dot(const Vec3& v1, const Vec3& v2) {
-    return simd_dot(v1.v, v2.v);
+    return v1.X() * v2.X()
+         + v1.Y() * v2.Y()
+         + v1.Z() * v2.Z();
 }
 
 inline Vec3 cross(const Vec3& v1, const Vec3& v2) {
-    return simd_cross(v1.v, v2.v);
+    return Vec3(v1.Y() * v2.Z() - v1.Z() * v2.Y(),
+                v1.Z() * v2.X() - v1.X() * v2.Z(),
+                v1.X() * v2.Y() - v1.Y() * v2.X());
 }
 
 inline Vec3 norm(const Vec3& v) {
-    return simd_normalize(v.v);
+    auto len = v.len();
+    return Vec3(v.v / len);
 }
 
 inline Vec3 reflect(const Vec3& v, const Vec3& n) {
-    return v.v - simd_dot(v.v, n.v) * n.v * 2;
+    return v.v - dot(v, n) * n.v * 2;
 }
 
 inline Vec3 refract(const Vec3& v, const Vec3& n, double eta_over_eta) {
-    double cos_vn = std::fmin( simd_dot(-v.v, n.v), 1.0 );
-    simd_double3 r_out_perp = eta_over_eta * (v.v + (cos_vn * n.v));
-    simd_double3 r_out_parallel = -std::sqrt( std::fabs(1.0 - simd_length_squared(r_out_perp))) * n.v;
+    double cos_vn = std::fmin( dot(-v, n), 1.0 );
+    auto r_out_perp = eta_over_eta * (v + (cos_vn * n));
+    auto r_out_parallel = -std::sqrt( std::fabs(1.0 - r_out_perp.len_sq())) * n;
     return r_out_perp + r_out_parallel;
 }
 
@@ -159,4 +167,4 @@ inline static Vec3 random_unit_vector() {
 
 #endif
 
-#endif /* Vec3_apple_simd_h */
+#endif /* Vec3_win_simd_h */
