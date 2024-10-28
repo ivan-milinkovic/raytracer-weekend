@@ -18,7 +18,7 @@ class ConstantMedium : public Hittable {
         phase_function(make_shared<IsotropicMaterial>(albedo))
     {}
 
-    bool hit(const Ray& r, const Interval& limits, Hit& hit) const override {
+    bool hit(const Ray& r, const Interval& limits, Hit& hit) const {
         Hit hit1, hit2;
 
         if (!boundary->hit(r, Interval::universe, hit1))
@@ -53,7 +53,7 @@ class ConstantMedium : public Hittable {
         return true;
     }
 
-    AABB bounding_box() const override { return boundary->bounding_box(); }
+    AABB bounding_box() const { return boundary->bounding_box(); }
 
   private:
     shared_ptr<Hittable> boundary;

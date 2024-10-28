@@ -8,6 +8,7 @@ using std::make_shared;
 #include "rwimage.h"
 #include "hittable_list.h"
 #include "constant_medium.h"
+#include "hit_polymorph.h"
 
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.

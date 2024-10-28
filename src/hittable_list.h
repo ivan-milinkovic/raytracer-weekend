@@ -28,7 +28,7 @@ class HittableList : public Hittable {
         bbox = AABB(bbox, object->bounding_box());
     }
 
-    bool hit(const Ray& r, const Interval& limits, Hit& hit) const override {
+    bool hit(const Ray& r, const Interval& limits, Hit& hit) const {
         Hit tmp_hit;
         bool hit_anything = false;
         auto closest_so_far = limits.max;
@@ -43,7 +43,7 @@ class HittableList : public Hittable {
         return hit_anything;
     }
 
-    AABB bounding_box() const override { return bbox; }
+    AABB bounding_box() const { return bbox; }
 
   private:
     AABB bbox;

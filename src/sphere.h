@@ -41,7 +41,7 @@ public:
         bbox = AABB(box0, box1);
     }
     
-    AABB bounding_box() const override {
+    AABB bounding_box() const {
         return bbox;
     }
     
@@ -54,7 +54,7 @@ public:
     
 #if HIT_IMPL == 1
     
-    bool hit(const Ray& ray, const Interval& limits, Hit& hit) const override {
+    bool hit(const Ray& ray, const Interval& limits, Hit& hit) const {
         // manual inline is slower, why?
         return intersect(ray, limits, hit);
 

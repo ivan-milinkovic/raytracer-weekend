@@ -40,8 +40,8 @@ public:
     
     Hittable(HittableType type): type(type) { }
     
-    virtual inline bool hit(const Ray& ray, const Interval& limits, Hit& hit) const = 0;
-    virtual inline AABB bounding_box() const = 0;
+    inline bool hit(const Ray& ray, const Interval& limits, Hit& hit);
+    inline AABB bounding_box();
     
     // Tried avoiding v-tables, but wasn't much faster, time is spent elsewhere.
     // Also, hard to do static dispatch at this point,
@@ -58,7 +58,7 @@ class Translate : public Hittable {
         }
 
     
-    bool hit(const Ray& r, const Interval& limits, Hit& hit) const override {
+    bool hit(const Ray& r, const Interval& limits, Hit& hit) const {
         // Instead of objects, move the ray
         Ray offset_r(r.origin() - offset, r.dir(), r.time());
         if (!object->hit(offset_r, limits, hit))
@@ -67,7 +67,7 @@ class Translate : public Hittable {
         return true;
     }
     
-    AABB bounding_box() const override { return bbox; }
+    AABB bounding_box() const { return bbox; }
 
   private:
     shared_ptr<Hittable> object;
@@ -111,7 +111,7 @@ class RotateY : public Hittable {
         bbox = AABB(min, max);
     }
 
-    bool hit(const Ray& r, const Interval& limits, Hit& hit) const override {
+    bool hit(const Ray& r, const Interval& limits, Hit& hit) const {
 
         // Transform the ray from world space to object space.
 
@@ -151,7 +151,7 @@ class RotateY : public Hittable {
         return true;
     }
     
-    AABB bounding_box() const override { return bbox; }
+    AABB bounding_box() const { return bbox; }
     
 private:
     shared_ptr<Hittable> object;

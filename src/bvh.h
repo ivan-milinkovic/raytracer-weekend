@@ -51,11 +51,11 @@ public:
         }
     }
     
-    AABB bounding_box() const override {
+    AABB bounding_box() const {
         return bbox;
     }
     
-    bool hit(const Ray& ray, const Interval& interval, Hit& hit) const override {
+    bool hit(const Ray& ray, const Interval& interval, Hit& hit) const {
         if ( !bbox.hit(ray, interval) )
             return false;
         bool in_left = left->hit(ray, interval, hit);

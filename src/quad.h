@@ -25,9 +25,9 @@ class Quad: public Hittable {
         bbox = AABB(b1, b2);
     }
     
-    AABB bounding_box() const override { return bbox; }
+    AABB bounding_box() const { return bbox; }
     
-    bool hit(const Ray &ray, const Interval &limits, Hit &hit) const override {
+    bool hit(const Ray &ray, const Interval &limits, Hit &hit) const {
         auto nd = dot(normal, ray.dir());
         if(std::fabs(nd) < 1e-8) return false;
         auto t = (D - dot(normal, ray.origin())) / nd;

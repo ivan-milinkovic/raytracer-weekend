@@ -24,6 +24,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C468A102CCF71750015A5FE /* hit_polymorph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hit_polymorph.h; sourceTree = "<group>"; };
 		2C4E34D82CC59EB000EF2B6F /* rwimage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rwimage.h; sourceTree = "<group>"; };
 		2C4E34D92CC59F2200EF2B6F /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		2C4E34DA2CC6CBD200EF2B6F /* perlin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = perlin.h; sourceTree = "<group>"; };
@@ -100,6 +101,7 @@
 				2CBD71BF2CBACFD000C14983 /* camera.h */,
 				2CBD71BE2CBACCF100C14983 /* scene.h */,
 				2CB356E42CC3B749009D3EB0 /* hittable.h */,
+				2C468A102CCF71750015A5FE /* hit_polymorph.h */,
 				2CB356E32CC3B131009D3EB0 /* bvh.h */,
 				2CBD71B02CBA7B9200C14983 /* ray.h */,
 				2CBD71B72CBA91FA00C14983 /* sphere.h */,

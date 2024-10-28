@@ -1,14 +1,8 @@
-//
-//  camera.h
-//  RaytracerWeekendConsole
-//
-//  Created by Ivan Milinkovic on 12.10.24..
-//
-
 #ifndef camera_h
 #define camera_h
 
 #include <fstream>
+#include <thread>
 #include "ray.h"
 #include "scene.h"
 #include "sphere.h"
@@ -16,7 +10,6 @@
 #include "material.h"
 #include "util.h"
 
-#include <thread>
 
 #define PRINT_PROGRESS 1
 
