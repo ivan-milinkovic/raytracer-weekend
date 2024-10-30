@@ -48,7 +48,7 @@ class ConstantMedium : public Hittable {
 
         hit.n = Vec3(1,0,0);  // arbitrary
         hit.is_front = true;  // also arbitrary
-        hit.material = phase_function;
+        hit.material = phase_function.get();
 
         return true;
     }

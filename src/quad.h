@@ -43,7 +43,7 @@ class Quad: public Hittable {
         hit.p = p_hit;
         hit.u = a;
         hit.v = b;
-        hit.material = material;
+        hit.material = material.get();
         hit.set_normal(ray, normal);
         
         return true;

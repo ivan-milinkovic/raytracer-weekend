@@ -84,7 +84,7 @@ public:
         Vec3 normal = (hit.p - center_dt) / r;
         hit.set_normal(ray, normal);
         get_uv(hit.n, hit.u, hit.v);
-        hit.material = material;
+        hit.material = material.get();
         return true;
     }
 #endif

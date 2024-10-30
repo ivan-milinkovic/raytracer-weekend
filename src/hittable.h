@@ -12,7 +12,7 @@ public:
     Vec3 p;
     Vec3 n;
     double d; // distance from ray origin
-    std::shared_ptr<Material> material;
+    Material* material; // raw pointer up to 30% faster than shared_ptr (many assignments)
     double u;
     double v;
     bool is_front;
