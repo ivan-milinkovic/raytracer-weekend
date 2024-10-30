@@ -28,13 +28,13 @@ public:
     }
     
     inline double operator[] (int i) const { return v[i]; }
-    inline double& operator[] (int i) { return v[i]; }
+    // inline double& operator[] (int i) { return v[i]; }
     inline void set(int i, double val) { v[i] = val; }
     
     Vec3& operator+=(Vec3 v2) {
-        v[0] += v2[0];
-        v[1] += v2[1];
-        v[2] += v2[2];
+        v[0] += v2.v[0];
+        v[1] += v2.v[1];
+        v[2] += v2.v[2];
         return *this;
     }
     
@@ -81,33 +81,33 @@ public:
 };
 
 inline Vec3 Vec3AddScalar(const Vec3& v, double s) {
-    return Vec3(v[0] + s,
-                v[1] + s,
-                v[2] + s);
+    return Vec3(v.v[0] + s,
+                v.v[1] + s,
+                v.v[2] + s);
 }
 
 inline Vec3 operator+(const Vec3& v1, const Vec3& v2) {
-    return Vec3(v1[0] + v2[0],
-                v1[1] + v2[1],
-                v1[2] + v2[2]);
+    return Vec3(v1.v[0] + v2.v[0],
+                v1.v[1] + v2.v[1],
+                v1.v[2] + v2.v[2]);
 }
 
 inline Vec3 operator-(const Vec3& v1, const Vec3& v2) {
-    return Vec3(v1[0] - v2[0],
-                v1[1] - v2[1],
-                v1[2] - v2[2]);
+    return Vec3(v1.v[0] - v2.v[0],
+                v1.v[1] - v2.v[1],
+                v1.v[2] - v2.v[2]);
 }
 
 inline Vec3 operator*(const Vec3& v, double s) {
-    return Vec3(v[0] * s,
-                v[1] * s,
-                v[2] * s);
+    return Vec3(v.v[0] * s,
+                v.v[1] * s,
+                v.v[2] * s);
 }
 
 inline Vec3 operator*(double s, const Vec3 v) {
-    return Vec3(v[0] * s,
-                v[1] * s,
-                v[2] * s);
+    return Vec3(v.v[0] * s,
+                v.v[1] * s,
+                v.v[2] * s);
 }
 
 inline Vec3 operator*(const Vec3& v1, const Vec3& v2) {
