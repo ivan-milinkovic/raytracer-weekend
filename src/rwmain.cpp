@@ -35,15 +35,15 @@ public:
 
 State state = State();
 
-Image* getImage() {
+Image* rw_get_image() {
     return state.image.get();
 }
 
-RawImage& getRawImage() {
+RawImage& rw_get_raw_image() {
     return state.raw_image;
 }
 
-void setRenderPassCallback(void (*render_pass_callback)(RawImage&)) {
+void rw_set_render_pass_callback(void (*render_pass_callback)(RawImage&)) {
     state.render_pass_callback = render_pass_callback;
 }
 
