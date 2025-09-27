@@ -13,7 +13,7 @@
 #include "thread_pool.h"
 
 
-#define PRINT_PROGRESS 1
+#define PRINT_PROGRESS 0
 
 
 class Camera {
@@ -102,6 +102,98 @@ public:
             - camera_up * (point_delta.Y() / 2.0);
     }
     
+    // In this version, the multisampling loop is the outer loop
+    // allowing for callbacks when each multisample render pass ends
+    void render(const Scene& scene, Image& render_pass_image, Image& image, void (*render_pass_callback)(Image*))
+    {
+        // return test(scene);
+        
+        // hardware_concurrency is 10 for M1 pro
+        const int cores = std::thread::hardware_concurrency();
+        
+        ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
+        
+        // 10 x 1 performs the best on M1 pro for 600x337 image size
+        const int tile_rows = cores; // std::floor(std::sqrt(cores));
+        const int tile_cols = 1;     // tile_rows;
+        
+        const int tile_height = image.H() / tile_rows;
+        const int tile_width  = image.W() / tile_cols;
+        
+        int tile_id = 0;
+        
+        #if PRINT_PROGRESS
+        printf("%d tiles\n", tile_rows*tile_cols);
+        #endif
+        
+        // multisampling
+        for (int k = 0; k < samples_per_pixel; k++) {
+            
+            for (int j = 0; j < tile_rows; j++) {
+                for (int i = 0; i < tile_cols; i++) {
+                    
+                    int x_start = i * tile_width;
+                    int twidth = tile_width;
+                    if(i >= tile_rows - 1) {
+                        twidth = image.W() - x_start;
+                    }
+                    
+                    int y_start = j * tile_height;
+                    int theight = tile_height;
+                    if(j >= tile_rows - 1) {
+                        theight = image.H() - y_start;
+                    }
+                    
+                    int tid = ++tile_id;
+                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid](){
+                        this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
+                    });
+                }
+            }
+            
+            // printf("waiting for pass %d\n", k);
+            thread_pool.wait_empty_condition();
+            // printf("pass %d done\n", k);
+            
+            // callback outside to notify that one pass is done
+            if (render_pass_callback)
+                render_pass_callback(&render_pass_image);
+        }
+        
+        thread_pool.stop();
+        thread_pool.join();
+        
+        for(int i = 0; i<image.W()*image.H(); i++) {
+            Vec3& pixel = image[i];
+            pixel *= samples_per_pixel_inv; // average
+            gamma_correct(pixel);
+        }
+    }
+    
+    void render_tile(const Scene& scene, Image& image,
+                     int x_start, int width,
+                     int y_start, int height,
+                     int tile_id)
+    {
+        for (int row = y_start; row < y_start + height; row++)
+        {
+            for (int col = x_start; col < x_start + width; col++)
+            {
+                int i = row * image.W() + col;
+                Vec3& pixel = image[i];
+                
+                Vec3 viewport_point;
+                Ray ray = this->make_ray(col, row, viewport_point);
+                pixel += this->ray_color(ray, max_bounces, scene);
+            }
+        }
+        #if PRINT_PROGRESS
+        printf("tile %d done\n", tile_id);
+        #endif
+    }
+    
+    // older version that handles multisampling for each pixel immediatelly
+    /*
     // multi-threaded: 660ms, down from 3700ms single-threaded, 5.6x speed-up
     void render(const Scene& scene, Image& image)
     {
@@ -178,6 +270,7 @@ public:
         printf("tile %d done\n", tile_id);
         #endif
     }
+     */
     
     // A ray with random direction offset within a pixel square
     Ray make_ray(int x, int y, Vec3& viewport_point) {

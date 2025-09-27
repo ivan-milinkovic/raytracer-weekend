@@ -19,8 +19,10 @@ using std::make_shared;
 class State {
 public:
     std::unique_ptr<Image> image;
+    std::unique_ptr<Image> render_pass_image;
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Camera> camera;
+    void (*render_pass_callback)(Image*);
     
     double screen_aspect;
     int screen_W;
@@ -28,8 +30,14 @@ public:
 };
 
 State state = State();
-Image* getImage() { return state.image.get(); }
 
+Image* getImage() {
+    return state.image.get();
+}
+
+void setRenderPassCallback(void (*render_pass_callback)(Image*)) {
+    state.render_pass_callback = render_pass_callback;
+}
 
 void init();
 void init_scene_3_balls();
@@ -42,7 +50,6 @@ void init_scene_cornell_box();
 void init_scene_cornell_smoke();
 void init_scene_book_2();
 void render();
-
 
 void rwmain()
 {
@@ -80,7 +87,7 @@ void init_image(int width, double aspect) {
 }
 
 inline void render() {
-    state.camera->render(*state.scene, *state.image);
+    state.camera->render(*state.scene, *state.render_pass_image, *state.image, *state.render_pass_callback);
 }
 
 void init_scene_3_balls()

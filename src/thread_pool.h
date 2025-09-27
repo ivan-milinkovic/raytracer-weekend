@@ -50,8 +50,7 @@ public:
     
     void join() {
         for (auto& thread: threads) {
-            if (thread.joinable())
-                thread.join();
+            thread.join();
         }
     }
     
