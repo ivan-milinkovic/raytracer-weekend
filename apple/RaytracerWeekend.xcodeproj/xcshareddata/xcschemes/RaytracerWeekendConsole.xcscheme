@@ -18,7 +18,7 @@
                BlueprintIdentifier = "2CBD718E2CBA787600C14983"
                BuildableName = "RaytracerWeekendConsole"
                BlueprintName = "RaytracerWeekendConsole"
-               ReferencedContainer = "container:RaytracerWeekendConsole.xcodeproj">
+               ReferencedContainer = "container:RaytracerWeekend.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -48,7 +48,7 @@
             BlueprintIdentifier = "2CBD718E2CBA787600C14983"
             BuildableName = "RaytracerWeekendConsole"
             BlueprintName = "RaytracerWeekendConsole"
-            ReferencedContainer = "container:RaytracerWeekendConsole.xcodeproj">
+            ReferencedContainer = "container:RaytracerWeekend.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -65,7 +65,7 @@
             BlueprintIdentifier = "2CBD718E2CBA787600C14983"
             BuildableName = "RaytracerWeekendConsole"
             BlueprintName = "RaytracerWeekendConsole"
-            ReferencedContainer = "container:RaytracerWeekendConsole.xcodeproj">
+            ReferencedContainer = "container:RaytracerWeekend.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
