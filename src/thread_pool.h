@@ -9,9 +9,10 @@
 
 class ThreadPool {
 public:
-    ThreadPool(size_t num_threads) {
-        this->_stop = false;
+    ThreadPool(size_t num_threads, qos_class_t qos_class) {
         this->num_threads = num_threads;
+        this->qos_class = qos_class;
+        this->_stop = false;
         this->on_empty_callback = []{};
         this->setup();
     }
@@ -49,6 +50,7 @@ public:
     
 private:
     size_t num_threads;
+    qos_class_t qos_class;
     std::function<void()> on_empty_callback;
     std::queue<std::function<void()>> tasks;
     std::vector<std::thread> threads;
@@ -59,6 +61,7 @@ private:
     void setup() {
         for(int i=0; i<num_threads; i++) {
             std::thread thread = std::thread( [this] {
+                pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
                 while (true) {
                     std::function<void()> task;
                     bool is_empty = false;
