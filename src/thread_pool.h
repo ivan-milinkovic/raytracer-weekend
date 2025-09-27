@@ -95,6 +95,28 @@ private:
             threads.emplace_back(std::move(thread));
         }
     }
+    
+public:
+    static void test() {
+        ThreadPool pool(4, QOS_CLASS_USER_INITIATED);
+        
+        auto on_empty_callback = [&pool] {
+            std::cout << "queue empty" <<std::endl;
+            pool.stop();
+        };
+        pool.setOnEmptyCallback(on_empty_callback);
+        
+        for (int i = 0; i <= 4; ++i) {
+            pool.enqueue([i] {
+                std::stringstream str_buffer;
+                str_buffer << std::this_thread::get_id() << " " << i << std::endl;
+                std::cout << str_buffer.str();
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            });
+        }
+        
+        pool.join();
+    }
 };
 
 #endif /* thread_pool_h */
