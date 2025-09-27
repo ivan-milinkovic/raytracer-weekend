@@ -10,6 +10,7 @@
 #include "color.h"
 #include "material.h"
 #include "util.h"
+#include "thread_pool.h"
 
 
 #define PRINT_PROGRESS 1
@@ -109,9 +110,15 @@ public:
         // hardware_concurrency is 10 for M1 pro
         const int cores = std::thread::hardware_concurrency();
         
+        ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
+        auto on_empty_callback = [&thread_pool] {
+            thread_pool.stop();
+        };
+        thread_pool.setOnEmptyCallback(on_empty_callback);
+        
         // 10 x 1 performs the best on M1 pro for 600x337 image size
-        const int tile_rows = cores; // std::ceil(std::sqrt(cores));
-        const int tile_cols = 1;     // std::max(cores - tile_rows, 1);
+        const int tile_rows = cores; // std::floor(std::sqrt(cores));
+        const int tile_cols = 1;     // tile_rows;
         const int tile_height = image.H() / tile_rows;
         const int tile_width  = image.W() / tile_cols;
         int tile_id = 1;
@@ -140,10 +147,13 @@ public:
                 auto thread = new std::thread([this, &image, &scene, y_start, theight, tid](){
                     pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
                     render_tile(scene, image, 0, image.W(), y_start, theight, tid);
+                thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid](){
+                    render_tile(scene, image, 0, twidth, y_start, theight, tid);
                 });
                 threads.push_back(thread);
             }
         }
+        thread_pool.join();
         
         for (int i=0; i<threads.size(); i++) {
             std::thread* t = threads[i];
@@ -163,6 +173,7 @@ public:
                 int i = row * image.W() + col;
                 Vec3& pixel = image[i];
                 
+                // multisampling
                 for (int k = 0; k < samples_per_pixel; k++) {
                     Vec3 viewport_point;
                     Ray ray = this->make_ray(col, row, viewport_point);
