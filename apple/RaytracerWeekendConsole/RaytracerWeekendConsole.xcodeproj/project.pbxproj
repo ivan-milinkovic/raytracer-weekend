@@ -29,6 +29,7 @@
 		2C4E34D92CC59F2200EF2B6F /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		2C4E34DA2CC6CBD200EF2B6F /* perlin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = perlin.h; sourceTree = "<group>"; };
 		2C4E34DB2CC76FA500EF2B6F /* quad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = quad.h; sourceTree = "<group>"; };
+		2C5B7D062E87F73900564180 /* thread_pool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread_pool.h; sourceTree = "<group>"; };
 		2C9533022CC8BCB9001E67A2 /* hittable_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hittable_list.h; sourceTree = "<group>"; };
 		2C9533032CC8C4B7001E67A2 /* constant_medium.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = constant_medium.h; sourceTree = "<group>"; };
 		2C9533042CCAA180001E67A2 /* vec3_apple_simd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vec3_apple_simd.h; sourceTree = "<group>"; };
@@ -99,6 +100,7 @@
 				2CBD71B12CBA7B9200C14983 /* rwmain.h */,
 				2CBD71B22CBA7B9200C14983 /* rwmain.cpp */,
 				2CBD71BF2CBACFD000C14983 /* camera.h */,
+				2C5B7D062E87F73900564180 /* thread_pool.h */,
 				2CBD71BE2CBACCF100C14983 /* scene.h */,
 				2CB356E42CC3B749009D3EB0 /* hittable.h */,
 				2C468A102CCF71750015A5FE /* hit_polymorph.h */,
