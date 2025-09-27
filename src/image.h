@@ -3,6 +3,14 @@
 
 #include "vec3.h"
 
+typedef struct RawImage {
+    uint8_t* bytes;
+    size_t w;
+    size_t h;
+    size_t pixel_size;
+} RawImage;
+
+
 class Image {
 private:
     int w, h;
@@ -15,14 +23,29 @@ public:
         pixels = new Vec3[w*h];
     }
     
+    // Image(Image& other) = delete;
+    
     ~Image() {
         delete pixels;
     }
     
     inline int W() const { return w; }
     inline int H() const { return h; }
-    inline const Vec3 * Pixels() { return pixels; }
+    inline const Vec3 * Pixels() const { return pixels; }
     inline Vec3& operator[](int i) { return pixels[i]; }
+    const int pixel_size = 3;
+    
+    void copy_as_pixels_to(RawImage& raw_img) {
+        int j = 0;
+        for (int i = 0; i < w * h; i++) {
+            auto p = pixels[i];
+            raw_img.bytes[j++] = (uint8_t) (p.X() * 255);
+            raw_img.bytes[j++] = (uint8_t) (p.Y() * 255);
+            raw_img.bytes[j++] = (uint8_t) (p.Z() * 255);
+        }
+    }
 };
+
+
 
 #endif /* Image_h */

@@ -19,14 +19,18 @@ using std::make_shared;
 class State {
 public:
     std::unique_ptr<Image> image;
-    std::unique_ptr<Image> render_pass_image;
+    RawImage raw_image;
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Camera> camera;
-    void (*render_pass_callback)(Image*);
+    void (*render_pass_callback)(RawImage&);
     
     double screen_aspect;
     int screen_W;
     int screen_H;
+    
+    ~State() {
+        free(raw_image.bytes);
+    }
 };
 
 State state = State();
@@ -35,7 +39,11 @@ Image* getImage() {
     return state.image.get();
 }
 
-void setRenderPassCallback(void (*render_pass_callback)(Image*)) {
+RawImage& getRawImage() {
+    return state.raw_image;
+}
+
+void setRenderPassCallback(void (*render_pass_callback)(RawImage&)) {
     state.render_pass_callback = render_pass_callback;
 }
 
@@ -84,10 +92,15 @@ void init_image(int width, double aspect) {
     state.screen_H = (int) (state.screen_W / state.screen_aspect);
     state.image = std::make_unique<Image>(state.screen_W, state.screen_H);
     state.scene = std::make_unique<Scene>();
+    
+    state.raw_image.bytes = (uint8_t*) malloc(state.image->W() * state.image->H());
+    state.raw_image.w = state.image->W();
+    state.raw_image.h = state.image->H();
+    state.raw_image.pixel_size = state.image->pixel_size;
 }
 
 inline void render() {
-    state.camera->render(*state.scene, *state.render_pass_image, *state.image, *state.render_pass_callback);
+    state.camera->render(*state.scene, state.raw_image, *state.image, *state.render_pass_callback);
 }
 
 void init_scene_3_balls()

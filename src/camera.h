@@ -104,7 +104,11 @@ public:
     
     // In this version, the multisampling loop is the outer loop
     // allowing for callbacks when each multisample render pass ends
-    void render(const Scene& scene, Image& render_pass_image, Image& image, void (*render_pass_callback)(Image*))
+    void render(const Scene& scene,
+                RawImage& raw_image,
+                Image& image,
+                void (*render_pass_callback)(RawImage&)
+                )
     {
         // return test(scene);
         
@@ -157,7 +161,7 @@ public:
             
             // callback outside to notify that one pass is done
             if (render_pass_callback)
-                render_pass_callback(&render_pass_image);
+                render_pass_callback(raw_image);
         }
         
         thread_pool.stop();
@@ -168,6 +172,8 @@ public:
             pixel *= samples_per_pixel_inv; // average
             gamma_correct(pixel);
         }
+        
+        image.copy_as_pixels_to(raw_image);
     }
     
     void render_tile(const Scene& scene, Image& image,
