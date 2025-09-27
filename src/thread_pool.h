@@ -33,6 +33,13 @@ public:
         condition.notify_one();
     }
     
+    void wait_empty_condition() {
+        std::unique_lock<std::mutex> lock(tasks_empty_mutex);
+        tasks_empty_condition.wait(lock, [this] {
+            return this->tasks.empty();
+        });
+    }
+    
     void stop() {
         {
             std::unique_lock<std::mutex> lock(tasks_mutex);
@@ -55,7 +62,9 @@ private:
     std::queue<std::function<void()>> tasks;
     std::vector<std::thread> threads;
     std::condition_variable condition;
+    std::condition_variable tasks_empty_condition;
     std::mutex tasks_mutex;
+    std::mutex tasks_empty_mutex;
     bool _stop;
     
     void setup() {
@@ -85,6 +94,7 @@ private:
                     task();
                     
                     if (is_empty) {
+                        tasks_empty_condition.notify_all();
                         this->on_empty_callback();
                     }
                     
@@ -99,13 +109,6 @@ private:
 public:
     static void test() {
         ThreadPool pool(4, QOS_CLASS_USER_INITIATED);
-        
-        auto on_empty_callback = [&pool] {
-            std::cout << "queue empty" <<std::endl;
-            pool.stop();
-        };
-        pool.setOnEmptyCallback(on_empty_callback);
-        
         for (int i = 0; i <= 4; ++i) {
             pool.enqueue([i] {
                 std::stringstream str_buffer;
@@ -114,7 +117,8 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             });
         }
-        
+        pool.wait_empty_condition();
+        pool.stop();
         pool.join();
     }
 };
