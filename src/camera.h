@@ -127,7 +127,6 @@ public:
         printf("%d tiles\n", tile_rows*tile_cols);
         #endif
         
-        std::vector<std::thread*> threads;
         for (int j = 0; j < tile_rows; j++) {
             for (int i = 0; i < tile_cols; i++) {
                 
@@ -144,21 +143,12 @@ public:
                 }
                 
                 int tid = tile_id++;
-                auto thread = new std::thread([this, &image, &scene, y_start, theight, tid](){
-                    pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
-                    render_tile(scene, image, 0, image.W(), y_start, theight, tid);
                 thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid](){
-                    render_tile(scene, image, 0, twidth, y_start, theight, tid);
+                    this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
                 });
-                threads.push_back(thread);
             }
         }
         thread_pool.join();
-        
-        for (int i=0; i<threads.size(); i++) {
-            std::thread* t = threads[i];
-            t->join();
-        }
     }
     
     void render_tile(const Scene& scene, Image& image,
