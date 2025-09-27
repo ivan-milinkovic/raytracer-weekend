@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <thread>
+#include <pthread.h>
 #include "ray.h"
 #include "scene.h"
 #include "sphere.h"
@@ -137,6 +138,7 @@ public:
                 
                 int tid = tile_id++;
                 auto thread = new std::thread([this, &image, &scene, y_start, theight, tid](){
+                    pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
                     render_tile(scene, image, 0, image.W(), y_start, theight, tid);
                 });
                 threads.push_back(thread);
