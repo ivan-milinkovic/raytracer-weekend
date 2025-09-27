@@ -160,8 +160,10 @@ public:
             // printf("pass %d done\n", k);
             
             // callback outside to notify that one pass is done
-            if (render_pass_callback)
+            if (render_pass_callback) {
+                image.copy_as_pixels_to(raw_image, 1/k);
                 render_pass_callback(raw_image);
+            }
         }
         
         thread_pool.stop();
@@ -173,7 +175,7 @@ public:
             gamma_correct(pixel);
         }
         
-        image.copy_as_pixels_to(raw_image);
+        image.copy_as_pixels_to(raw_image, 1);
     }
     
     void render_tile(const Scene& scene, Image& image,

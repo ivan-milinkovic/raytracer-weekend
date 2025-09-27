@@ -35,13 +35,13 @@ public:
     inline Vec3& operator[](int i) { return pixels[i]; }
     const int pixel_size = 3;
     
-    void copy_as_pixels_to(RawImage& raw_img) {
+    void copy_as_pixels_to(RawImage& raw_img, double factor) {
         int j = 0;
         for (int i = 0; i < w * h; i++) {
             auto p = pixels[i];
-            raw_img.bytes[j++] = (uint8_t) (p.X() * 255);
-            raw_img.bytes[j++] = (uint8_t) (p.Y() * 255);
-            raw_img.bytes[j++] = (uint8_t) (p.Z() * 255);
+            raw_img.bytes[j++] = (uint8_t) (p.X() * factor * 255);
+            raw_img.bytes[j++] = (uint8_t) (p.Y() * factor * 255);
+            raw_img.bytes[j++] = (uint8_t) (p.Z() * factor * 255);
         }
     }
 };
