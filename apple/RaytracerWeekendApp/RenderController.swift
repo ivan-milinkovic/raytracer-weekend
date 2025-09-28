@@ -18,6 +18,8 @@ func callbackFromRender(imgPtr: UnsafeMutablePointer<RawImage>) {
 
 class RenderController: ObservableObject {
     
+    let renderQueue = DispatchQueue.init(label: "render-queue", qos: .userInitiated)
+    
     @Published var cgImage: CGImage?
     
     func setup() {
@@ -25,9 +27,8 @@ class RenderController: ObservableObject {
     }
     
     func render() {
-        Task.detached {
+        renderQueue.async {
             rwmain()
-            await self.handle(imgPtr: rw_get_raw_image())
         }
     }
     
@@ -38,10 +39,11 @@ class RenderController: ObservableObject {
         let h = Int(img.h)
         let pixelSize = Int(img.pixel_size)
         
-        let cgImg = Images.cgImageSRGB(img.bytes, w: w, h: h, pixelSize: pixelSize)
-        
-        DispatchQueue.main.async {
-            self.cgImage = cgImg
+        autoreleasepool {
+            let cgImg = Images.cgImageSRGB(img.bytes, w: w, h: h, pixelSize: pixelSize)
+            DispatchQueue.main.async {
+                self.cgImage = cgImg
+            }
         }
     }
     

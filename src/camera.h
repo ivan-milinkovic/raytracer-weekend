@@ -115,7 +115,7 @@ public:
         // hardware_concurrency is 10 for M1 pro
         const int cores = std::thread::hardware_concurrency();
         
-        ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
+        // ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
         
         // 10 x 1 performs the best on M1 pro for 600x337 image size
         const int tile_rows = cores; // std::floor(std::sqrt(cores));
@@ -132,6 +132,8 @@ public:
         
         // multisampling
         for (int k = 0; k < samples_per_pixel; k++) {
+            
+            ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
             
             for (int j = 0; j < tile_rows; j++) {
                 for (int i = 0; i < tile_cols; i++) {
@@ -151,6 +153,7 @@ public:
                     int tid = ++tile_id;
                     thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid](){
                         this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
+                        // std::atomic_thread_fence(std::memory_order_release); // doesn't work
                     });
                 }
             }
@@ -159,15 +162,22 @@ public:
             thread_pool.wait_empty_condition();
             // printf("pass %d done\n", k);
             
+            thread_pool.stop();
+            thread_pool.join();
+            
+            // Images are incomplete without joining all the pool threads because threads do not synchronize their cache with RAM
+            // https://vorbrodt.blog/2019/02/21/memory-barriers-and-thread-synchronization/
+            // std::atomic_thread_fence(std::memory_order_acquire); // doesn't work
+            
             // callback outside to notify that one pass is done
-            if (render_pass_callback) {
-                image.copy_as_pixels_to(raw_image, 1/k);
-                render_pass_callback(raw_image);
-            }
+//            if (render_pass_callback) {
+//                image.copy_as_pixels_to(raw_image, k == 0 ? 1.0f : 1.0f/k);
+//                render_pass_callback(raw_image);
+//            }
         }
         
-        thread_pool.stop();
-        thread_pool.join();
+        // thread_pool.stop();
+        // thread_pool.join();
         
         for(int i = 0; i<image.W()*image.H(); i++) {
             Vec3& pixel = image[i];
@@ -175,7 +185,12 @@ public:
             gamma_correct(pixel);
         }
         
-        image.copy_as_pixels_to(raw_image, 1);
+        image.copy_as_pixels_to(raw_image, 1.0f);
+        
+        if (render_pass_callback) {
+            image.copy_as_pixels_to(raw_image, 1.0f);
+            render_pass_callback(raw_image);
+        }
     }
     
     void render_tile(const Scene& scene, Image& image,
