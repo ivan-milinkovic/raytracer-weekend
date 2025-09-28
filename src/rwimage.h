@@ -22,7 +22,10 @@ public:
     bool load(const std::string& file_path) {
         auto n = bytes_per_pixel; // Dummy out parameter: original components per pixel
         fdata = stbi_loadf(file_path.c_str(), &image_width, &image_height, &n, bytes_per_pixel);
-        if (fdata == nullptr) return false;
+        if (fdata == nullptr) {
+            std::cout << "could not load image: " << file_path << std::endl;
+            return false;
+        }
 
         bytes_per_scanline = image_width * bytes_per_pixel;
         convert_to_bytes();

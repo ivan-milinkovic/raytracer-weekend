@@ -10,6 +10,10 @@ using std::make_shared;
 #include "constant_medium.h"
 #include "hit_polymorph.h"
 
+#if RW_APPLE_LOAD_RESOURCES_FROM_BUNDLE
+#include <CoreFoundation/CFBundle.h>
+#endif
+
 // viewport - A projection plane in 3D space. In world space, not view space:
 //            because objects are not projected, not transformed to view space.
 //            Instead, the camera is moved and it generates rays from it's own transform.
@@ -217,7 +221,21 @@ void init_scene_texture()
 {
     init_image(600, 16 / 9.0);
     
-    auto file_path = root_dir() / "res" / "tex.png";
+#if RW_APPLE_LOAD_RESOURCES_FROM_BUNDLE
+    CFURLRef resourceURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+    char resourcePath[PATH_MAX];
+    if (!CFURLGetFileSystemRepresentation(resourceURL, true, (UInt8 *)resourcePath, PATH_MAX)) {
+        printf("cannot load from bundle");
+        return;
+    }
+    if (resourceURL != NULL) CFRelease(resourceURL);
+    
+    std::filesystem::path file_path(resourcePath);
+    file_path = file_path / "tex.png";
+#elif
+    std::filesystem::path file_path = root_dir() / "res" / "tex.png";
+#endif
+    
     auto texture = make_shared<ImageTexture>(file_path.string().c_str());
     state.scene->add(
         make_shared<Sphere>(Vec3(0, 0, 0), 2, make_shared<LambertianMaterial>(texture))
