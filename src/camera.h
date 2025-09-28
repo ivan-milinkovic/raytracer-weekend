@@ -158,7 +158,6 @@ public:
                     thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid, &progress, render_progress_callback, totalProgress] () {
                         
                         this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
-                        // std::atomic_thread_fence(std::memory_order_release); // doesn't work
                         
                         if (render_progress_callback) {
                             progress++;
@@ -177,7 +176,6 @@ public:
             
             // Images are incomplete without joining all the pool threads because threads do not synchronize their cache with RAM
             // https://vorbrodt.blog/2019/02/21/memory-barriers-and-thread-synchronization/
-            // std::atomic_thread_fence(std::memory_order_acquire); // doesn't work
             
             // callback outside to notify that one pass is done
             if (render_pass_callback) {
