@@ -22,7 +22,8 @@ struct ContentView: View {
                     .resizable(resizingMode: .stretch)
                     .aspectRatio(contentMode: .fit)
             } else {
-                EmptyView()
+                Rectangle()
+                    .stroke(.gray)
             }
         }
         .padding()

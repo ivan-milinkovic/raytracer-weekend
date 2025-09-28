@@ -19,10 +19,12 @@ using std::make_shared;
 class State {
 public:
     std::unique_ptr<Image> image;
-    RawImage raw_image;
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Camera> camera;
     void (*render_pass_callback)(RawImage&);
+    // separate from Image, because swift calls destructors on classes
+    // causing double deletes
+    RawImage raw_image;
     
     double screen_aspect;
     int screen_W;
