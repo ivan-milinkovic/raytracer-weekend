@@ -38,8 +38,10 @@ class RenderController: ObservableObject {
     
     func render() {
         isRendering = true
+        cgImage = nil
+        let sceneId: Int32 = Int32(self.sceneId)
         renderQueue.async { [sceneId] in
-            rwmain(Int32(sceneId))
+            rwmain(sceneId)
             DispatchQueue.main.async {
                 self.isRendering = false
             }

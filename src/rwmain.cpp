@@ -82,14 +82,14 @@ void rwmain(int scene_id)
 void init(int scene_id) {
     switch(scene_id) {
         case 1: init_scene_bouncing_balls(); break;
-        case 2: init_scene_book_2(); break;
-        case 3: init_scene_3_balls(); break;
-        case 4: init_scene_texture(); break;
-        case 5: init_scene_perlin_spheres(); break;
-        case 6: init_scene_quads(); break;
-        case 7: init_scene_light(); break;
-        case 8: init_scene_cornell_box(); break;
-        case 9: init_scene_cornell_smoke(); break;
+        case 2: init_scene_3_balls(); break;
+        case 3: init_scene_texture(); break;
+        case 4: init_scene_perlin_spheres(); break;
+        case 5: init_scene_quads(); break;
+        case 6: init_scene_light(); break;
+        case 7: init_scene_cornell_box(); break;
+        case 8: init_scene_cornell_smoke(); break;
+        case 9: init_scene_book_2(); break;
         default: printf("unknown scene id %d", scene_id); break;
     }
 }
