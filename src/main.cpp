@@ -7,7 +7,7 @@ int main(int argc, const char * argv[]) {
     
     // ThreadPool::test(); return 0;
     
-    rwmain();
+    rwmain(1);
     
     // output
     Image* img = rw_get_image();

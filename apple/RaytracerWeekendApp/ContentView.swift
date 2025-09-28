@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  RaytracerWeekendApp
 //
-//  Created by Ivan Milinkovic on 27. 9. 2025..
+//  Created by Ivan Milinkovic on 27. 9. 2025.
 //
 
 import SwiftUI
@@ -13,10 +13,18 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Button("Render") {
-                rc.render()
+            HStack {
+                Button("Render") {
+                    rc.render()
+                }
+                .disabled(rc.isRendering)
+                
+                ForEach(1..<10) { i in
+                    Button("\(i)") {
+                        rc.sceneId = i
+                    }
+                }
             }
-            .disabled(rc.isRendering)
             
             Group {
                 if rc.isRendering {

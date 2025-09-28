@@ -54,7 +54,7 @@ void rw_set_render_progress_callback(void (*render_progress_callback)(double)) {
     state.render_progress_callback = render_progress_callback;
 }
 
-void init();
+void init(int scene_id);
 void init_scene_3_balls();
 void init_scene_bouncing_balls();
 void init_scene_texture();
@@ -66,9 +66,9 @@ void init_scene_cornell_smoke();
 void init_scene_book_2();
 void render();
 
-void rwmain()
+void rwmain(int scene_id)
 {
-    init();
+    init(scene_id);
     
     auto t0 = std::chrono::high_resolution_clock::now();
     
@@ -79,8 +79,8 @@ void rwmain()
     std::cout << dt << "ms\n";
 }
 
-void init() {
-    switch(1) {
+void init(int scene_id) {
+    switch(scene_id) {
         case 1: init_scene_bouncing_balls(); break;
         case 2: init_scene_book_2(); break;
         case 3: init_scene_3_balls(); break;
@@ -90,6 +90,7 @@ void init() {
         case 7: init_scene_light(); break;
         case 8: init_scene_cornell_box(); break;
         case 9: init_scene_cornell_smoke(); break;
+        default: printf("unknown scene id %d", scene_id); break;
     }
 }
 

@@ -29,6 +29,7 @@ class RenderController: ObservableObject {
     @Published var cgImage: CGImage?
     @Published var progress: Double = 0
     @Published var isRendering: Bool = false
+    @Published var sceneId: Int = 1
     
     func setup() {
         rw_set_render_pass_callback(callbackFromRender)
@@ -37,8 +38,8 @@ class RenderController: ObservableObject {
     
     func render() {
         isRendering = true
-        renderQueue.async {
-            rwmain()
+        renderQueue.async { [sceneId] in
+            rwmain(Int32(sceneId))
             DispatchQueue.main.async {
                 self.isRendering = false
             }
