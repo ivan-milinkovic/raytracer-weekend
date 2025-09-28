@@ -17,13 +17,16 @@ struct ContentView: View {
                 Button("Render") {
                     rc.render()
                 }
-                .disabled(rc.isRendering)
                 
-                ForEach(1..<10) { i in
-                    Button("\(i)") {
-                        rc.sceneId = i
+                Spacer().frame(width: 20)
+                
+                Picker("", selection: $rc.sceneId) {
+                    ForEach(1..<10) { i in
+                        Text("\(i)").tag(i)
                     }
                 }
+                .pickerStyle(.segmented)
+                .frame(width: 300)
             }
             
             Group {
@@ -44,9 +47,13 @@ struct ContentView: View {
                     .stroke(.gray)
             }
         }
+        .disabled(rc.isRendering)
         .padding()
         .task {
             rc.setup()
+            rc.render()
+        }
+        .onChange(of: rc.sceneId) { _, _ in
             rc.render()
         }
     }

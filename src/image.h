@@ -24,7 +24,7 @@ public:
         pixels = new Vec3[w*h];
     }
     
-    // Image(Image& other) = delete;
+    // Image(Image& other) = delete; // prevent swift from copying it
     
     ~Image() {
         delete pixels;

@@ -76,7 +76,7 @@ void rwmain(int scene_id)
     
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-    std::cout << dt << "ms\n";
+    std::cout << "scene " << scene_id << ": " << dt << "ms" << std::endl;
 }
 
 void init(int scene_id) {
