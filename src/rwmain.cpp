@@ -145,6 +145,7 @@ void init_scene_3_balls()
     state.camera->vfov_deg = 70;
     state.camera->focus_dist = 1;
     state.camera->defocus_angle = 0;
+    state.camera->samples_per_pixel = 50;
     state.camera->setup();
     state.camera->look_from_at({ 0, 0, 0 }, { 0, 0, 1 });
     state.camera->background = Vec3(0.70, 0.80, 1.00);
@@ -247,7 +248,7 @@ void init_scene_texture()
     state.camera->vfov_deg = 20;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 10;
+    state.camera->samples_per_pixel = 20;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
@@ -272,7 +273,7 @@ void init_scene_perlin_spheres()
     state.camera->vfov_deg = 20;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 10;
+    state.camera->samples_per_pixel = 50;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
@@ -318,7 +319,7 @@ void init_scene_quads()
     state.camera->vfov_deg = 80;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 10;
+    state.camera->samples_per_pixel = 50;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
@@ -351,7 +352,7 @@ void init_scene_light()
     state.camera->vfov_deg = 20;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 10;
+    state.camera->samples_per_pixel = 50;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0,0,0);
     state.camera->setup();
@@ -404,7 +405,7 @@ void init_scene_cornell_box()
     state.camera->vfov_deg = 40;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 30;
+    state.camera->samples_per_pixel = 100;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0,0,0);
     state.camera->setup();
@@ -460,7 +461,7 @@ void init_scene_cornell_smoke()
     state.camera->vfov_deg = 40;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 30;
+    state.camera->samples_per_pixel = 100;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0,0,0);
     state.camera->setup();
