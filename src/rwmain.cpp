@@ -22,6 +22,7 @@ public:
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Camera> camera;
     void (*render_pass_callback)(RawImage&);
+    void (*render_progress_callback)(double);
     // separate from Image, because swift calls destructors on classes
     // causing double deletes
     RawImage raw_image;
@@ -47,6 +48,10 @@ RawImage& rw_get_raw_image() {
 
 void rw_set_render_pass_callback(void (*render_pass_callback)(RawImage&)) {
     state.render_pass_callback = render_pass_callback;
+}
+
+void rw_set_render_progress_callback(void (*render_progress_callback)(double)) {
+    state.render_progress_callback = render_progress_callback;
 }
 
 void init();
@@ -102,7 +107,7 @@ void init_image(int width, double aspect) {
 }
 
 inline void render() {
-    state.camera->render(*state.scene, state.raw_image, *state.image, *state.render_pass_callback);
+    state.camera->render(*state.scene, state.raw_image, *state.image, *state.render_pass_callback, *state.render_progress_callback);
 }
 
 void init_scene_3_balls()

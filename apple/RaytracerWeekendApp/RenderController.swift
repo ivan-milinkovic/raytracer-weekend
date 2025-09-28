@@ -15,20 +15,33 @@ func callbackFromRender(imgPtr: UnsafeMutablePointer<RawImage>) {
     renderController.handle(imgPtr: imgPtr)
 }
 
+func renderProgressCallback(progress: Double) {
+    DispatchQueue.main.async {
+        renderController.progress = progress
+    }
+}
+
 
 class RenderController: ObservableObject {
     
     let renderQueue = DispatchQueue.init(label: "render-queue", qos: .userInitiated)
     
     @Published var cgImage: CGImage?
+    @Published var progress: Double = 0
+    @Published var isRendering: Bool = false
     
     func setup() {
         rw_set_render_pass_callback(callbackFromRender)
+        rw_set_render_progress_callback(renderProgressCallback)
     }
     
     func render() {
+        isRendering = true
         renderQueue.async {
             rwmain()
+            DispatchQueue.main.async {
+                self.isRendering = false
+            }
         }
     }
     

@@ -107,7 +107,8 @@ public:
     void render(const Scene& scene,
                 RawImage& raw_image,
                 Image& image,
-                void (*render_pass_callback)(RawImage&)
+                void (*render_pass_callback)(RawImage&),
+                void (*render_progress_callback)(double)
                 )
     {
         // return test(scene);
@@ -127,6 +128,9 @@ public:
         #if PRINT_PROGRESS
         printf("%d tiles\n", tile_rows*tile_cols);
         #endif
+        
+        std::atomic_int progress(0);
+        const int totalProgress = tile_rows * tile_cols * samples_per_pixel;
         
         // ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
         
@@ -151,9 +155,15 @@ public:
                     }
                     
                     int tid = ++tile_id;
-                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid] () {
+                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid, &progress, render_progress_callback, totalProgress] () {
+                        
                         this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
                         // std::atomic_thread_fence(std::memory_order_release); // doesn't work
+                        
+                        if (render_progress_callback) {
+                            progress++;
+                            render_progress_callback( ((double) progress) / ((double) totalProgress) );
+                        }
                     });
                 }
             }

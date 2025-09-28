@@ -17,6 +17,15 @@ struct ContentView: View {
                 rc.render()
             }
             
+            Group {
+                if rc.isRendering {
+                    ProgressView(value: rc.progress, total: 1.0)
+                } else {
+                    Rectangle().stroke(.clear)
+                }
+            }
+            .frame(height: 15)
+            
             if let img = rc.cgImage {
                 Image(img, scale: 1.0, label: Text(""))
                     .resizable(resizingMode: .stretch)
