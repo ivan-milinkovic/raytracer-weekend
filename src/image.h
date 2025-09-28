@@ -2,6 +2,7 @@
 #define Image_h
 
 #include "vec3.h"
+#include "color.h"
 
 typedef struct RawImage {
     uint8_t* bytes;
@@ -38,10 +39,13 @@ public:
     void copy_as_pixels_to(RawImage& raw_img, double factor) {
         int j = 0;
         for (int i = 0; i < w * h; i++) {
-            auto p = pixels[i];
+            Vec3 p = pixels[i];
             raw_img.bytes[j++] = (uint8_t) (p.X() * factor * 255);
             raw_img.bytes[j++] = (uint8_t) (p.Y() * factor * 255);
             raw_img.bytes[j++] = (uint8_t) (p.Z() * factor * 255);
+            // raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.X()) * factor * 255);
+            // raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.Y()) * factor * 255);
+            // raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.Z()) * factor * 255);
         }
     }
 };

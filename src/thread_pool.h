@@ -33,13 +33,6 @@ public:
         condition.notify_one();
     }
     
-    void wait_empty_condition() {
-        std::unique_lock<std::mutex> lock(tasks_empty_mutex);
-        tasks_empty_condition.wait(lock, [this] {
-            return this->tasks.empty();
-        });
-    }
-    
     void stop() {
         {
             std::unique_lock<std::mutex> lock(tasks_mutex);
@@ -50,7 +43,8 @@ public:
     
     void join() {
         for (auto& thread: threads) {
-            thread.join();
+            if (thread.joinable())
+                thread.join();
         }
     }
     
@@ -61,9 +55,7 @@ private:
     std::queue<std::function<void()>> tasks;
     std::vector<std::thread> threads;
     std::condition_variable condition;
-    std::condition_variable tasks_empty_condition;
     std::mutex tasks_mutex;
-    std::mutex tasks_empty_mutex;
     bool _stop;
     
     void setup() {
@@ -92,11 +84,6 @@ private:
                     
                     task();
                     
-                    if (is_empty) {
-                        tasks_empty_condition.notify_all();
-                        this->on_empty_callback();
-                    }
-                    
                     // don't use mutex again here, it will deadlock
                 }
             });
@@ -108,15 +95,18 @@ private:
 public:
     static void test() {
         ThreadPool pool(4, QOS_CLASS_USER_INITIATED);
-        for (int i = 0; i <= 4; ++i) {
-            pool.enqueue([i] {
+        const int num_workers = 4;
+        std::latch countdown(num_workers);
+        for (int i = 0; i <= num_workers; ++i) {
+            pool.enqueue([i, &countdown] {
                 std::stringstream str_buffer;
                 str_buffer << std::this_thread::get_id() << " " << i << std::endl;
                 std::cout << str_buffer.str();
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                countdown.count_down();
             });
         }
-        pool.wait_empty_condition();
+        countdown.wait();
         pool.stop();
         pool.join();
     }

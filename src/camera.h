@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include <thread>
-#include <pthread.h>
+#include <latch>
 #include "ray.h"
 #include "scene.h"
 #include "sphere.h"
@@ -132,12 +132,12 @@ public:
         std::atomic_int progress(0);
         const int totalProgress = tile_rows * tile_cols * samples_per_pixel;
         
-        // ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
+        ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
         
         // multisampling
         for (int k = 0; k < samples_per_pixel; k++) {
             
-            ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
+            std::latch countdown(tile_rows * tile_cols);
             
             for (int j = 0; j < tile_rows; j++) {
                 for (int i = 0; i < tile_cols; i++) {
@@ -155,9 +155,10 @@ public:
                     }
                     
                     int tid = ++tile_id;
-                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid, &progress, render_progress_callback, totalProgress] () {
+                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid, &progress, render_progress_callback, totalProgress, &countdown] () {
                         
                         this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
+                        countdown.count_down();
                         
                         if (render_progress_callback) {
                             progress++;
@@ -167,33 +168,26 @@ public:
                 }
             }
             
-            // printf("waiting for pass %d\n", k);
-            thread_pool.wait_empty_condition();
-            // printf("pass %d done\n", k);
-            
-            thread_pool.stop();
-            thread_pool.join();
+            countdown.wait();
             
             // Images are incomplete without joining all the pool threads because threads do not synchronize their cache with RAM
             // https://vorbrodt.blog/2019/02/21/memory-barriers-and-thread-synchronization/
             
             // callback outside to notify that one pass is done
             if (render_pass_callback) {
-                image.copy_as_pixels_to(raw_image, k == 0 ? 1.0f : 1.0f/k);
+                image.copy_as_pixels_to(raw_image, 1.0f/((double)(k+1))); // don't divide by zero
                 render_pass_callback(raw_image);
             }
         }
         
-        // thread_pool.stop();
-        // thread_pool.join();
+        thread_pool.stop();
+        thread_pool.join();
         
         for(int i = 0; i<image.W()*image.H(); i++) {
             Vec3& pixel = image[i];
             pixel *= samples_per_pixel_inv; // average
             gamma_correct(pixel);
         }
-        
-        image.copy_as_pixels_to(raw_image, 1.0f);
         
         if (render_pass_callback) {
             image.copy_as_pixels_to(raw_image, 1.0f);
