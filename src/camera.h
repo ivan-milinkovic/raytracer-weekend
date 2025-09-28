@@ -175,7 +175,7 @@ public:
             
             // callback outside to notify that one pass is done
             if (render_pass_callback) {
-                image.copy_as_pixels_to(raw_image, 1.0f/((double)(k+1))); // don't divide by zero
+                image.copy_for_output_with_gamma(raw_image, 1.0f/((double)(k+1))); // don't divide by zero
                 render_pass_callback(raw_image);
             }
         }
@@ -189,8 +189,9 @@ public:
             gamma_correct(pixel);
         }
         
+        image.copy_for_output(raw_image, 1.0f);
+        
         if (render_pass_callback) {
-            image.copy_as_pixels_to(raw_image, 1.0f);
             render_pass_callback(raw_image);
         }
     }

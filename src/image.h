@@ -36,16 +36,23 @@ public:
     inline Vec3& operator[](int i) { return pixels[i]; }
     const int pixel_size = 3;
     
-    void copy_as_pixels_to(RawImage& raw_img, double factor) {
+    void copy_for_output(RawImage& raw_img, double factor) {
         int j = 0;
         for (int i = 0; i < w * h; i++) {
             Vec3 p = pixels[i];
             raw_img.bytes[j++] = (uint8_t) (p.X() * factor * 255);
             raw_img.bytes[j++] = (uint8_t) (p.Y() * factor * 255);
             raw_img.bytes[j++] = (uint8_t) (p.Z() * factor * 255);
-            // raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.X()) * factor * 255);
-            // raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.Y()) * factor * 255);
-            // raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.Z()) * factor * 255);
+        }
+    }
+    
+    void copy_for_output_with_gamma(RawImage& raw_img, double factor) {
+        int j = 0;
+        for (int i = 0; i < w * h; i++) {
+            Vec3 p = pixels[i];
+            raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.X() * factor ) * 255);
+            raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.Y() * factor ) * 255);
+            raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.Z() * factor ) * 255);
         }
     }
 };
