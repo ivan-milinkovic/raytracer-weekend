@@ -16,6 +16,7 @@ struct ContentView: View {
             Button("Render") {
                 rc.render()
             }
+            .disabled(rc.isRendering)
             
             Group {
                 if rc.isRendering {

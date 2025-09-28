@@ -82,14 +82,14 @@ void rwmain()
 void init() {
     switch(1) {
         case 1: init_scene_bouncing_balls(); break;
-        case 2: init_scene_3_balls(); break;
-        case 3: init_scene_texture(); break;
-        case 4: init_scene_perlin_spheres(); break;
-        case 5: init_scene_quads(); break;
-        case 6: init_scene_light(); break;
-        case 7: init_scene_cornell_box(); break;
-        case 8: init_scene_cornell_smoke(); break;
-        case 9: init_scene_book_2(); break;
+        case 2: init_scene_book_2(); break;
+        case 3: init_scene_3_balls(); break;
+        case 4: init_scene_texture(); break;
+        case 5: init_scene_perlin_spheres(); break;
+        case 6: init_scene_quads(); break;
+        case 7: init_scene_light(); break;
+        case 8: init_scene_cornell_box(); break;
+        case 9: init_scene_cornell_smoke(); break;
     }
 }
 
@@ -205,7 +205,7 @@ void init_scene_bouncing_balls()
     state.camera->vfov_deg = 20;
     state.camera->focus_dist = 10;
     state.camera->defocus_angle = 0.6;
-    state.camera->samples_per_pixel = 10;
+    state.camera->samples_per_pixel = 24;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
