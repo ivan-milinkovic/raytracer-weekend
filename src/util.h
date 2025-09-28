@@ -21,8 +21,9 @@ inline std::filesystem::path src_dir() {
 }
 
 inline std::filesystem::path root_dir() {
-    auto path = src_dir();
+    auto path = src_dir().parent_path();
     path = path / "..";
+    path = path.lexically_normal();
     return path;
 }
 
