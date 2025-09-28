@@ -115,8 +115,6 @@ public:
         // hardware_concurrency is 10 for M1 pro
         const int cores = std::thread::hardware_concurrency();
         
-        // ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
-        
         // 10 x 1 performs the best on M1 pro for 600x337 image size
         const int tile_rows = cores; // std::floor(std::sqrt(cores));
         const int tile_cols = 1;     // tile_rows;
@@ -129,6 +127,8 @@ public:
         #if PRINT_PROGRESS
         printf("%d tiles\n", tile_rows*tile_cols);
         #endif
+        
+        // ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
         
         // multisampling
         for (int k = 0; k < samples_per_pixel; k++) {
@@ -151,7 +151,7 @@ public:
                     }
                     
                     int tid = ++tile_id;
-                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid](){
+                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid] () {
                         this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
                         // std::atomic_thread_fence(std::memory_order_release); // doesn't work
                     });
@@ -170,10 +170,10 @@ public:
             // std::atomic_thread_fence(std::memory_order_acquire); // doesn't work
             
             // callback outside to notify that one pass is done
-//            if (render_pass_callback) {
-//                image.copy_as_pixels_to(raw_image, k == 0 ? 1.0f : 1.0f/k);
-//                render_pass_callback(raw_image);
-//            }
+            if (render_pass_callback) {
+                image.copy_as_pixels_to(raw_image, k == 0 ? 1.0f : 1.0f/k);
+                render_pass_callback(raw_image);
+            }
         }
         
         // thread_pool.stop();
