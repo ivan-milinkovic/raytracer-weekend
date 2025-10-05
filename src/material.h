@@ -34,7 +34,8 @@ public:
     : Material(MaterialType_Lambertian), tex(tex) { }
     
     bool scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
-        Vec3 scattered_dir = norm(hit.n + Vec3::random(-1, 1));
+        // Vec3 scattered_dir = norm(hit.n + Vec3::random(-1, 1));
+        Vec3 scattered_dir = random_vec3_on_hemisphere(hit.n);
         if (scattered_dir.is_near_zero()) {
             scattered_dir = hit.n;
         }
