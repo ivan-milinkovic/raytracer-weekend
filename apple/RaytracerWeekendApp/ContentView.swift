@@ -20,13 +20,23 @@ struct ContentView: View {
                 
                 Spacer().frame(width: 20)
                 
-                Picker("", selection: $rc.sceneId) {
+                // Crashes in combination with @Published on macOS Tahoe
+                // Picker("", selection: $rc.sceneId) {
+                //     ForEach(1..<10) { i in
+                //         Text("\(i)").tag(i)
+                //     }
+                // }
+                // .pickerStyle(.segmented)
+                // .frame(width: 300)
+                
+                HStack {
                     ForEach(1..<10) { i in
-                        Text("\(i)").tag(i)
+                        Button("\(i)") {
+                            rc.sceneId = i
+                        }
+                        .tint(i == rc.sceneId ? .blue : nil)
                     }
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 300)
             }
             
             Group {
