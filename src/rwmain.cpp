@@ -105,7 +105,7 @@ void init_image(int width, double aspect) {
     state.image = std::make_unique<Image>(state.screen_W, state.screen_H);
     state.scene = std::make_unique<Scene>();
     
-    state.raw_image.bytes = (uint8_t*) malloc(state.image->W() * state.image->H());
+    state.raw_image.bytes = (uint8_t*) malloc(state.image->W() * state.image->H() * state.image->pixel_size);
     state.raw_image.w = state.image->W();
     state.raw_image.h = state.image->H();
     state.raw_image.pixel_size = state.image->pixel_size;
