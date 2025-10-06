@@ -1,6 +1,7 @@
 #ifndef material_h
 #define material_h
 
+#include <random>
 #include "texture.h"
 
 typedef enum {
@@ -35,7 +36,10 @@ public:
     
     bool scatter(const Ray& ray, const Hit& hit, Vec3& attenuation, Ray& scattered) {
         // Vec3 scattered_dir = norm(hit.n + Vec3::random(-1, 1));
-        Vec3 scattered_dir = random_vec3_on_hemisphere(hit.n);
+        // Vec3 scattered_dir = random_vec3_on_hemisphere(hit.n);
+        // Vec3 scattered_dir = norm(random_vec3_on_hemisphere(hit.n) + hit.n); // push it towards the normal
+        Vec3 scattered_dir = norm( hit.n + Vec3 { norm_dist(gen), norm_dist(gen), norm_dist(gen) } );
+        
         if (scattered_dir.is_near_zero()) {
             scattered_dir = hit.n;
         }
@@ -47,6 +51,9 @@ public:
     
 private:
     shared_ptr<Texture> tex;
+    std::random_device random_dev {};
+    std::mt19937 gen { random_dev() };
+    std::normal_distribution<double> norm_dist { 0.0, 0.4 }; // https://en.wikipedia.org/wiki/Normal_distribution
     
     // True Lambertian Reflection - more rays closer to the normal
     // Imagine a unit sphere above p: centered at p + n, tangent to / touching p

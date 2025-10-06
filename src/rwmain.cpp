@@ -408,6 +408,7 @@ void init_scene_cornell_box()
     state.camera->samples_per_pixel = 100;
     state.camera->max_bounces = 10;
     state.camera->background = Vec3(0,0,0);
+    // state.camera->background = Vec3(0.70, 0.80, 1.00);
     state.camera->setup();
     state.camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
     

@@ -46,7 +46,7 @@ struct ContentView: View {
                     Rectangle().stroke(.clear)
                 }
             }
-            .frame(height: 15)
+            .frame(width: 500, height: 15)
             
             if let img = rc.cgImage {
                 Image(img, scale: 1.0, label: Text(""))
@@ -63,9 +63,9 @@ struct ContentView: View {
             rc.setup()
             rc.render()
         }
-        .onChange(of: rc.sceneId) { _, _ in
+        .onReceive(rc.$sceneId, perform: { _ in
             rc.render()
-        }
+        })
     }
 }
 
