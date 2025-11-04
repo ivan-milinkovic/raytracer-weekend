@@ -520,7 +520,20 @@ void init_scene_book_2()
 //    state.scene->add(make_shared<ConstantMedium>(boundary, .0001, Vec3(1,1,1)));
 
     // left middle textured sphere
-    auto file_path = root_dir() / "res" / "tex.png";
+#if RW_APPLE_LOAD_RESOURCES_FROM_BUNDLE
+    CFURLRef resourceURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+    char resourcePath[PATH_MAX];
+    if (!CFURLGetFileSystemRepresentation(resourceURL, true, (UInt8 *)resourcePath, PATH_MAX)) {
+        printf("cannot load from bundle");
+        return;
+    }
+    if (resourceURL != NULL) CFRelease(resourceURL);
+    
+    std::filesystem::path file_path(resourcePath);
+    file_path = file_path / "tex.png";
+#elif
+    std::filesystem::path file_path = root_dir() / "res" / "tex.png";
+#endif
     auto texture_mat = make_shared<LambertianMaterial>(make_shared<ImageTexture>(file_path.string().c_str()));
     state.scene->add(make_shared<Sphere>(Vec3(400,200,400), 100, texture_mat));
     
