@@ -26,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C084DDE2ED260EF006DD0E8 /* arena.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = arena.h; sourceTree = "<group>"; };
 		2C468A102CCF71750015A5FE /* hit_polymorph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hit_polymorph.h; sourceTree = "<group>"; };
 		2C4E34D82CC59EB000EF2B6F /* rwimage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rwimage.h; sourceTree = "<group>"; };
 		2C4E34D92CC59F2200EF2B6F /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
@@ -143,6 +144,7 @@
 				2C4E34DA2CC6CBD200EF2B6F /* perlin.h */,
 				2C9533022CC8BCB9001E67A2 /* hittable_list.h */,
 				2C9533032CC8C4B7001E67A2 /* constant_medium.h */,
+				2C084DDE2ED260EF006DD0E8 /* arena.h */,
 			);
 			name = src;
 			path = ../src;
