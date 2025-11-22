@@ -74,13 +74,6 @@ void render();
 
 void rwmain(int scene_id)
 {
-//    Arena arena(1024);
-//    auto res = arena.allocate<int>();
-//    *res = 123;
-//    printf("%p", res);
-//    printf("%d", *res);
-//    return;
-    
     init(scene_id);
     
     auto t0 = std::chrono::high_resolution_clock::now();
