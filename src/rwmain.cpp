@@ -23,6 +23,7 @@ using std::make_shared;
 
 class State {
 public:
+    std::unique_ptr<Arena> arena;
     std::unique_ptr<Image> image;
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Camera> camera;
@@ -92,6 +93,9 @@ void rwmain(int scene_id)
 }
 
 void init(int scene_id) {
+    state.scene = std::make_unique<Scene>();
+    state.arena = std::make_unique<Arena>(1024);
+    state.scene->arena = state.arena.get();
     switch(scene_id) {
         case 1: init_scene_bouncing_balls(); break;
         case 2: init_scene_3_balls(); break;
@@ -111,7 +115,6 @@ void init_image(int width, double aspect) {
     state.screen_W = width;
     state.screen_H = (int) (state.screen_W / state.screen_aspect);
     state.image = std::make_unique<Image>(state.screen_W, state.screen_H);
-    state.scene = std::make_unique<Scene>();
     
     state.raw_image.bytes = (uint8_t*) malloc(state.image->W() * state.image->H() * state.image->pixel_size);
     state.raw_image.w = state.image->W();

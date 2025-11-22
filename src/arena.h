@@ -9,7 +9,7 @@
 #define arena_h
 
 class Arena {
-    
+
 public:
     Arena(size_t size) {
         this->size = size;

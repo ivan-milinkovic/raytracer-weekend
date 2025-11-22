@@ -14,6 +14,7 @@ class Scene {
 public:
     vector<shared_ptr<Hittable>> objects;
     BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
+    Arena* arena;
     
     void add(shared_ptr<Hittable> obj) {
         objects.push_back(obj);
@@ -28,7 +29,9 @@ public:
     }
     
     void make_bvh() {
-        bvh_root = new BVH_Node(objects);
+//        bvh_root = new BVH_Node(objects);
+        auto ptr = arena->allocate<BVH_Node>();
+        bvh_root = new (ptr) BVH_Node(objects);
     }
     
 };
