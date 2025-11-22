@@ -233,7 +233,7 @@ void init_scene_texture()
     
     std::filesystem::path file_path(resourcePath);
     file_path = file_path / "tex.png";
-#elif
+#else
     std::filesystem::path file_path = root_dir() / "res" / "tex.png";
 #endif
     
@@ -531,7 +531,7 @@ void init_scene_book_2()
     
     std::filesystem::path file_path(resourcePath);
     file_path = file_path / "tex.png";
-#elif
+#else
     std::filesystem::path file_path = root_dir() / "res" / "tex.png";
 #endif
     auto texture_mat = make_shared<LambertianMaterial>(make_shared<ImageTexture>(file_path.string().c_str()));
