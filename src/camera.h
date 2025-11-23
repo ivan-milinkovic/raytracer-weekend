@@ -18,6 +18,7 @@
 
 class Camera {
 public:
+    
     double focal_len;
     double vfov_deg = 70;
     
@@ -51,6 +52,11 @@ public:
     int screen_W;
     int screen_H;
     
+    Image* image;
+    // separate from Image, because swift calls destructors on classes
+    // causing double deletes
+    RawImage raw_image;
+    
     Camera(int screen_W, int screen_H) {
         this->screen_W = screen_W;
         this->screen_H = screen_H;
@@ -74,6 +80,22 @@ public:
         point_delta.set(2, 0);
         
         update_p00();
+        
+        init_image();
+    }
+    
+    void init_image() {
+        image = new Image(screen_W, screen_H);
+        
+        raw_image.bytes = (uint8_t*) malloc(image->W() * image->H() * image->pixel_size);
+        raw_image.w = image->W();
+        raw_image.h = image->H();
+        raw_image.pixel_size = image->pixel_size;
+    }
+    
+    ~Camera() {
+        delete image;
+        free(raw_image.bytes);
     }
     
     void look_at(const Vec3& v_look_at) {
@@ -105,8 +127,6 @@ public:
     // In this version, the multisampling loop is the outer loop
     // allowing for callbacks when each multisample render pass ends
     void render(const Scene& scene,
-                RawImage& raw_image,
-                Image& image,
                 void (*render_pass_callback)(RawImage&),
                 void (*render_progress_callback)(double)
                 )
@@ -120,8 +140,8 @@ public:
         const int tile_rows = cores; // std::floor(std::sqrt(cores));
         const int tile_cols = 1;     // tile_rows;
         
-        const int tile_height = image.H() / tile_rows;
-        const int tile_width  = image.W() / tile_cols;
+        const int tile_height = image->H() / tile_rows;
+        const int tile_width  = image->W() / tile_cols;
         
         int tile_id = 0;
         
@@ -145,19 +165,19 @@ public:
                     int x_start = i * tile_width;
                     int twidth = tile_width;
                     if(i >= tile_rows - 1) {
-                        twidth = image.W() - x_start;
+                        twidth = image->W() - x_start;
                     }
                     
                     int y_start = j * tile_height;
                     int theight = tile_height;
                     if(j >= tile_rows - 1) {
-                        theight = image.H() - y_start;
+                        theight = image->H() - y_start;
                     }
                     
                     int tid = ++tile_id;
-                    thread_pool.enqueue([this, &image, &scene, y_start, twidth, theight, tid, &progress, render_progress_callback, totalProgress, &countdown] () {
+                    thread_pool.enqueue([this, &scene, y_start, twidth, theight, tid, &progress, render_progress_callback, totalProgress, &countdown] () {
                         
-                        this->render_tile(scene, image, 0, twidth, y_start, theight, tid);
+                        this->render_tile(scene, 0, twidth, y_start, theight, tid);
                         countdown.count_down();
                         
                         if (render_progress_callback) {
@@ -175,7 +195,7 @@ public:
             
             // callback outside to notify that one pass is done
             if (render_pass_callback) {
-                image.copy_for_output_with_gamma(raw_image, 1.0f/((double)(k+1))); // don't divide by zero
+                image->copy_for_output_with_gamma(raw_image, 1.0f/((double)(k+1))); // don't divide by zero
                 render_pass_callback(raw_image);
             }
         }
@@ -183,20 +203,20 @@ public:
         thread_pool.stop();
         thread_pool.join();
         
-        for(int i = 0; i<image.W()*image.H(); i++) {
-            Vec3& pixel = image[i];
+        for(int i = 0; i<image->W()*image->H(); i++) {
+            Vec3& pixel = (*image)[i];
             pixel *= samples_per_pixel_inv; // average
             gamma_correct(pixel);
         }
         
-        image.copy_for_output(raw_image, 1.0f);
+        image->copy_for_output(raw_image, 1.0f);
         
         if (render_pass_callback) {
             render_pass_callback(raw_image);
         }
     }
     
-    void render_tile(const Scene& scene, Image& image,
+    void render_tile(const Scene& scene,
                      int x_start, int width,
                      int y_start, int height,
                      int tile_id)
@@ -205,8 +225,8 @@ public:
         {
             for (int col = x_start; col < x_start + width; col++)
             {
-                int i = row * image.W() + col;
-                Vec3& pixel = image[i];
+                int i = row * image->W() + col;
+                Vec3& pixel = (*image)[i];
                 
                 Vec3 viewport_point;
                 Ray ray = this->make_ray(col, row, viewport_point);

@@ -24,32 +24,23 @@ using std::make_shared;
 class State {
 public:
     std::unique_ptr<Arena> arena;
-    std::unique_ptr<Image> image;
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Camera> camera;
     void (*render_pass_callback)(RawImage&);
     void (*render_progress_callback)(double);
-    // separate from Image, because swift calls destructors on classes
-    // causing double deletes
-    RawImage raw_image;
     
-    double screen_aspect;
     int screen_W;
     int screen_H;
-    
-    ~State() {
-        free(raw_image.bytes);
-    }
 };
 
 State state = State();
 
 Image* rw_get_image() {
-    return state.image.get();
+    return state.camera->image;
 }
 
 RawImage& rw_get_raw_image() {
-    return state.raw_image;
+    return state.camera->raw_image;
 }
 
 void rw_set_render_pass_callback(void (*render_pass_callback)(RawImage&)) {
@@ -59,6 +50,8 @@ void rw_set_render_pass_callback(void (*render_pass_callback)(RawImage&)) {
 void rw_set_render_progress_callback(void (*render_progress_callback)(double)) {
     state.render_progress_callback = render_progress_callback;
 }
+
+double aspect_16_9 = 16.0 / 9.0;
 
 void init(int scene_id);
 void init_scene_3_balls();
@@ -87,6 +80,8 @@ void rwmain(int scene_id)
 
 void init(int scene_id) {
     state.scene = std::make_unique<Scene>();
+    state.screen_W = 600;
+    state.screen_H = 600 / aspect_16_9;
     state.arena = std::make_unique<Arena>(1024);
     state.scene->arena = state.arena.get();
     switch(scene_id) {
@@ -103,26 +98,12 @@ void init(int scene_id) {
     }
 }
 
-void init_image(int width, double aspect) {
-    state.screen_aspect = aspect;
-    state.screen_W = width;
-    state.screen_H = (int) (state.screen_W / state.screen_aspect);
-    state.image = std::make_unique<Image>(state.screen_W, state.screen_H);
-    
-    state.raw_image.bytes = (uint8_t*) malloc(state.image->W() * state.image->H() * state.image->pixel_size);
-    state.raw_image.w = state.image->W();
-    state.raw_image.h = state.image->H();
-    state.raw_image.pixel_size = state.image->pixel_size;
-}
-
 inline void render() {
-    state.camera->render(*state.scene, state.raw_image, *state.image, *state.render_pass_callback, *state.render_progress_callback);
+    state.camera->render(*state.scene, *state.render_pass_callback, *state.render_progress_callback);
 }
 
 void init_scene_3_balls()
 {
-    init_image(600, 16 / 9.0);
-    
     auto material_ground = make_shared<LambertianMaterial> ( Vec3(0.5, 0.5, 0.5) );
     
     auto material_center = make_shared<LambertianMaterial> ( Vec3(0.1, 0.2, 0.5) );
@@ -163,8 +144,6 @@ void init_scene_3_balls()
 
 void init_scene_bouncing_balls()
 {
-    init_image(600, 16 / 9.0);
-    
     // auto material_ground = make_shared<LambertianMaterial>( Vec3(0.5, 0.5, 0.5) );
     auto texture_checker = make_shared<CheckerTexture>(0.32, Vec3(0.05, 0.05, .4), Vec3(.9, .9, .9));
     auto material_ground = make_shared<LambertianMaterial> ( texture_checker );
@@ -224,8 +203,6 @@ void init_scene_bouncing_balls()
 
 void init_scene_texture()
 {
-    init_image(600, 16 / 9.0);
-    
 #if RW_APPLE_LOAD_RESOURCES_FROM_BUNDLE
     CFURLRef resourceURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
     char resourcePath[PATH_MAX];
@@ -261,8 +238,6 @@ void init_scene_texture()
 
 void init_scene_perlin_spheres()
 {
-    init_image(600, 16 / 9.0);
-    
     auto perlin_texture = make_shared<PerlinTexture>(4);
     state.scene->add(
         make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
@@ -286,8 +261,6 @@ void init_scene_perlin_spheres()
 
 void init_scene_quads()
 {
-    init_image(600, 16 / 9.0);
-    
     auto left_red     = make_shared<LambertianMaterial>(Vec3(1.0, 0.2, 0.2));
     auto back_green   = make_shared<LambertianMaterial>(Vec3(0.2, 1.0, 0.2));
     auto right_blue   = make_shared<LambertianMaterial>(Vec3(0.2, 0.2, 1.0));
@@ -332,8 +305,6 @@ void init_scene_quads()
 
 void init_scene_light()
 {
-    init_image(600, 16 / 9.0);
-    
     auto perlin_texture = make_shared<PerlinTexture>(4);
     state.scene->add(
         make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
@@ -365,8 +336,6 @@ void init_scene_light()
 
 void init_scene_cornell_box()
 {
-    init_image(600, 16 / 9.0);
-    
     auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
     auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
     auto green = make_shared<LambertianMaterial>   (Vec3(.12, .45, .15));
@@ -420,8 +389,6 @@ void init_scene_cornell_box()
 
 void init_scene_cornell_smoke()
 {
-    init_image(600, 16 / 9.0);
-    
     auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
     auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
     auto green = make_shared<LambertianMaterial>   (Vec3(.12, .45, .15));
@@ -476,8 +443,6 @@ void init_scene_cornell_smoke()
 
 void init_scene_book_2()
 {
-    init_image(600, 1.0);
-    
     auto light_material = make_shared<DiffuseLightMaterial>(Vec3(7, 7, 7));
     state.scene->add(make_shared<Quad>(Vec3(123,554,147), Vec3(300,0,0), Vec3(0,0,265), light_material));
     
