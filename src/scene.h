@@ -6,6 +6,7 @@ using std::shared_ptr;
 using std::vector;
 #include "bvh.h"
 #include "hittable.h"
+#include "camera.h"
 
 class Scene {
     
@@ -13,6 +14,7 @@ public:
     vector<shared_ptr<Hittable>> objects;
     BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
     Arena* arena;
+    std::unique_ptr<Camera> camera;
     
     void add(shared_ptr<Hittable> obj) {
         objects.push_back(obj);

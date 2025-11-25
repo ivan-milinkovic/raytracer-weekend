@@ -28,7 +28,7 @@ public:
     std::unique_ptr<Arena> arena;
     std::unique_ptr<Tracer> tracer;
     std::unique_ptr<Scene> scene;
-    std::unique_ptr<Camera> camera;
+    
     void (*render_pass_callback)(RawImage&);
     void (*render_progress_callback)(double);
     
@@ -39,11 +39,11 @@ public:
 State state = State();
 
 Image* rw_get_image() {
-    return state.camera->image;
+    return state.scene->camera->image;
 }
 
 RawImage& rw_get_raw_image() {
-    return state.camera->raw_image;
+    return state.scene->camera->raw_image;
 }
 
 void rw_set_render_pass_callback(void (*render_pass_callback)(RawImage&)) {
@@ -103,7 +103,7 @@ void init(int scene_id) {
 }
 
 inline void render() {
-    state.tracer->render(*state.scene, *state.camera, *state.render_pass_callback, *state.render_progress_callback);
+    state.tracer->render(*state.scene, *state.scene->camera, *state.render_pass_callback, *state.render_progress_callback);
 }
 
 void init_scene_3_balls()
@@ -129,21 +129,22 @@ void init_scene_3_balls()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 70;
+    camera->focus_dist = 1;
+    camera->defocus_angle = 0;
+    camera->samples_per_pixel = 50;
+    camera->setup();
+    camera->look_from_at({ 0, 0, 0 }, { 0, 0, 1 });
+    camera->background = Vec3(0.70, 0.80, 1.00);
     
-    state.camera->vfov_deg = 70;
-    state.camera->focus_dist = 1;
-    state.camera->defocus_angle = 0;
-    state.camera->samples_per_pixel = 50;
-    state.camera->setup();
-    state.camera->look_from_at({ 0, 0, 0 }, { 0, 0, 1 });
-    state.camera->background = Vec3(0.70, 0.80, 1.00);
+//    camera->vfov_deg = 40;
+//    camera->focus_dist = 4.7;
+//    camera->defocus_angle = 4;
+//    camera->setup();
+//    camera->look_from_at({ -4.5,0,0.5 }, { 0,0,2 });
     
-//    state.camera->vfov_deg = 40;
-//    state.camera->focus_dist = 4.7;
-//    state.camera->defocus_angle = 4;
-//    state.camera->setup();
-//    state.camera->look_from_at({ -4.5,0,0.5 }, { 0,0,2 });
+    state.scene->camera = std::move(camera);
 }
 
 void init_scene_bouncing_balls()
@@ -194,15 +195,17 @@ void init_scene_bouncing_balls()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 20;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.6;
-    state.camera->samples_per_pixel = 24;
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0.70, 0.80, 1.00);
-    state.camera->setup();
-    state.camera->look_from_at({ 13,2,3 }, { 0,0,0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 20;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.6;
+    camera->samples_per_pixel = 24;
+    camera->max_bounces = 10;
+    camera->background = Vec3(0.70, 0.80, 1.00);
+    camera->setup();
+    camera->look_from_at({ 13,2,3 }, { 0,0,0 });
+    
+    state.scene->camera = std::move(camera);
 }
 
 void init_scene_texture()
@@ -229,15 +232,17 @@ void init_scene_texture()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 20;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 20;
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0.70, 0.80, 1.00);
-    state.camera->setup();
-    state.camera->look_from_at({ 0,0,-12 }, { 0,0,0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 20;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.0;
+    camera->samples_per_pixel = 20;
+    camera->max_bounces = 10;
+    camera->background = Vec3(0.70, 0.80, 1.00);
+    camera->setup();
+    camera->look_from_at({ 0,0,-12 }, { 0,0,0 });
+    
+    state.scene->camera = std::move(camera);
 }
 
 void init_scene_perlin_spheres()
@@ -252,15 +257,17 @@ void init_scene_perlin_spheres()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 20;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 50;
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0.70, 0.80, 1.00);
-    state.camera->setup();
-    state.camera->look_from_at({ 13,2,-3 }, { 0,0,0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 20;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.0;
+    camera->samples_per_pixel = 50;
+    camera->max_bounces = 10;
+    camera->background = Vec3(0.70, 0.80, 1.00);
+    camera->setup();
+    camera->look_from_at({ 13,2,-3 }, { 0,0,0 });
+    
+    state.scene->camera = std::move(camera);
 }
 
 void init_scene_quads()
@@ -296,15 +303,17 @@ void init_scene_quads()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 80;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 50;
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0.70, 0.80, 1.00);
-    state.camera->setup();
-    state.camera->look_from_at({ 0,0, -3 }, { 0,0,0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 80;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.0;
+    camera->samples_per_pixel = 50;
+    camera->max_bounces = 10;
+    camera->background = Vec3(0.70, 0.80, 1.00);
+    camera->setup();
+    camera->look_from_at({ 0,0, -3 }, { 0,0,0 });
+    
+    state.scene->camera = std::move(camera);
 }
 
 void init_scene_light()
@@ -327,15 +336,17 @@ void init_scene_light()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 20;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 50;
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0,0,0);
-    state.camera->setup();
-    state.camera->look_from_at({ 26,3,-6 }, { 0,2,0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 20;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.0;
+    camera->samples_per_pixel = 50;
+    camera->max_bounces = 10;
+    camera->background = Vec3(0,0,0);
+    camera->setup();
+    camera->look_from_at({ 26,3,-6 }, { 0,2,0 });
+    
+    state.scene->camera = std::move(camera);
 }
 
 void init_scene_cornell_box()
@@ -378,17 +389,18 @@ void init_scene_cornell_box()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 40;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 100;
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0,0,0);
-    // state.camera->background = Vec3(0.70, 0.80, 1.00);
-    state.camera->setup();
-    state.camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 40;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.0;
+    camera->samples_per_pixel = 100;
+    camera->max_bounces = 10;
+    camera->background = Vec3(0,0,0);
+    // camera->background = Vec3(0.70, 0.80, 1.00);
+    camera->setup();
+    camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
     
+    state.scene->camera = std::move(camera);
 }
 
 void init_scene_cornell_smoke()
@@ -433,15 +445,17 @@ void init_scene_cornell_smoke()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 40;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 100;
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0,0,0);
-    state.camera->setup();
-    state.camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 40;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.0;
+    camera->samples_per_pixel = 100;
+    camera->max_bounces = 10;
+    camera->background = Vec3(0,0,0);
+    camera->setup();
+    camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
+    
+    state.scene->camera = std::move(camera);
 }
 
 
@@ -529,13 +543,15 @@ void init_scene_book_2()
     
     state.scene->make_bvh();
     
-    state.camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
-    state.camera->vfov_deg = 40;
-    state.camera->focus_dist = 10;
-    state.camera->defocus_angle = 0.0;
-    state.camera->samples_per_pixel = 10; // 1 - 5s, 10 - 36s, 60 - 5min
-    state.camera->max_bounces = 10;
-    state.camera->background = Vec3(0,0,0);
-    state.camera->setup();
-    state.camera->look_from_at({ 478, 278, -600 }, { 278, 278, 0 });
+    auto camera = std::make_unique<Camera>(state.screen_W, state.screen_H);
+    camera->vfov_deg = 40;
+    camera->focus_dist = 10;
+    camera->defocus_angle = 0.0;
+    camera->samples_per_pixel = 10; // 1 - 5s, 10 - 36s, 60 - 5min
+    camera->max_bounces = 10;
+    camera->background = Vec3(0,0,0);
+    camera->setup();
+    camera->look_from_at({ 478, 278, -600 }, { 278, 278, 0 });
+    
+    state.scene->camera = std::move(camera);
 }
