@@ -1,10 +1,12 @@
 #include <memory>
 using std::make_shared;
 #include "arena.h"
+#include "tracer.h"
 #include "image.h"
 #include "camera.h"
 #include "sphere.h"
 #include "quad.h"
+#include "tracer.h"
 #include "scene.h"
 #include "rwimage.h"
 #include "hittable_list.h"
@@ -24,6 +26,7 @@ using std::make_shared;
 class State {
 public:
     std::unique_ptr<Arena> arena;
+    std::unique_ptr<Tracer> tracer;
     std::unique_ptr<Scene> scene;
     std::unique_ptr<Camera> camera;
     void (*render_pass_callback)(RawImage&);
@@ -83,6 +86,7 @@ void init(int scene_id) {
     state.screen_W = 600;
     state.screen_H = 600 / aspect_16_9;
     state.arena = std::make_unique<Arena>(1024);
+    state.tracer = std::make_unique<Tracer>();
     state.scene->arena = state.arena.get();
     switch(scene_id) {
         case 1: init_scene_bouncing_balls(); break;
@@ -99,7 +103,7 @@ void init(int scene_id) {
 }
 
 inline void render() {
-    state.camera->render(*state.scene, *state.render_pass_callback, *state.render_progress_callback);
+    state.tracer->render(*state.scene, *state.camera, *state.render_pass_callback, *state.render_progress_callback);
 }
 
 void init_scene_3_balls()

@@ -11,6 +11,7 @@ using std::vector;
 #include "material.h"
 
 class Scene {
+    
 public:
     vector<shared_ptr<Hittable>> objects;
     BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
