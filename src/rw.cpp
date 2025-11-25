@@ -45,6 +45,8 @@ void rw_set_render_progress_callback(void (*render_progress_callback)(double)) {
 
 void rw_init_scene(int scene_id) {
     
+    auto t0 = std::chrono::high_resolution_clock::now();
+    
     state.scene_id = scene_id;
     state.tracer = std::make_unique<Tracer>();
     
@@ -82,6 +84,10 @@ void rw_init_scene(int scene_id) {
             break;
         default: printf("unknown scene id %d", scene_id); break;
     }
+    
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    std::cout << "scene " << state.scene_id << ": init: " << dt << "ms" << std::endl;
 }
 
 void rw_render() {
@@ -91,5 +97,5 @@ void rw_render() {
     
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-    std::cout << "scene " << state.scene_id << ": " << dt << "ms" << std::endl;
+    std::cout << "scene " << state.scene_id << ": render: " << dt << "ms" << std::endl;
 }
