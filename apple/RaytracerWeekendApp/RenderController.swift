@@ -1,10 +1,3 @@
-//
-//  RenderController.swift
-//  RaytracerWeekend
-//
-//  Created by Ivan Milinkovic on 27. 9. 2025.
-//
-
 import Foundation
 import Combine
 import CoreGraphics

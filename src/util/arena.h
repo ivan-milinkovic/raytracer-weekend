@@ -1,10 +1,3 @@
-//
-//  Arena.h
-//  RaytracerWeekend
-//
-//  Created by Ivan Milinkovic on 22. 11. 2025.
-//
-
 #ifndef arena_h
 #define arena_h
 

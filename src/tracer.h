@@ -1,10 +1,3 @@
-//
-//  tracer.h
-//  RaytracerWeekend
-//
-//  Created by Ivan Milinkovic on 25. 11. 2025.
-//
-
 #ifndef tracer_h
 #define tracer_h
 
