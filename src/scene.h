@@ -4,6 +4,7 @@
 #include <memory>
 using std::shared_ptr;
 using std::vector;
+#include "util/arena.h"
 #include "geom/bvh.h"
 #include "geom/hittable.h"
 #include "camera.h"
