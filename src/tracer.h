@@ -24,6 +24,8 @@ public:
     {
         // return test(scene);
         
+        camera.image->zero();
+        
         // hardware_concurrency is 10 for M1 pro
         const int cores = std::thread::hardware_concurrency();
         

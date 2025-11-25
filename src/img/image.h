@@ -55,8 +55,13 @@ public:
             raw_img.bytes[j++] = (uint8_t) ( linear_to_gamma(p.Z() * factor ) * 255);
         }
     }
+    
+    void zero() {
+        for (int i = 0; i < w * h; i++) {
+            pixels[i] = Vec3::zero();
+        }
+    }
 };
-
 
 
 #endif /* Image_h */
