@@ -1,17 +1,16 @@
 #include <memory>
 using std::make_shared;
-#include "arena.h"
-#include "tracer.h"
-#include "image.h"
-#include "camera.h"
-#include "sphere.h"
-#include "quad.h"
+#include "util/arena.h"
 #include "tracer.h"
 #include "scene.h"
-#include "rwimage.h"
-#include "hittable_list.h"
-#include "constant_medium.h"
-#include "hit_polymorph.h"
+#include "camera.h"
+#include "img/image.h"
+#include "img/rwimage.h"
+#include "geom/sphere.h"
+#include "geom/quad.h"
+#include "geom/hittable_list.h"
+#include "geom/constant_medium.h"
+#include "geom/hit_polymorph.h"
 
 #if RW_APPLE_LOAD_RESOURCES_FROM_BUNDLE
 #include <CoreFoundation/CFBundle.h>
@@ -25,7 +24,6 @@ using std::make_shared;
 
 class State {
 public:
-    std::unique_ptr<Arena> arena;
     std::unique_ptr<Tracer> tracer;
     std::unique_ptr<Scene> scene;
     
@@ -85,9 +83,8 @@ void init(int scene_id) {
     state.scene = std::make_unique<Scene>();
     state.screen_W = 600;
     state.screen_H = 600 / aspect_16_9;
-    state.arena = std::make_unique<Arena>(1024);
     state.tracer = std::make_unique<Tracer>();
-    state.scene->arena = state.arena.get();
+    state.scene->arena = std::make_unique<Arena>(1024);
     switch(scene_id) {
         case 1: init_scene_bouncing_balls(); break;
         case 2: init_scene_3_balls(); break;
@@ -108,6 +105,8 @@ inline void render() {
 
 void init_scene_3_balls()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     auto material_ground = make_shared<LambertianMaterial> ( Vec3(0.5, 0.5, 0.5) );
     
     auto material_center = make_shared<LambertianMaterial> ( Vec3(0.1, 0.2, 0.5) );
@@ -149,6 +148,8 @@ void init_scene_3_balls()
 
 void init_scene_bouncing_balls()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     // auto material_ground = make_shared<LambertianMaterial>( Vec3(0.5, 0.5, 0.5) );
     auto texture_checker = make_shared<CheckerTexture>(0.32, Vec3(0.05, 0.05, .4), Vec3(.9, .9, .9));
     auto material_ground = make_shared<LambertianMaterial> ( texture_checker );
@@ -210,6 +211,8 @@ void init_scene_bouncing_balls()
 
 void init_scene_texture()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
 #if RW_APPLE_LOAD_RESOURCES_FROM_BUNDLE
     CFURLRef resourceURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
     char resourcePath[PATH_MAX];
@@ -247,6 +250,8 @@ void init_scene_texture()
 
 void init_scene_perlin_spheres()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     auto perlin_texture = make_shared<PerlinTexture>(4);
     state.scene->add(
         make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
@@ -272,6 +277,8 @@ void init_scene_perlin_spheres()
 
 void init_scene_quads()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     auto left_red     = make_shared<LambertianMaterial>(Vec3(1.0, 0.2, 0.2));
     auto back_green   = make_shared<LambertianMaterial>(Vec3(0.2, 1.0, 0.2));
     auto right_blue   = make_shared<LambertianMaterial>(Vec3(0.2, 0.2, 1.0));
@@ -318,6 +325,8 @@ void init_scene_quads()
 
 void init_scene_light()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     auto perlin_texture = make_shared<PerlinTexture>(4);
     state.scene->add(
         make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
@@ -351,6 +360,8 @@ void init_scene_light()
 
 void init_scene_cornell_box()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
     auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
     auto green = make_shared<LambertianMaterial>   (Vec3(.12, .45, .15));
@@ -405,6 +416,8 @@ void init_scene_cornell_box()
 
 void init_scene_cornell_smoke()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
     auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
     auto green = make_shared<LambertianMaterial>   (Vec3(.12, .45, .15));
@@ -461,6 +474,8 @@ void init_scene_cornell_smoke()
 
 void init_scene_book_2()
 {
+    state.scene->arena = std::make_unique<Arena>(1024);
+    
     auto light_material = make_shared<DiffuseLightMaterial>(Vec3(7, 7, 7));
     state.scene->add(make_shared<Quad>(Vec3(123,554,147), Vec3(300,0,0), Vec3(0,0,265), light_material));
     

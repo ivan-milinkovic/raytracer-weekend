@@ -4,8 +4,8 @@
 #include <memory>
 using std::shared_ptr;
 using std::vector;
-#include "bvh.h"
-#include "hittable.h"
+#include "geom/bvh.h"
+#include "geom/hittable.h"
 #include "camera.h"
 
 class Scene {
@@ -13,7 +13,7 @@ class Scene {
 public:
     vector<shared_ptr<Hittable>> objects;
     BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
-    Arena* arena;
+    std::unique_ptr<Arena> arena;
     std::unique_ptr<Camera> camera;
     
     void add(shared_ptr<Hittable> obj) {
@@ -29,7 +29,7 @@ public:
     }
     
     void make_bvh() {
-//        bvh_root = new BVH_Node(objects);
+        // bvh_root = new BVH_Node(objects);
         auto ptr = arena->allocate<BVH_Node>();
         bvh_root = new (ptr) BVH_Node(objects);
     }

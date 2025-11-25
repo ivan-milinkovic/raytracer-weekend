@@ -1,9 +1,9 @@
 #ifndef aabb_h
 #define aabb_h
 
-#include "vec3.h"
-#include "ray.h"
-#include "interval.h"
+#include "../math/vec3.h"
+#include "../math/interval.h"
+#include "../ray.h"
 
 
 class AABB {

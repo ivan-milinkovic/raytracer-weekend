@@ -2,7 +2,7 @@
 #define material_h
 
 #include <random>
-#include "texture.h"
+#include "img/texture.h"
 
 typedef enum {
     MaterialType_Lambertian,

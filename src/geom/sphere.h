@@ -2,15 +2,17 @@
 #define geometry_h
 
 #include <memory>
-#include "ray.h"
-#include "vec3.h"
-#include "interval.h"
+#include "../ray.h"
+#include "../math/vec3.h"
+#include "../math/interval.h"
 #include "aabb.h"
 #include "hittable.h"
 
-// 0 - original RT weekend, 1 - scratch-a-pixel geometric (fastest), 2 - scratch-a-pixel analytic
+// 0 - original RT weekend
+// 1 - scratch-a-pixel geometric (fastest)
+//     https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
+// 2 - scratch-a-pixel analytic
 #define HIT_IMPL 1
-// https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 
 
 class Sphere: public Hittable { // clang crashes without public inheritance

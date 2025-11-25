@@ -3,9 +3,9 @@
 
 #include <filesystem>
 #include <fstream>
-#include "vec3.h"
-#include "color.h"
-#include "util.h"
+#include "../math/vec3.h"
+#include "../img/color.h"
+#include "../util/util.h"
 
 std::filesystem::path ppm_file_path() {
     auto path = root_dir();

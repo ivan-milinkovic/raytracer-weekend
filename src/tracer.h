@@ -10,11 +10,11 @@
 
 #include <thread>
 #include <latch>
-#include "vec3.h"
-#include "image.h"
+#include "math/vec3.h"
+#include "img/image.h"
 #include "scene.h"
 #include "camera.h"
-#include "thread_pool.h"
+#include "util/thread_pool.h"
 #include "material.h"
 
 class Tracer {

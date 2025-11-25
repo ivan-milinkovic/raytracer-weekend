@@ -3,9 +3,9 @@
 
 #include "hittable.h"
 #include "hittable_list.h"
-#include "vec3.h"
 #include "aabb.h"
-#include "interval.h"
+#include "../math/vec3.h"
+#include "../math/interval.h"
 
 class Quad: public Hittable {
     public:

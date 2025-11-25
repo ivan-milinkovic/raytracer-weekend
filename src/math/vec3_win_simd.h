@@ -6,7 +6,7 @@
 // https://gist.github.com/bangonkali/52137c168f9bb0aaf003
 
 #include <iostream>
-#include "util.h"
+#include "../util/util.h"
 #include <intrin.h>
 
 class Vec3

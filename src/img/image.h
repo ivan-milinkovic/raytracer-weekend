@@ -1,7 +1,7 @@
 #ifndef Image_h
 #define Image_h
 
-#include "vec3.h"
+#include "../math/vec3.h"
 #include "color.h"
 
 typedef struct RawImage {

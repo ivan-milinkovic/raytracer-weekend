@@ -1,7 +1,7 @@
 #ifndef interval_h
 #define interval_h
 
-#include "util.h"
+#include "../util/util.h"
 
 class Interval {
 public:

@@ -1,7 +1,7 @@
 #ifndef texture_h
 #define texture_h
 
-#include "perlin.h"
+#include "../util/perlin.h"
 
 class Texture {
 public:

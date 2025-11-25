@@ -2,7 +2,7 @@
 #define color_h
 
 #include <iostream>
-#include "vec3.h"
+#include "../math/vec3.h"
 
 
 inline double clamp_color_comp(double n) {

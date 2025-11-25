@@ -1,6 +1,6 @@
 #include "rwmain.h"
-#include "ppm.h"
-#include "image.h"
+#include "img/ppm.h"
+#include "img/image.h"
 // #include "thread_pool.h"
 
 int main(int argc, const char * argv[]) {
