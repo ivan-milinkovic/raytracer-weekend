@@ -15,6 +15,7 @@
 #include "scene.h"
 #include "camera.h"
 #include "thread_pool.h"
+#include "material.h"
 
 class Tracer {
     

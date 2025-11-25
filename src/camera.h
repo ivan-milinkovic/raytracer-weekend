@@ -2,9 +2,6 @@
 #define camera_h
 
 #include "ray.h"
-#include "scene.h"
-#include "sphere.h"
-#include "material.h"
 
 #define PRINT_PROGRESS 0
 

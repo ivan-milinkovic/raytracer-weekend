@@ -4,11 +4,8 @@
 #include <memory>
 using std::shared_ptr;
 using std::vector;
-#include "interval.h"
-#include "sphere.h"
 #include "bvh.h"
 #include "hittable.h"
-#include "material.h"
 
 class Scene {
     
