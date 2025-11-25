@@ -42,30 +42,13 @@ void rw_set_render_progress_callback(void (*render_progress_callback)(double)) {
     state.render_progress_callback = render_progress_callback;
 }
 
-double aspect_16_9 = 16.0 / 9.0;
-
-void init(int scene_id);
-void render();
-
-void rwmain(int scene_id)
-{
-    init(scene_id);
-    
-    auto t0 = std::chrono::high_resolution_clock::now();
-    
-    render();
-    
-    auto t1 = std::chrono::high_resolution_clock::now();
-    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-    std::cout << "scene " << scene_id << ": " << dt << "ms" << std::endl;
-}
-
-void init(int scene_id) {
+void rw_init_scene(int scene_id) {
     
     state.tracer = std::make_unique<Tracer>();
     
+    double aspect_16_9 = 16.0 / 9.0;
     int screen_w = 600;
-    int screen_h = 600 / aspect_16_9;
+    int screen_h = (int) (600 / aspect_16_9);
     
     switch(scene_id) {
         case 1:
@@ -99,6 +82,12 @@ void init(int scene_id) {
     }
 }
 
-inline void render() {
+void rw_render() {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    
     state.tracer->render(*state.scene, *state.scene->camera, *state.render_pass_callback, *state.render_progress_callback);
+    
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    std::cout << "scene " << ": " << dt << "ms" << std::endl;
 }

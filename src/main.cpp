@@ -1,13 +1,11 @@
-#include "rwmain.h"
+#include "rw.h"
 #include "img/ppm.h"
 #include "img/image.h"
-// #include "thread_pool.h"
 
 int main(int argc, const char * argv[]) {
     
-    // ThreadPool::test(); return 0;
-    
-    rwmain(1);
+    rw_init_scene(1);
+    rw_render();
     
     // output
     Image* img = rw_get_image();

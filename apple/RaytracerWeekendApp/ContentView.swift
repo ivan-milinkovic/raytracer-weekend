@@ -25,7 +25,7 @@ struct ContentView: View {
                 HStack {
                     ForEach(1..<10) { i in
                         Button("\(i)") {
-                            rc.sceneId = i
+                            changeScene(i)
                         }
                         .tint(i == rc.sceneId ? .blue : nil)
                     }
@@ -56,9 +56,11 @@ struct ContentView: View {
             rc.setup()
             rc.render()
         }
-        .onReceive(rc.$sceneId, perform: { _ in
-            rc.render()
-        })
+    }
+    
+    func changeScene(_ id: Int) {
+        rc.setScene(id)
+        rc.render()
     }
 }
 

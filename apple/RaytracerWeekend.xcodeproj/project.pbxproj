@@ -34,14 +34,14 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				main.cpp,
-				rwmain.cpp,
+				rw.cpp,
 			);
 			target = 2CBD718E2CBA787600C14983 /* RaytracerWeekendConsole */;
 		};
 		2CAA5C2F2ED64D13000ED698 /* Exceptions for "src" folder in "RaytracerWeekendApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				rwmain.cpp,
+				rw.cpp,
 			);
 			target = 2C5B7DDE2E88602C00564180 /* RaytracerWeekendApp */;
 		};

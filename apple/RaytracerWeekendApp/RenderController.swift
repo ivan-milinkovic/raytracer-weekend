@@ -30,7 +30,13 @@ final class RenderController: ObservableObject {
     var copyPxPtr: UnsafeMutableRawPointer?
     
     func setup() {
+        rw_init_scene(Int32(self.sceneId))
         setup_callbacks()
+    }
+    
+    func setScene(_ sceneId: Int) {
+        self.sceneId = sceneId
+        rw_init_scene(Int32(self.sceneId))
     }
     
     func render() {
@@ -38,13 +44,15 @@ final class RenderController: ObservableObject {
         isRendering = true
         progress = 0.0
         cgImage = nil
-        let sceneId: Int32 = Int32(self.sceneId)
         copyPxPtr?.deallocate()
         copyPxPtr = nil
         
-        renderQueue.async { [sceneId] in
-            rwmain(sceneId)
+        renderQueue.async {
+            
+            rw_render()
+            
             self.handle(imgPtr: rw_get_raw_image(), isFinal: true)
+            
             DispatchQueue.main.async {
                 self.isRendering = false
             }
