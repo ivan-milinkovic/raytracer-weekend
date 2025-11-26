@@ -6,12 +6,39 @@
 #include <mutex>
 #include <queue>
 #include <functional>
+#if defined _WIN64
+#include <windows.h>
+#endif
+
+enum class RWThreadPriority {
+    low,
+    mid,
+    high
+};
+
+#if defined __APPLE__
+qos_class_t qos_class(RWThreadPriority prio) {
+    switch prio {
+    case RWThreadPriority::low: return QOS_CLASS_USER_INITIATED;
+    case RWThreadPriority::mid: return QOS_CLASS_USER_INITIATED;
+    case RWThreadPriority::high: return QOS_CLASS_USER_INITIATED;
+    }
+}
+#elif defined _WIN64
+int win_thread_priority(RWThreadPriority prio) {
+    switch (prio) {
+    case RWThreadPriority::low: return THREAD_PRIORITY_LOWEST;
+    case RWThreadPriority::mid: return THREAD_PRIORITY_NORMAL;
+    case RWThreadPriority::high: return THREAD_PRIORITY_HIGHEST;
+    }
+}
+#endif
 
 class ThreadPool {
 public:
-    ThreadPool(size_t num_threads, qos_class_t qos_class) {
+    ThreadPool(size_t num_threads, RWThreadPriority thread_priority) {
         this->num_threads = num_threads;
-        this->qos_class = qos_class;
+        this->thread_priority = thread_priority;
         this->_stop = false;
         this->on_empty_callback = []{};
         this->setup();
@@ -50,7 +77,7 @@ public:
     
 private:
     size_t num_threads;
-    qos_class_t qos_class;
+    RWThreadPriority thread_priority;
     std::function<void()> on_empty_callback;
     std::queue<std::function<void()>> tasks;
     std::vector<std::thread> threads;
@@ -61,7 +88,11 @@ private:
     void setup() {
         for(int i=0; i<num_threads; i++) {
             std::thread thread = std::thread( [this] {
+                
+                #if defined __APPLE__
                 pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
+                #endif
+
                 while (true) {
                     std::function<void()> task;
                     bool is_empty = false;
@@ -87,6 +118,12 @@ private:
                     // don't use mutex again here, it will deadlock
                 }
             });
+
+            #if defined _WIN64
+            int prio = win_thread_priority(this->thread_priority);
+            HANDLE thread_handle = (HANDLE)thread.native_handle();
+            SetThreadPriority(thread_handle, THREAD_PRIORITY_HIGHEST);
+            #endif
             
             threads.emplace_back(std::move(thread));
         }
@@ -94,7 +131,7 @@ private:
     
 public:
     static void test() {
-        ThreadPool pool(4, QOS_CLASS_USER_INITIATED);
+        ThreadPool pool(4, RWThreadPriority::high);
         const int num_workers = 4;
         std::latch countdown(num_workers);
         for (int i = 0; i <= num_workers; ++i) {

@@ -6,7 +6,7 @@ using std::make_shared;
 #endif
 
 #include "tracer.h"
-#include "scenes.h"
+#include "scenes/scenes.h"
 
 
 // viewport - A projection plane in 3D space. In world space, not view space:

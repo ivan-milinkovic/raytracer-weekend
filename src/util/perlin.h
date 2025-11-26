@@ -1,7 +1,7 @@
 #ifndef perlin_h
 #define perlin_h
 
-#include "vec3.h"
+#include "../math/vec3.h"
 #include "util.h"
 
 class Perlin {

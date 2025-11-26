@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <iostream>
-#include "util.h"
+#include "../util/util.h"
 
 class Vec3
 {
@@ -167,7 +167,7 @@ inline void print_csv(const Vec3& v0, const Vec3& v1, std::ostream& stream) {
 }
 
 inline void print_csv(const std::initializer_list<Vec3> vs, std::ostream& stream) {
-    for(Vec3 v: vs) {
+    for(const Vec3& v: vs) {
         stream << v.X() << ',' << v.Y() << ',' << v.Z() << ',';
     }
     stream << std::endl;

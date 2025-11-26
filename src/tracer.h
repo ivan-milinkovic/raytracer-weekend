@@ -45,7 +45,7 @@ public:
         std::atomic_int progress(0);
         const int totalProgress = tile_rows * tile_cols * camera.samples_per_pixel;
         
-        ThreadPool thread_pool(cores, QOS_CLASS_USER_INITIATED);
+        ThreadPool thread_pool(cores, RWThreadPriority::high);
         
         // multisampling
         for (int k = 0; k < camera.samples_per_pixel; k++) {
