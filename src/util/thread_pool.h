@@ -18,9 +18,9 @@ enum class RWThreadPriority {
 
 #if defined __APPLE__
 qos_class_t qos_class(RWThreadPriority prio) {
-    switch prio {
-    case RWThreadPriority::low: return QOS_CLASS_USER_INITIATED;
-    case RWThreadPriority::mid: return QOS_CLASS_USER_INITIATED;
+    switch (prio) {
+    case RWThreadPriority::low: return QOS_CLASS_BACKGROUND;
+    case RWThreadPriority::mid: return QOS_CLASS_DEFAULT;
     case RWThreadPriority::high: return QOS_CLASS_USER_INITIATED;
     }
 }
