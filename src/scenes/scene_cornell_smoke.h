@@ -55,7 +55,8 @@ std::unique_ptr<Scene> init_scene_cornell_smoke(int screen_w, int screen_h)
     camera->defocus_angle = 0.0;
     camera->samples_per_pixel = 100;
     camera->max_bounces = 10;
-    camera->background = Vec3(0,0,0);
+    // camera->background = Vec3(0,0,0);
+    camera->background = Vec3(0.70, 0.80, 1.00);
     camera->setup();
     camera->look_from_at({ 278, 278, -800 }, { 278, 278, 0 });
     
