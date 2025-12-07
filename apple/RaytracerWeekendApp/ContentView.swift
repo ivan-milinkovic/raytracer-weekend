@@ -35,6 +35,7 @@ struct ContentView: View {
             Group {
                 if rc.isRendering {
                     ProgressView(value: rc.progress, total: 1.0)
+                        .progressViewStyle(.linear)
                 } else {
                     Rectangle().stroke(.clear)
                 }
