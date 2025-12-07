@@ -20,24 +20,29 @@ public:
     
     template<class T>
     T* allocate() {
-        auto size = sizeof(T);
+        return allocate<T>(1);
+    }
+    
+    template<class T>
+    T* allocate(std::size_t count) {
+        auto size = sizeof(T) * count;
         auto alignment = alignof(T);
         
         // todo: use std::align
         
-        auto new_loc = current + size;
+        auto new_loc = current;
         auto remainder = new_loc % alignment;
         if(remainder > 0) {
             new_loc += (alignment - remainder);
         }
         
-        if(new_loc >= end) {
+        auto new_offset = new_loc + size;
+        if(new_offset >= end) {
             throw std::bad_alloc();
         }
+        current = new_offset;
         
-        current = new_loc;
-        
-        return reinterpret_cast<T*>(current);
+        return reinterpret_cast<T*>(new_loc);
     }
     
     void reset() {
