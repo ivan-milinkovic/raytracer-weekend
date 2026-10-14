@@ -54,11 +54,11 @@ public:
     
     bool hit(const Ray& ray, Interval ray_dt) const {
         const Vec3& ro = ray.origin();
-        const Vec3& rd = ray.dir();
+        const Vec3& rdi = ray.one_over_dir();
         
         for (int axis=0; axis<3; axis++) {
             const Interval& interval = axis_interval(axis);
-            const double r_axis_inv = 1.0 / rd[axis];
+            const double r_axis_inv = rdi[axis];
             
             double t0 = ( interval.min - ro[axis] ) * r_axis_inv;
             double t1 = ( interval.max - ro[axis] ) * r_axis_inv;
