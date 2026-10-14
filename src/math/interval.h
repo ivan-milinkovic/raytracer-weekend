@@ -20,11 +20,11 @@ public:
         return max - min;
     }
     
-    bool contains(double n) const {
+    inline bool contains(double n) const {
         return min <= n && n <= max;
     }
     
-    bool surrounds(double n) const {
+    inline bool surrounds(double n) const {
         return min < n && n < max;
     }
     
