@@ -12,3 +12,7 @@ Following: https://raytracing.github.io
 
 (samples_per_pixel = 70)
 
+TODO:
+Resetting the arena doesn't call destructors so they need to be either tracked in Arena or called manually. 
+Without destructors, vector instances would remain in memory - leak.
+Use arena where cleanup objects/structs don't need cleanup (desctructor call).
