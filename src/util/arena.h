@@ -14,7 +14,7 @@ public:
     ~Arena() {
         size = 0;
         current = 0;
-        delete memory;
+        delete[] memory;
         memory = nullptr;
     }
     
@@ -47,6 +47,10 @@ public:
     
     void reset() {
         current = reinterpret_cast<uintptr_t>(memory);
+    }
+    
+    std::size_t get_allocation_size() {
+        return current - reinterpret_cast<uintptr_t>(memory);
     }
     
 private:

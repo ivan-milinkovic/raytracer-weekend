@@ -7,7 +7,7 @@ std::unique_ptr<Scene> init_scene_bouncing_balls(int screen_w, int screen_h)
 {
     auto scene = std::make_unique<Scene>();
     
-    scene->arena = std::make_unique<Arena>(1024);
+    scene->arena = std::make_unique<Arena>(50*1024);
     
     // auto material_ground = make_shared<LambertianMaterial>( Vec3(0.5, 0.5, 0.5) );
     auto texture_checker = make_shared<CheckerTexture>(0.32, Vec3(0.05, 0.05, .4), Vec3(.9, .9, .9));
@@ -66,6 +66,8 @@ std::unique_ptr<Scene> init_scene_bouncing_balls(int screen_w, int screen_h)
     camera->look_from_at({ 13,2,3 }, { 0,0,0 });
     
     scene->camera = std::move(camera);
+    
+    printf("Allocation size: %zu bytes \n", scene->arena->get_allocation_size());
     
     return scene;
 }

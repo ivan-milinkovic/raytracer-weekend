@@ -11,8 +11,8 @@
 class BVH_Node: public Hittable {
 public:
     AABB bbox;
-    std::shared_ptr<Hittable> left;
-    std::shared_ptr<Hittable> right;
+    Hittable* left;
+    Hittable* right;
     Arena& arena;
     
     BVH_Node(Arena& arena) : Hittable(HittableType_BVH_Node), arena(arena) {}
@@ -41,18 +41,26 @@ public:
         
         auto subset_len = end - start;
         if (subset_len == 1) {
-            left = right = objects[start];
+            left = right = objects[start].get();
         }
         else if (subset_len == 2) {
-            left = objects[start];
-            right = objects[start + 1];
+            left = objects[start].get();
+            right = objects[start + 1].get();
         }
         else {
             std::sort(std::begin(objects) + start, std::begin(objects) + end, comparator);
             auto mid = start + subset_len/2;
-            left = std::make_shared<BVH_Node>(objects, start, mid, arena);
-            right = std::make_shared<BVH_Node>(objects, mid, end, arena);
+            left = alloc_node(objects, start, mid, arena);
+            right = alloc_node(objects, mid, end, arena);
         }
+    }
+    
+    BVH_Node* alloc_node(std::vector<std::shared_ptr<Hittable>>& objects,
+                        size_t start,
+                        size_t end,
+                        Arena& arena) {
+        auto lptr = arena.allocate<BVH_Node>();
+        return new (lptr) BVH_Node(objects, start, end, arena);
     }
     
     AABB bounding_box() const {

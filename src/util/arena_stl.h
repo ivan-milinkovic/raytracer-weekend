@@ -32,4 +32,11 @@ public:
     }
 };
 
+// Support for std::allocate_shared
+template <typename>
+friend class ArenaSTL;
+
+template <typename U>
+ArenaSTL(const ArenaSTL<U>& other) noexcept : arena(other.arena) {}
+
 #endif /* arena_stl_h */
