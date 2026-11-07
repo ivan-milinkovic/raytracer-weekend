@@ -13,7 +13,7 @@ class Scene {
     
 public:
     vector<shared_ptr<Hittable>> objects;
-    BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
+    std::unique_ptr<BVH_Node> bvh_root; // 2x speed up, compared to iterating objects array
     std::unique_ptr<Arena> arena;
     std::unique_ptr<Camera> camera;
     
@@ -30,9 +30,7 @@ public:
     }
     
     void make_bvh() {
-        // bvh_root = new BVH_Node(objects);
-        auto ptr = arena->allocate<BVH_Node>();
-        bvh_root = new (ptr) BVH_Node(objects);
+        bvh_root = std::make_unique<BVH_Node>(objects);
     }
     
 };
