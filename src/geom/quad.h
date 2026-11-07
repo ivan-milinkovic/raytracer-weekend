@@ -68,10 +68,9 @@ private:
 
 
 inline
-vector<shared_ptr<Hittable>>
-make_box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
+vector<Hittable*> make_box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat, Arena& arena)
 {
-    vector<shared_ptr<Hittable>> sides;
+    vector<Hittable*> sides;
     
     // Construct the two opposite vertices with the minimum and maximum coordinates.
     auto min = Vec3(std::fmin(a.X(),b.X()), std::fmin(a.Y(),b.Y()), std::fmin(a.Z(),b.Z()));
@@ -81,12 +80,14 @@ make_box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
     auto dy = Vec3(0, max.Y() - min.Y(), 0);
     auto dz = Vec3(0, 0, max.Z() - min.Z());
 
-    sides.push_back(make_shared<Quad>( Vec3(min.X(), min.Y(), max.Z()),  dx,  dy, mat)); // front
-    sides.push_back(make_shared<Quad>( Vec3(max.X(), min.Y(), max.Z()), -dz,  dy, mat)); // right
-    sides.push_back(make_shared<Quad>( Vec3(max.X(), min.Y(), min.Z()), -dx,  dy, mat)); // back
-    sides.push_back(make_shared<Quad>( Vec3(min.X(), min.Y(), min.Z()),  dz,  dy, mat)); // left
-    sides.push_back(make_shared<Quad>( Vec3(min.X(), max.Y(), max.Z()),  dx, -dz, mat)); // top
-    sides.push_back(make_shared<Quad>( Vec3(min.X(), min.Y(), min.Z()),  dx,  dz, mat)); // bottom
+    auto ptr = arena.allocate<Quad>(6);
+    
+    sides.push_back( new (ptr + 0) Quad( Vec3(min.X(), min.Y(), max.Z()),  dx,  dy, mat) ); // front
+    sides.push_back( new (ptr + 1) Quad( Vec3(max.X(), min.Y(), max.Z()), -dz,  dy, mat) ); // right
+    sides.push_back( new (ptr + 2) Quad( Vec3(max.X(), min.Y(), min.Z()), -dx,  dy, mat) ); // back
+    sides.push_back( new (ptr + 3) Quad( Vec3(min.X(), min.Y(), min.Z()),  dz,  dy, mat) ); // left
+    sides.push_back( new (ptr + 4) Quad( Vec3(min.X(), max.Y(), max.Z()),  dx, -dz, mat) ); // top
+    sides.push_back( new (ptr + 5) Quad( Vec3(min.X(), min.Y(), min.Z()),  dx,  dz, mat) ); // bottom
 
     return sides;
 }
@@ -94,10 +95,10 @@ make_box(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
 
 
 inline
-shared_ptr<HittableList>
-make_box_2(const Vec3& a, const Vec3& b, shared_ptr<Material> mat)
+HittableList* make_box_2(const Vec3& a, const Vec3& b, shared_ptr<Material> mat, Arena& arena)
 {
-    return make_shared<HittableList>(make_box(a, b, mat));
+    auto ptr = arena.allocate<HittableList>();
+    return new (ptr) HittableList(make_box(a, b, mat, arena));
 }
 
 

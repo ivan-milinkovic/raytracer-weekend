@@ -17,12 +17,12 @@ public:
     
     BVH_Node(Arena& arena) : Hittable(HittableType_BVH_Node), arena(arena) {}
     
-    BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects, Arena& arena)
+    BVH_Node(std::vector<Hittable*>& objects, Arena& arena)
     : BVH_Node(objects, 0, objects.size(), arena) { }
     
     BVH_Node(HittableList list, Arena& arena) : BVH_Node(list.objects, 0, list.objects.size(), arena) { }
     
-    BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects,
+    BVH_Node(std::vector<Hittable*>& objects,
              size_t start,
              size_t end,
              Arena& arena
@@ -41,26 +41,19 @@ public:
         
         auto subset_len = end - start;
         if (subset_len == 1) {
-            left = right = objects[start].get();
+            left = right = objects[start];
         }
         else if (subset_len == 2) {
-            left = objects[start].get();
-            right = objects[start + 1].get();
+            left = objects[start];
+            right = objects[start + 1];
         }
         else {
             std::sort(std::begin(objects) + start, std::begin(objects) + end, comparator);
             auto mid = start + subset_len/2;
-            left = alloc_node(objects, start, mid, arena);
-            right = alloc_node(objects, mid, end, arena);
+            
+            left = new (arena.allocate<BVH_Node>()) BVH_Node(objects, start, mid, arena);
+            right = new (arena.allocate<BVH_Node>()) BVH_Node(objects, mid, end, arena);
         }
-    }
-    
-    BVH_Node* alloc_node(std::vector<std::shared_ptr<Hittable>>& objects,
-                        size_t start,
-                        size_t end,
-                        Arena& arena) {
-        auto lptr = arena.allocate<BVH_Node>();
-        return new (lptr) BVH_Node(objects, start, end, arena);
     }
     
     AABB bounding_box() const {
@@ -75,27 +68,22 @@ public:
         return in_left || in_right;
     }
     
-    static bool box_compare(const std::shared_ptr<Hittable> a,
-                            const std::shared_ptr<Hittable> b,
-                            int axis_index )
+    static bool box_compare(Hittable* a, Hittable* b, int axis_index)
     {
         auto a_axis_interval = a->bounding_box().axis_interval(axis_index);
         auto b_axis_interval = b->bounding_box().axis_interval(axis_index);
         return a_axis_interval.min < b_axis_interval.min;
     }
     
-    static bool box_x_compare (const std::shared_ptr<Hittable> a,
-                               const std::shared_ptr<Hittable> b) {
+    static bool box_x_compare (Hittable* a, Hittable* b) {
         return box_compare(a, b, 0);
     }
     
-    static bool box_y_compare (const std::shared_ptr<Hittable> a,
-                               const std::shared_ptr<Hittable> b) {
+    static bool box_y_compare (Hittable* a, Hittable* b) {
         return box_compare(a, b, 1);
     }
     
-    static bool box_z_compare (const std::shared_ptr<Hittable> a,
-                               const std::shared_ptr<Hittable> b) {
+    static bool box_z_compare (Hittable* a, Hittable* b) {
         return box_compare(a, b, 2);
     }
 };

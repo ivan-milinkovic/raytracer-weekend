@@ -7,12 +7,12 @@
 
 class ConstantMedium : public Hittable {
   public:
-    ConstantMedium(shared_ptr<Hittable> boundary, double density, shared_ptr<Texture> tex)
+    ConstantMedium(Hittable* boundary, double density, shared_ptr<Texture> tex)
       : Hittable(HittableType_ConstantMedium), boundary(boundary), neg_inv_density(-1/density),
         phase_function(make_shared<IsotropicMaterial>(tex))
     {}
 
-    ConstantMedium(shared_ptr<Hittable> boundary, double density, const Vec3& albedo)
+    ConstantMedium(Hittable* boundary, double density, const Vec3& albedo)
       : Hittable(HittableType_ConstantMedium),
         boundary(boundary), neg_inv_density(-1/density),
         phase_function(make_shared<IsotropicMaterial>(albedo))

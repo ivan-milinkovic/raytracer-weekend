@@ -7,12 +7,12 @@ std::unique_ptr<Scene> init_scene_book_2(int screen_w, int screen_h)
 {
     auto scene = std::make_unique<Scene>();
     
-    scene->arena = std::make_unique<Arena>(100*1024);
+    scene->arena = std::make_unique<Arena>(800*1024);
     
     auto light_material = make_shared<DiffuseLightMaterial>(Vec3(7, 7, 7));
-    scene->add(make_shared<Quad>(Vec3(123,554,147), Vec3(300,0,0), Vec3(0,0,265), light_material));
+    scene->add( new (scene->arena->allocate<Quad>()) Quad(Vec3(123,554,147), Vec3(300,0,0), Vec3(0,0,265), light_material));
     
-    auto boxes1 = make_shared<HittableList>();
+    auto boxes1 = new (scene->arena->allocate<HittableList>()) HittableList();
     auto ground_material = make_shared<LambertianMaterial>(Vec3(0.48, 0.83, 0.53));
 
     int boxes_per_side = 20;
@@ -26,7 +26,7 @@ std::unique_ptr<Scene> init_scene_book_2(int screen_w, int screen_h)
             auto y1 = rw_random(1, 101);
             auto z1 = z0 + w;
             
-            boxes1->add(make_box_2(Vec3(x0,y0,z0), Vec3(x1,y1,z1), ground_material));
+            boxes1->add(make_box_2(Vec3(x0,y0,z0), Vec3(x1,y1,z1), ground_material, *(scene->arena)));
         }
     }
     scene->add(boxes1);
@@ -35,18 +35,18 @@ std::unique_ptr<Scene> init_scene_book_2(int screen_w, int screen_h)
     auto center1 = Vec3(400, 400, 200);
     auto center2 = center1 + Vec3(30,0,0);
     auto sphere_material = make_shared<LambertianMaterial>(Vec3(0.7, 0.3, 0.1));
-    scene->add(make_shared<Sphere>(center1, center2, 50, sphere_material));
+    scene->add(new (scene->arena->allocate<Sphere>()) Sphere(center1, center2, 50, sphere_material));
     
     // bottom middle sphere
-    scene->add(make_shared<Sphere>(Vec3(260, 150, 45), 50,
+    scene->add(new (scene->arena->allocate<Sphere>()) Sphere(Vec3(260, 150, 45), 50,
                                          make_shared<DielectricMaterial>(1.5)));
     
     // bottom left sphere
-    scene->add(make_shared<Sphere>(Vec3(0, 150, 145), 50,
+    scene->add(new (scene->arena->allocate<Sphere>()) Sphere(Vec3(0, 150, 145), 50,
                                          make_shared<MetalMaterial>(Vec3(0.8, 0.8, 0.9), 1.0)));
     
     // bottom right sphere
-    auto boundary = make_shared<Sphere>(Vec3(360,150,145), 70, make_shared<DielectricMaterial>(1.5));
+    auto boundary = new (scene->arena->allocate<Sphere>()) Sphere(Vec3(360,150,145), 70, make_shared<DielectricMaterial>(1.5));
     scene->add(boundary);
     
     // full scene volumetric
@@ -70,21 +70,24 @@ std::unique_ptr<Scene> init_scene_book_2(int screen_w, int screen_h)
     std::filesystem::path file_path = root_dir() / "res" / "tex.png";
 #endif
     auto texture_mat = make_shared<LambertianMaterial>(make_shared<ImageTexture>(file_path.string().c_str()));
-    scene->add(make_shared<Sphere>(Vec3(400,200,400), 100, texture_mat));
+    scene->add( new (scene->arena->allocate<Sphere>()) Sphere(Vec3(400,200,400), 100, texture_mat));
     
     // middle noise sphere
     auto perlin_texture = make_shared<PerlinTexture>(0.2);
-    scene->add(make_shared<Sphere>(Vec3(220,280,300), 80, make_shared<LambertianMaterial>(perlin_texture)));
+    scene->add(new (scene->arena->allocate<Sphere>()) Sphere(Vec3(220,280,300), 80, make_shared<LambertianMaterial>(perlin_texture)));
 
     // bubbles
     HittableList boxes2;
     auto white = make_shared<LambertianMaterial>(Vec3(.73, .73, .73));
     int ns = 1000;
     for (int j = 0; j < ns; j++) {
-        boxes2.add(make_shared<Sphere>(Vec3::random(0,165), 10, white));
+        boxes2.add(new (scene->arena->allocate<Sphere>()) Sphere(Vec3::random(0,165), 10, white));
     }
-    scene->add(make_shared<Translate>(
-        make_shared<RotateY>(make_shared<BVH_Node>(boxes2, *(scene->arena)), 15),
+    scene->add(new (scene->arena->allocate<Translate>()) Translate(
+        new (scene->arena->allocate<RotateY>()) RotateY( 
+            new (scene->arena->allocate<BVH_Node>()) BVH_Node(boxes2, *(scene->arena)), 
+            15
+        ),
         Vec3(-100,270,395)
         )
     );

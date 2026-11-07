@@ -10,11 +10,14 @@ std::unique_ptr<Scene> init_scene_perlin_spheres(int screen_w, int screen_h)
     scene->arena = std::make_unique<Arena>(1024);
     
     auto perlin_texture = make_shared<PerlinTexture>(4);
+    
+    auto ptr = scene->arena->allocate<Sphere>(2);
+    
     scene->add(
-        make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
+        new (ptr + 0) Sphere(Vec3(0,-1000,0), 1000, make_shared<LambertianMaterial>(perlin_texture))
     );
     scene->add(
-        make_shared<Sphere>(Vec3(0,2,0), 2, make_shared<LambertianMaterial>(perlin_texture))
+        new (ptr + 1) Sphere(Vec3(0,2,0), 2, make_shared<LambertianMaterial>(perlin_texture))
     );
     
     scene->make_bvh();

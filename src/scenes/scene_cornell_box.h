@@ -7,7 +7,7 @@ std::unique_ptr<Scene>  init_scene_cornell_box(int screen_w, int screen_h)
 {
     auto scene = std::make_unique<Scene>();
     
-    scene->arena = std::make_unique<Arena>(1024);
+    scene->arena = std::make_unique<Arena>(5*1024);
     
     auto red   = make_shared<LambertianMaterial>   (Vec3(.65, .05, .05));
     auto white = make_shared<LambertianMaterial>   (Vec3(.73, .73, .73));
@@ -15,34 +15,35 @@ std::unique_ptr<Scene>  init_scene_cornell_box(int screen_w, int screen_h)
     auto light = make_shared<DiffuseLightMaterial> (Vec3(15, 15, 15));
 
     scene->add(
-        make_shared<Quad>(Vec3(0,0,0), Vec3(0,555,0), Vec3(0,0,555), green)
+        new (scene->arena->allocate<Quad>()) Quad(Vec3(0,0,0), Vec3(0,555,0), Vec3(0,0,555), green)
     );
     scene->add(
-        make_shared<Quad>(Vec3(555,0,0), Vec3(0,555,0), Vec3(0,0,555), red)
+        new (scene->arena->allocate<Quad>()) Quad(Vec3(555,0,0), Vec3(0,555,0), Vec3(0,0,555), red)
     );
     scene->add(
-        make_shared<Quad>(Vec3(343, 554, 332), Vec3(-130,0,0), Vec3(0,0,-105), light)
+        new (scene->arena->allocate<Quad>()) Quad(Vec3(343, 554, 332), Vec3(-130,0,0), Vec3(0,0,-105), light)
     );
     scene->add(
-        make_shared<Quad>(Vec3(0,0,0), Vec3(555,0,0), Vec3(0,0,555), white)
+        new (scene->arena->allocate<Quad>()) Quad(Vec3(0,0,0), Vec3(555,0,0), Vec3(0,0,555), white)
     );
     scene->add(
-        make_shared<Quad>(Vec3(555,555,555), Vec3(-555,0,0), Vec3(0,0,-555), white)
+        new (scene->arena->allocate<Quad>()) Quad(Vec3(555,555,555), Vec3(-555,0,0), Vec3(0,0,-555), white)
     );
     scene->add(
-        make_shared<Quad>(Vec3(0,0,555), Vec3(555,0,0), Vec3(0,555,0), white)
+        new (scene->arena->allocate<Quad>()) Quad(Vec3(0,0,555), Vec3(555,0,0), Vec3(0,555,0), white)
     );
     
-    vector<shared_ptr<Hittable>> b1 = make_box(Vec3(0,0,0), Vec3(165,330,165), white);
-    shared_ptr<Hittable> box1 = std::make_shared<HittableList>(b1);
-    box1 = make_shared<RotateY>(box1, 15);
-    box1 = make_shared<Translate>(box1, Vec3(265,0,295));
+    vector<Hittable*> b1 = make_box(Vec3(0,0,0), Vec3(165,330,165), white, *(scene->arena));
+    Hittable* box1 = new (scene->arena->allocate<HittableList>()) HittableList(b1);
+    
+    box1 = new (scene->arena->allocate<RotateY>()) RotateY(box1, 15);
+    box1 = new (scene->arena->allocate<Translate>()) Translate(box1, Vec3(265,0,295));
     scene->add(box1);
     
-    vector<shared_ptr<Hittable>> b2 = make_box(Vec3(0,0,0), Vec3(165,165,165), white);
-    shared_ptr<Hittable> box2 = std::make_shared<HittableList>(b2);
-    box2 = make_shared<RotateY>(box2, -18);
-    box2 = make_shared<Translate>(box2, Vec3(130,0,65));
+    vector<Hittable*> b2 = make_box(Vec3(0,0,0), Vec3(165,165,165), white, *(scene->arena));
+    Hittable* box2 = new (scene->arena->allocate<RotateY>()) HittableList(b2);
+    box2 = new (scene->arena->allocate<RotateY>()) RotateY(box2, -18);
+    box2 = new (scene->arena->allocate<Translate>()) Translate(box2, Vec3(130,0,65));
     scene->add(box2);
     
     scene->make_bvh();

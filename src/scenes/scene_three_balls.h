@@ -7,7 +7,7 @@ std::unique_ptr<Scene> init_scene_3_balls(int screen_w, int screen_h)
 {
     auto scene = std::make_unique<Scene>();
     
-    scene->arena = std::make_unique<Arena>(1024);
+    scene->arena = std::make_unique<Arena>(2*1024);
     
     auto material_ground = make_shared<LambertianMaterial> ( Vec3(0.5, 0.5, 0.5) );
     
@@ -16,11 +16,12 @@ std::unique_ptr<Scene> init_scene_3_balls(int screen_w, int screen_h)
     auto material_bubble = make_shared<DielectricMaterial> ( 1.0 / 1.5 );
     auto material_right  = make_shared<MetalMaterial>      ( Vec3(0.8, 0.6, 0.2), 0.16 );
     
-    auto center = make_shared<Sphere>( Vec3( 0, 0, 3), 1, material_center);
-    auto left   = make_shared<Sphere>( Vec3(-2, 0, 3), 1, material_left);
-    auto bubble = make_shared<Sphere>( Vec3(-2, 0, 3), 0.75, material_bubble);
-    auto right  = make_shared<Sphere>( Vec3( 2, 0, 3), 1, material_right);
-    auto ground = make_shared<Sphere>( Vec3( 0, -101, 3), 100, material_ground);
+    auto ptr = scene->arena->allocate<Sphere>(5);
+    auto center = new (ptr + 0) Sphere( Vec3( 0, 0, 3), 1, material_center);
+    auto left   = new (ptr + 1) Sphere( Vec3(-2, 0, 3), 1, material_left);
+    auto bubble = new (ptr + 2) Sphere( Vec3(-2, 0, 3), 0.75, material_bubble);
+    auto right  = new (ptr + 3) Sphere( Vec3( 2, 0, 3), 1, material_right);
+    auto ground = new (ptr + 4) Sphere( Vec3( 0, -101, 3), 100, material_ground);
     
     scene->add( center );
     scene->add( left );

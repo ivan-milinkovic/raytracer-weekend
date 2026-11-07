@@ -26,8 +26,10 @@ std::unique_ptr<Scene> init_scene_texture(int screen_w, int screen_h)
 #endif
     
     auto texture = make_shared<ImageTexture>(file_path.string().c_str());
+    
+    auto ptr = scene->arena->allocate<Sphere>();
     scene->add(
-        make_shared<Sphere>(Vec3(0, 0, 0), 2, make_shared<LambertianMaterial>(texture))
+        new (ptr) Sphere(Vec3(0, 0, 0), 2, make_shared<LambertianMaterial>(texture))
     );
     
     scene->make_bvh();

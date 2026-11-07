@@ -9,13 +9,13 @@
 
 class HittableList : public Hittable {
   public:
-    std::vector<shared_ptr<Hittable>> objects;
+    std::vector<Hittable*> objects;
 
     HittableList(): Hittable(HittableType_List) {}
-    HittableList(shared_ptr<Hittable> object): Hittable(HittableType_List) {
+    HittableList(Hittable* object): Hittable(HittableType_List) {
         add(object);
     }
-    HittableList(vector<shared_ptr<Hittable>> objects): Hittable(HittableType_List), objects(objects) {
+    HittableList(vector<Hittable*> objects): Hittable(HittableType_List), objects(objects) {
         for (auto obj: objects) {
             add(obj); // add updates the bounding box
         }
@@ -23,7 +23,7 @@ class HittableList : public Hittable {
 
     void clear() { objects.clear(); }
 
-    void add(shared_ptr<Hittable> object) {
+    void add(Hittable* object) {
         objects.push_back(object);
         bbox = AABB(bbox, object->bounding_box());
     }

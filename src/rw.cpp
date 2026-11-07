@@ -64,25 +64,25 @@ void rw_init_scene(int scene_id) {
         case 3:
             state.scene = init_scene_texture(screen_w, screen_h);
             break;
-        case 4:
-            state.scene = init_scene_perlin_spheres(screen_w, screen_h);
-            break;
-        case 5:
-            state.scene = init_scene_quads(screen_w, screen_h);
-            break;
-        case 6:
-            state.scene = init_scene_light(screen_w, screen_h);
-            break;
-        case 7:
-            state.scene = init_scene_cornell_box(screen_w, screen_h);
-            break;
-        case 8:
-            state.scene = init_scene_cornell_smoke(screen_w, screen_h);
-            break;
+       case 4:
+           state.scene = init_scene_perlin_spheres(screen_w, screen_h);
+           break;
+       case 5:
+           state.scene = init_scene_quads(screen_w, screen_h);
+           break;
+       case 6:
+           state.scene = init_scene_light(screen_w, screen_h);
+           break;
+       case 7:
+           state.scene = init_scene_cornell_box(screen_w, screen_h);
+           break;
+       case 8:
+           state.scene = init_scene_cornell_smoke(screen_w, screen_h);
+           break;
         case 9:
             state.scene = init_scene_book_2(screen_w, screen_h);
             break;
-        default: printf("unknown scene id %d", scene_id); break;
+        default: printf("unknown scene id %d \n", scene_id); break;
     }
     
     auto t1 = std::chrono::high_resolution_clock::now();

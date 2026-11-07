@@ -12,16 +12,16 @@ using std::vector;
 class Scene {
     
 public:
-    vector<shared_ptr<Hittable>> objects;
+    vector<Hittable*> objects;
     BVH_Node* bvh_root; // 2x speed up, compared to iterating objects array
     std::unique_ptr<Arena> arena;
     std::unique_ptr<Camera> camera;
     
-    void add(shared_ptr<Hittable> obj) {
+    void add(Hittable* obj) {
         objects.push_back(obj);
     }
     
-    void add(vector<shared_ptr<Hittable>> objs) {
+    void add(vector<Hittable*> objs) {
         objects.insert(objects.end(), objs.begin(), objs.end());
     }
     
