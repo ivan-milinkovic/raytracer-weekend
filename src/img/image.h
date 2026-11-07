@@ -4,6 +4,8 @@
 #include "../math/vec3.h"
 #include "raw_image.h"
 #include "color.h"
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 
@@ -18,7 +20,7 @@ public:
     Image(int width, int height)
     : w(width),
       h(height),
-      output_bytes(static_cast<size_t>(width) * height * pixel_size),
+      output_bytes(static_cast<std::size_t>(width) * height * pixel_size),
       pixels(new Vec3[width * height]) {}
     
     Image(const Image&) = delete;
@@ -35,7 +37,7 @@ public:
     inline Vec3& operator[](int i) { return pixels[i]; }
     inline const uint8_t* OutputBytes() const { return output_bytes.data(); }
     inline RawImage raw_image() {
-        return {output_bytes.data(), static_cast<size_t>(w), static_cast<size_t>(h), pixel_size};
+        return {reinterpret_cast<unsigned char*>(output_bytes.data()), w, h, pixel_size};
     }
     
     void copy_for_output(double factor) {
