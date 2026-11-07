@@ -1,7 +1,7 @@
 #ifndef rw_h
 #define rw_h
 
-#include "img/image.h"
+#include "img/raw_image.h"
 
 void rw_init_scene(int scene_id);
 void rw_render();

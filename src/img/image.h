@@ -2,15 +2,10 @@
 #define Image_h
 
 #include "../math/vec3.h"
+#include "raw_image.h"
 #include "color.h"
 #include <vector>
 
-struct RawImage {
-    uint8_t* bytes;
-    size_t w;
-    size_t h;
-    size_t pixel_size;
-};
 
 class Image {
 private:
