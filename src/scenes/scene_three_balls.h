@@ -47,6 +47,8 @@ std::unique_ptr<Scene> init_scene_3_balls(int screen_w, int screen_h)
     
     scene->camera = std::move(camera);
     
+    printf("Allocation size: %zu bytes \n", scene->arena->get_allocation_size());
+    
     return scene;
 }
 

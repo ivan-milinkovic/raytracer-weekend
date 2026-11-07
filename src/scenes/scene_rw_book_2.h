@@ -7,7 +7,7 @@ std::unique_ptr<Scene> init_scene_book_2(int screen_w, int screen_h)
 {
     auto scene = std::make_unique<Scene>();
     
-    scene->arena = std::make_unique<Arena>(1024);
+    scene->arena = std::make_unique<Arena>(100*1024);
     
     auto light_material = make_shared<DiffuseLightMaterial>(Vec3(7, 7, 7));
     scene->add(make_shared<Quad>(Vec3(123,554,147), Vec3(300,0,0), Vec3(0,0,265), light_material));
@@ -102,6 +102,8 @@ std::unique_ptr<Scene> init_scene_book_2(int screen_w, int screen_h)
     camera->look_from_at({ 478, 278, -600 }, { 278, 278, 0 });
     
     scene->camera = std::move(camera);
+    
+    printf("Allocation size: %zu bytes \n", scene->arena->get_allocation_size());
     
     return scene;
 }

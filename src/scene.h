@@ -30,7 +30,6 @@ public:
     }
     
     void make_bvh() {
-        // bvh_root = new BVH_Node(objects);
         auto ptr = arena->allocate<BVH_Node>();
         bvh_root = new (ptr) BVH_Node(objects, *arena);
     }

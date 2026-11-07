@@ -38,6 +38,7 @@ public:
         
         auto new_offset = new_loc + size;
         if(new_offset >= end) {
+            printf("Arena is out of space, increase arena size");
             throw std::bad_alloc();
         }
         current = new_offset;
