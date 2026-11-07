@@ -13,16 +13,20 @@ public:
     AABB bbox;
     std::shared_ptr<Hittable> left;
     std::shared_ptr<Hittable> right;
+    Arena& arena;
     
-    BVH_Node() : Hittable(HittableType_BVH_Node) {}
+    BVH_Node(Arena& arena) : Hittable(HittableType_BVH_Node), arena(arena) {}
     
-    BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects)
-    : BVH_Node(objects, 0, objects.size()) { }
+    BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects, Arena& arena)
+    : BVH_Node(objects, 0, objects.size(), arena) { }
     
-    BVH_Node(HittableList list) : BVH_Node(list.objects, 0, list.objects.size()) { }
+    BVH_Node(HittableList list, Arena& arena) : BVH_Node(list.objects, 0, list.objects.size(), arena) { }
     
-    BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects, size_t start, size_t end)
-    : Hittable(HittableType_BVH_Node) {
+    BVH_Node(std::vector<std::shared_ptr<Hittable>>& objects,
+             size_t start,
+             size_t end,
+             Arena& arena
+    ): Hittable(HittableType_BVH_Node), arena(arena) {
         
         // Bounding box of the given subset of objects
         bbox = AABB::empty;
@@ -46,8 +50,8 @@ public:
         else {
             std::sort(std::begin(objects) + start, std::begin(objects) + end, comparator);
             auto mid = start + subset_len/2;
-            left = std::make_shared<BVH_Node>(objects, start, mid);
-            right = std::make_shared<BVH_Node>(objects, mid, end);
+            left = std::make_shared<BVH_Node>(objects, start, mid, arena);
+            right = std::make_shared<BVH_Node>(objects, mid, end, arena);
         }
     }
     

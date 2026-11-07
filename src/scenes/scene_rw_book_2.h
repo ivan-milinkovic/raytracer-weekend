@@ -84,7 +84,7 @@ std::unique_ptr<Scene> init_scene_book_2(int screen_w, int screen_h)
         boxes2.add(make_shared<Sphere>(Vec3::random(0,165), 10, white));
     }
     scene->add(make_shared<Translate>(
-        make_shared<RotateY>(make_shared<BVH_Node>(boxes2), 15),
+        make_shared<RotateY>(make_shared<BVH_Node>(boxes2, *(scene->arena)), 15),
         Vec3(-100,270,395)
         )
     );
