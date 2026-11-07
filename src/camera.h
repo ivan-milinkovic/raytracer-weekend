@@ -41,10 +41,10 @@ public:
     int screen_W;
     int screen_H;
     
-    Image* image;
+    std::unique_ptr<Image> image;
     // separate from Image, because swift calls destructors on classes
     // causing double deletes
-    RawImage raw_image;
+    RawImage raw_image {};
     
     Camera(int screen_W, int screen_H) {
         this->screen_W = screen_W;
@@ -74,16 +74,30 @@ public:
     }
     
     void init_image() {
-        image = new Image(screen_W, screen_H);
+        image = std::make_unique<Image>(screen_W, screen_H);
         
-        raw_image.bytes = (uint8_t*) malloc(image->W() * image->H() * image->pixel_size);
+        if(raw_image.bytes != nullptr) {
+            free(raw_image.bytes);
+            raw_image.bytes = nullptr;
+        }
+        
+        auto size = image->W() * image->H() * image->pixel_size;
+        if (size <= 0 ) {
+            printf("Invalid image size: %d\n", size);
+            throw std::runtime_error("Invalid image size");
+        }
+        auto bytes = (uint8_t*) malloc(size);
+        if (bytes == nullptr) {
+            printf("Failed to allocate memory for raw_image.bytes \n");
+            throw std::bad_alloc();
+        }
+        raw_image.bytes = bytes;
         raw_image.w = image->W();
         raw_image.h = image->H();
         raw_image.pixel_size = image->pixel_size;
     }
     
     ~Camera() {
-        delete image;
         free(raw_image.bytes);
     }
     
