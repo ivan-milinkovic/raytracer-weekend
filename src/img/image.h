@@ -27,7 +27,7 @@ public:
     // Image(Image& other) = delete; // prevent swift from copying it
     
     ~Image() {
-        delete pixels;
+        delete[] pixels;
     }
     
     inline int W() const { return w; }
