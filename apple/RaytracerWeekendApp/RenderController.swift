@@ -4,8 +4,8 @@ import CoreGraphics
 
 let renderController = RenderController()
 
-func callbackFromRender(imgPtr: UnsafeMutablePointer<RawImage>) {
-    renderController.handle(imgPtr: imgPtr)
+func callbackFromRender() {
+    renderController.handle(isFinal: false)
 }
 
 func renderProgressCallback(progress: Double) {
@@ -50,8 +50,8 @@ final class RenderController: ObservableObject {
         renderQueue.async {
             
             rw_render()
-            
-            self.handle(imgPtr: rw_get_raw_image(), isFinal: true)
+
+            self.handle(isFinal: true)
             
             DispatchQueue.main.async {
                 self.isRendering = false
@@ -59,12 +59,12 @@ final class RenderController: ObservableObject {
         }
     }
     
-    func handle(imgPtr: UnsafeMutablePointer<RawImage>, isFinal: Bool = false) {
-        let rawImg = rw_get_raw_image().pointee
-        let bytes = rawImg.bytes!
-        let w = Int(rawImg.w)
-        let h = Int(rawImg.h)
-        let pixelSize = Int(rawImg.pixel_size)
+    func handle(isFinal: Bool) {
+        let rawImage = rw_get_raw_image()
+        let bytes = rawImage.bytes!
+        let w = Int(rawImage.w)
+        let h = Int(rawImage.h)
+        let pixelSize = Int(rawImage.pixel_size)
         let byteCount = w * h * pixelSize
         
         // avoids copying large buffers on each update
@@ -73,7 +73,7 @@ final class RenderController: ObservableObject {
             copyPxPtr = UnsafeMutableRawPointer.allocate(byteCount: byteCount, alignment: 1)
         }
         
-        let imgBytesRawPtr = UnsafeMutableRawPointer(mutating: bytes)
+        let imgBytesRawPtr = UnsafeRawPointer(bytes)
         copyPxPtr!.copyMemory(from: imgBytesRawPtr, byteCount: byteCount)
         
         autoreleasepool {

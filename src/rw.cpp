@@ -21,7 +21,7 @@ public:
     std::unique_ptr<Scene> scene;
     int scene_id = -1;
     
-    void (*render_pass_callback)(RawImage&);
+    void (*render_pass_callback)();
     void (*render_progress_callback)(double);
 };
 
@@ -31,11 +31,11 @@ Image* rw_get_image() {
     return state.scene->camera->image.get();
 }
 
-RawImage& rw_get_raw_image() {
-    return state.scene->camera->raw_image;
+RawImage rw_get_raw_image() {
+    return state.scene->camera->image->raw_image();
 }
 
-void rw_set_render_pass_callback(void (*render_pass_callback)(RawImage&)) {
+void rw_set_render_pass_callback(void (*render_pass_callback)()) {
     state.render_pass_callback = render_pass_callback;
 }
 

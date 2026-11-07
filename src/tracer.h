@@ -18,7 +18,7 @@ public:
     // allowing for callbacks when each multisample render pass ends
     void render(const Scene& scene,
                 Camera& camera,
-                void (*render_pass_callback)(RawImage&),
+                void (*render_pass_callback)(),
                 void (*render_progress_callback)(double)
                 )
     {
@@ -88,8 +88,8 @@ public:
             
             // callback outside to notify that one pass is done
             if (render_pass_callback) {
-                camera.image->copy_for_output_with_gamma(camera.raw_image, 1.0f/((double)(k+1))); // don't divide by zero
-                render_pass_callback(camera.raw_image);
+                camera.image->copy_for_output_with_gamma(1.0f/((double)(k+1))); // don't divide by zero
+                render_pass_callback();
             }
         }
         
@@ -102,10 +102,10 @@ public:
             gamma_correct(pixel);
         }
         
-        camera.image->copy_for_output(camera.raw_image, 1.0f);
+        camera.image->copy_for_output(1.0f);
         
         if (render_pass_callback) {
-            render_pass_callback(camera.raw_image);
+            render_pass_callback();
         }
     }
     
