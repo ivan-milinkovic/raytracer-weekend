@@ -12,3 +12,7 @@ Following: https://raytracing.github.io
 
 (samples_per_pixel = 70)
 
+TODO: 
+
+LambertianMaterial probably mutates std::normal_distribution when generating during render, 
+which is a race condition when multithreading and sharing the same material instance.
