@@ -4,8 +4,6 @@
 #include "../math/vec3.h"
 #include "raw_image.h"
 #include "color.h"
-#include <cstddef>
-#include <cstdint>
 #include <vector>
 
 
@@ -44,9 +42,9 @@ public:
         int j = 0;
         for (int i = 0; i < w * h; i++) {
             Vec3 p = pixels[i];
-            output_bytes[j++] = (uint8_t) (p.X() * factor * 255);
-            output_bytes[j++] = (uint8_t) (p.Y() * factor * 255);
-            output_bytes[j++] = (uint8_t) (p.Z() * factor * 255);
+            output_bytes[j++] = output_byte(p.X() * factor, false);
+            output_bytes[j++] = output_byte(p.Y() * factor, false);
+            output_bytes[j++] = output_byte(p.Z() * factor, false);
         }
     }
     
@@ -54,9 +52,9 @@ public:
         int j = 0;
         for (int i = 0; i < w * h; i++) {
             Vec3 p = pixels[i];
-            output_bytes[j++] = (uint8_t) ( linear_to_gamma(p.X() * factor ) * 255);
-            output_bytes[j++] = (uint8_t) ( linear_to_gamma(p.Y() * factor ) * 255);
-            output_bytes[j++] = (uint8_t) ( linear_to_gamma(p.Z() * factor ) * 255);
+            output_bytes[j++] = output_byte(p.X() * factor, true);
+            output_bytes[j++] = output_byte(p.Y() * factor, true);
+            output_bytes[j++] = output_byte(p.Z() * factor, true);
         }
     }
     
@@ -65,6 +63,17 @@ public:
             pixels[i] = Vec3::zero();
         }
     }
+    
+private:
+    
+    static uint8_t output_byte(double value, bool apply_gamma) {
+        if (!std::isfinite(value))
+            return 0;
+        if (apply_gamma)
+            value = linear_to_gamma(value);
+        return static_cast<uint8_t>(std::clamp(value, 0.0, 1.0) * 255);
+    }
+    
 };
 
 
