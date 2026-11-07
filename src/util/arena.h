@@ -7,15 +7,13 @@ public:
     Arena(size_t size) {
         this->size = size;
         this->memory = new uint8_t[size];
+        std::memset(memory, 0, size);
         this->current = reinterpret_cast<uintptr_t>(memory);
         this->end = reinterpret_cast<uintptr_t>(memory + size);
     }
     
     ~Arena() {
-        size = 0;
-        current = 0;
-        delete memory;
-        memory = nullptr;
+        delete[] memory;
     }
     
     template<class T>
@@ -47,6 +45,7 @@ public:
     
     void reset() {
         current = reinterpret_cast<uintptr_t>(memory);
+        std::memset(memory, 0, size);
     }
     
 private:
