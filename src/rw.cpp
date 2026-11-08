@@ -27,6 +27,10 @@ public:
 
 State state = State();
 
+Image* rw_get_image() {
+    return state.scene->camera->image.get();
+}
+
 RawImage rw_get_raw_image() {
     return state.scene->camera->image->raw_image();
 }
